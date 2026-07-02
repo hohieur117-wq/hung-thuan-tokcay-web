@@ -1,0 +1,13 @@
+{
+  "name": "hung-thuan-tokcay",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "serve": "serve ."
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "serve": "^14.2.1"
+  }
+}
