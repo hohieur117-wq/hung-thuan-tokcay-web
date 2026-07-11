@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hùng Thuận Tokcay</title>
-    <meta name="description" content="Hùng Thuận Tokcay - Khám phá thế giới ẩm thực Hàn Quốc phong phú với các loại bánh gạo, mì cay, rong biển và vô vàn gia vị đặc trưng.">
+    <meta name="description"
+        content="Hùng Thuận Tokcay - Khám phá thế giới ẩm thực Hàn Quốc phong phú với các loại bánh gạo, mì cay, rong biển và vô vàn gia vị đặc trưng.">
     <link rel="icon" href="./media__1783017175239.png" />
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -37,32 +39,47 @@
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
+
     <!-- React Router DOM -->
     <script crossorigin src="https://unpkg.com/@remix-run/router@1.21.0/dist/router.umd.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-router@6.28.0/dist/umd/react-router.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-router-dom@6.28.0/dist/umd/react-router-dom.production.min.js"></script>
-    
+    <script crossorigin
+        src="https://unpkg.com/react-router-dom@6.28.0/dist/umd/react-router-dom.production.min.js"></script>
+
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
-        body { 
-            background-color: #f9fafb; 
+        body {
+            background-color: #f9fafb;
             overflow-x: hidden;
         }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;  
+            -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
@@ -70,16 +87,25 @@
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(2px);
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
+
         .animate-fade-in {
             animation: fadeIn 0.2s ease-out forwards;
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -133,7 +159,7 @@
                         canvas.height = cropHeight;
 
                         ctx.drawImage(img, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-                        
+
                         canvas.toBlob((blob) => {
                             if (!blob) {
                                 reject(new Error('Canvas is empty'));
@@ -156,11 +182,11 @@
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
                             <div className="flex-1 flex justify-start items-center">
-                                <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0,0); }}>
+                                <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0, 0); }}>
                                     <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
                                 </a>
                             </div>
-                            
+
                             {/* Search */}
                             <div className="flex-1 hidden md:flex justify-center items-center">
                                 <div className="relative flex shadow-inner rounded-lg overflow-hidden bg-white/10 p-1 w-full max-w-md">
@@ -175,14 +201,14 @@
                                     </button>
                                 </div>
                             </div>
-                            
+
                             {/* Navigation & Cart */}
                             <div className="flex-1 flex justify-end items-center gap-4 lg:gap-8">
                                 <nav className="hidden lg:flex items-center gap-6 text-white font-semibold text-sm">
                                     <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sản phẩm</button>
                                     <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
                                 </nav>
-                                
+
                                 <div className="flex items-center gap-2 sm:gap-4">
                                     <button onClick={() => {
                                         const el = document.getElementById('products-section');
@@ -194,12 +220,12 @@
                                         <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Sản phẩm</span>
                                         <i className="fa-solid fa-box-open text-xl md:hidden"></i>
                                     </button>
-                                    
+
                                     <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center">
                                         <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Liên hệ</span>
                                         <i className="fa-solid fa-headset text-xl md:hidden"></i>
                                     </button>
-                                    
+
                                     <button onClick={onOpenCart} className="relative p-2 text-white hover:text-yellow-300 transition-colors flex items-center justify-center">
                                         <i className="fa-solid fa-cart-shopping text-2xl"></i>
                                         {cartCount > 0 && (
@@ -211,7 +237,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Mobile Search */}
                         <div className="md:hidden pb-4">
                             <div className="relative flex rounded-md overflow-hidden">
@@ -236,15 +262,15 @@
             const finalDesktopBanner = bannerDesktopUrl || "./media__1783108509497.png";
             return (
                 <div className="w-full flex justify-center mb-8 relative group">
-                    <img 
-                        src={finalMobileBanner} 
+                    <img
+                        src={finalMobileBanner}
                         className="w-full h-auto block md:hidden"
-                        alt="Banner Mobile" 
+                        alt="Banner Mobile"
                     />
-                    <img 
-                        src={finalDesktopBanner} 
+                    <img
+                        src={finalDesktopBanner}
                         className="w-full h-auto hidden md:block"
-                        alt="Banner PC" 
+                        alt="Banner PC"
                     />
                     {isAdmin && (
                         <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
@@ -269,9 +295,9 @@
         const ZaloWidget = ({ zaloNumber }) => {
             const finalZaloNumber = zaloNumber || '0902631632';
             return (
-                <a 
-                    href={`https://zalo.me/${finalZaloNumber}`} 
-                    target="_blank" 
+                <a
+                    href={`https://zalo.me/${finalZaloNumber}`}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="fixed bottom-6 right-6 w-14 h-14 bg-[#0068FF] rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform z-50 group border-2 border-white"
                 >
@@ -282,12 +308,12 @@
 
         const ContactModal = ({ isOpen, onClose, settings }) => {
             if (!isOpen) return null;
-            
+
             // Các link mặc định theo yêu cầu
             const defaultFb = "https://www.facebook.com/share/18g7FWfpAP/";
             const defaultMaps = "https://maps.app.goo.gl/7XXZpNfJ3nQ6UUia6";
             const defaultZalo = "0902631632";
-            
+
             const fbLink = settings?.facebook_url || defaultFb;
             const mapsLink = settings?.maps_url || defaultMaps;
             const zaloLink = `https://zalo.me/${settings?.link_zalo || settings?.zalo_number || defaultZalo}`;
@@ -330,7 +356,7 @@
                     message += `${index + 1}. ${item.name} - Số lượng: ${item.qty}\n`;
                 });
                 message += `Tổng tạm tính: ${formatVND(total)}`;
-                
+
                 const encodedMessage = encodeURIComponent(message);
                 window.open(`https://zalo.me/0902631632?text=${encodedMessage}`, '_blank');
             };
@@ -340,7 +366,7 @@
                     <div className="absolute inset-0 bg-black bg-opacity-60 transition-opacity" onClick={onClose}></div>
                     <div className={`fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
                         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-primaryLight">
-                            <h2 className="text-xl font-bold text-primaryDark">Giỏ hàng ({cart.reduce((a,c)=>a+c.qty, 0)})</h2>
+                            <h2 className="text-xl font-bold text-primaryDark">Giỏ hàng ({cart.reduce((a, c) => a + c.qty, 0)})</h2>
                             <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full bg-white transition-colors">
                                 <i className="fa-solid fa-xmark text-xl"></i>
                             </button>
@@ -354,7 +380,7 @@
                             ) : (
                                 cart.map(item => (
                                     <div key={item.id} className="flex gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative pr-10">
-                                        <img src={item.image_url || FallbackImage} onError={(e) => {e.target.onerror = null; e.target.src = FallbackImage;}} alt={item.name} className="w-20 h-20 object-cover rounded-lg border border-gray-100" />
+                                        <img src={item.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={item.name} className="w-20 h-20 object-cover rounded-lg border border-gray-100" />
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug" title={item.name}>{item.name}</h4>
                                             <div className="flex justify-between items-end mt-2">
@@ -376,9 +402,9 @@
                                 <p>Tổng tiền:</p>
                                 <p className="text-primary text-xl">{formatVND(total)}</p>
                             </div>
-                            <button 
+                            <button
                                 onClick={handleCheckout}
-                                className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3.5 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md" 
+                                className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3.5 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                                 disabled={cart.length === 0}
                             >
                                 Đặt hàng
@@ -400,17 +426,17 @@
                         <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-500 hover:text-red-500 shadow-md">
                             <i className="fa-solid fa-xmark"></i>
                         </button>
-                        
+
                         {/* Image Section */}
                         <div className="w-full sm:w-1/2 bg-gray-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100">
-                            <img src={product.image_url || FallbackImage} onError={(e) => {e.target.onerror = null; e.target.src = FallbackImage;}} alt={product.name} className="w-full max-h-[40vh] sm:max-h-full object-contain mix-blend-multiply drop-shadow-md" />
+                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} className="w-full max-h-[40vh] sm:max-h-full object-contain mix-blend-multiply drop-shadow-md" />
                         </div>
-                        
+
                         {/* Content Section */}
                         <div className="w-full sm:w-1/2 p-6 sm:p-8 flex flex-col overflow-y-auto hide-scroll">
                             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h2>
                             <p className="text-3xl font-black text-primary mb-6">{formatVND(product.price)}</p>
-                            
+
                             <div className="prose prose-sm text-gray-600 mb-8 flex-1">
                                 <h4 className="font-semibold text-gray-900 mb-2 text-base">Thông tin chi tiết</h4>
                                 {product.description ? (
@@ -419,7 +445,7 @@
                                     <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                                 )}
                             </div>
-                            
+
                             <div className="mt-auto pt-4 border-t border-gray-100">
                                 <div className="flex items-center gap-4 mb-4">
                                     <span className="text-sm text-gray-600 font-medium">Tình trạng:</span>
@@ -427,7 +453,7 @@
                                         {product.stock_status || 'Hàng sẵn tại kho'}
                                     </span>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => { onAddToCart(product); onClose(); }}
                                     disabled={isOutOfStock}
                                     className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
@@ -478,18 +504,18 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 setUploading(true);
-                
+
                 try {
                     // Cắt ảnh tỉ lệ 1:1 cho sản phẩm
                     const croppedBlob = await cropImage(file, 1);
-                    
+
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
                     const filePath = `products/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage.from('images').upload(filePath, croppedBlob, {
                         contentType: 'image/jpeg'
                     });
-                    
+
                     if (uploadError) throw uploadError;
 
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
@@ -530,7 +556,7 @@
                     // Khởi tạo model từ esm.sh do chạy trực tiếp trên trình duyệt bằng Babel
                     // Hoặc lấy từ file config nếu có dùng Vite (bundle)
                     const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
-                    
+
                     // Thử lấy key từ import.meta.env (nếu dùng Vite) hoặc yêu cầu nhập tạm nếu chạy thuần
                     let apiKey = '';
                     try {
@@ -596,21 +622,21 @@ QUY TẮC:
                         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
-                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1">Giá (VNĐ) *</label>
-                                    <input required type="number" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                                    <input required type="number" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1">Tình trạng *</label>
                                     <div className="flex gap-2">
-                                        <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.stock_status} onChange={e => setFormData({...formData, stock_status: e.target.value})} placeholder="VD: Hàng sẵn kho, Hết hàng..." />
-                                        <select 
+                                        <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.stock_status} onChange={e => setFormData({ ...formData, stock_status: e.target.value })} placeholder="VD: Hàng sẵn kho, Hết hàng..." />
+                                        <select
                                             className="w-1/3 border border-gray-300 rounded-lg px-2 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all cursor-pointer"
                                             value={formData.statusColor}
-                                            onChange={e => setFormData({...formData, statusColor: e.target.value})}
+                                            onChange={e => setFormData({ ...formData, statusColor: e.target.value })}
                                         >
                                             <option value="green">Màu Xanh</option>
                                             <option value="red">Màu Đỏ</option>
@@ -624,8 +650,8 @@ QUY TẮC:
                                 {uniqueTags && uniqueTags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                         {uniqueTags.map(tag => (
-                                            <span 
-                                                key={tag} 
+                                            <span
+                                                key={tag}
                                                 onClick={() => setTagsInput(tag)}
                                                 className="inline-flex items-center w-max whitespace-nowrap bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full px-1.5 py-0.5 text-[11px] md:text-xs md:px-2 md:py-1 cursor-pointer transition-colors border border-gray-200"
                                             >
@@ -638,7 +664,7 @@ QUY TẮC:
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự động cắt Vuông 1:1)</label>
                                 <div className="flex gap-2">
-                                    <input required type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} placeholder="https://..." />
+                                    <input required type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
                                         {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh'}
                                         <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
@@ -649,20 +675,20 @@ QUY TẮC:
                             <div>
                                 <div className="flex justify-between items-center mb-1">
                                     <label className="block text-sm font-semibold text-gray-700">Mô tả chi tiết</label>
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={generateDescriptionFromImage}
                                         disabled={isGenerating || uploading}
                                         className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-1 px-3 rounded shadow-sm flex items-center transition-all disabled:opacity-50"
                                     >
                                         {isGenerating ? (
-                                            <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang phân tích ảnh...</>
+                                            <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang quét ảnh...</>
                                         ) : (
                                             <>✨ AI Tự Động Viết Mô Tả</>
                                         )}
                                     </button>
                                 </div>
-                                <textarea rows="6" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Nhập mô tả sản phẩm hoặc dùng AI..."></textarea>
+                                <textarea rows="6" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Nhập mô tả sản phẩm hoặc dùng AI..."></textarea>
                             </div>
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
@@ -678,17 +704,17 @@ QUY TẮC:
             const [formData, setFormData] = useState({});
             const [uploading, setUploading] = useState(false);
 
-            useEffect(() => { 
-                if(settings) setFormData(settings); 
+            useEffect(() => {
+                if (settings) setFormData(settings);
             }, [settings, isOpen]);
-            
+
             if (!isOpen) return null;
 
             const handleBannerUpload = async (e, type) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 setUploading(true);
-                
+
                 try {
                     const fileName = `${Date.now()}_banner_${type}.jpg`;
                     const filePath = `banners/${fileName}`;
@@ -696,7 +722,7 @@ QUY TẮC:
                     const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file, {
                         contentType: file.type || 'image/jpeg'
                     });
-                    
+
                     if (uploadError) throw uploadError;
 
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
@@ -705,7 +731,7 @@ QUY TẮC:
                     } else {
                         setFormData({ ...formData, banner_desktop_url: data.publicUrl });
                     }
-                } catch(error) {
+                } catch (error) {
                     alert('Lỗi xử lý ảnh: ' + error.message);
                 } finally {
                     setUploading(false);
@@ -722,20 +748,20 @@ QUY TẮC:
                         <form onSubmit={e => { e.preventDefault(); onSave(formData); }} className="p-6 overflow-y-auto hide-scroll flex-1 space-y-5">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Link Zalo</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.link_zalo || ''} onChange={e => setFormData({...formData, link_zalo: e.target.value})} placeholder="VD: 0902631632 hoặc link zalo.me" />
+                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.link_zalo || ''} onChange={e => setFormData({ ...formData, link_zalo: e.target.value })} placeholder="VD: 0902631632 hoặc link zalo.me" />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Link Facebook</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.facebook_url || ''} onChange={e => setFormData({...formData, facebook_url: e.target.value})} placeholder="https://facebook.com/..." />
+                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.facebook_url || ''} onChange={e => setFormData({ ...formData, facebook_url: e.target.value })} placeholder="https://facebook.com/..." />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Link Google Maps</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.maps_url || ''} onChange={e => setFormData({...formData, maps_url: e.target.value})} placeholder="https://maps.app.goo.gl/..." />
+                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.maps_url || ''} onChange={e => setFormData({ ...formData, maps_url: e.target.value })} placeholder="https://maps.app.goo.gl/..." />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Điện Thoại (Không cắt xén)</label>
                                 <div className="flex gap-2">
-                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_mobile_url || ''} onChange={e => setFormData({...formData, banner_mobile_url: e.target.value})} placeholder="https://..." />
+                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_mobile_url || ''} onChange={e => setFormData({ ...formData, banner_mobile_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2 rounded-lg font-semibold text-gray-700 whitespace-nowrap min-w-[140px] flex items-center justify-center">
                                         {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh Mobile'}
                                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleBannerUpload(e, 'mobile')} disabled={uploading} />
@@ -746,7 +772,7 @@ QUY TẮC:
                             <div className="mt-4">
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Máy Tính (Không cắt xén)</label>
                                 <div className="flex gap-2">
-                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_desktop_url || ''} onChange={e => setFormData({...formData, banner_desktop_url: e.target.value})} placeholder="https://..." />
+                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_desktop_url || ''} onChange={e => setFormData({ ...formData, banner_desktop_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2 rounded-lg font-semibold text-gray-700 whitespace-nowrap min-w-[140px] flex items-center justify-center">
                                         {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh PC'}
                                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleBannerUpload(e, 'desktop')} disabled={uploading} />
@@ -767,10 +793,10 @@ QUY TẮC:
         const TagsSlider = ({ uniqueTags, selectedTag, onTagToggle, isAdmin, onManageTags }) => {
             const sliderRef = useRef(null);
             const scrollLeft = () => {
-                if(sliderRef.current) sliderRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: -200, behavior: 'smooth' });
             };
             const scrollRight = () => {
-                if(sliderRef.current) sliderRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: 200, behavior: 'smooth' });
             };
 
             return (
@@ -785,28 +811,28 @@ QUY TẮC:
                         <div className="w-full bg-white border border-gray-100 rounded-xl shadow-sm p-4 md:py-2 md:px-0 relative overflow-hidden">
                             <div className="relative w-full max-w-4xl mx-auto flex items-center">
                                 <button onClick={scrollLeft} className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 items-center justify-center bg-white border border-gray-200 shadow-md rounded-full hover:bg-gray-50 text-gray-600 cursor-pointer">&lt;</button>
-                                
-                                <div 
-                                    ref={sliderRef} 
+
+                                <div
+                                    ref={sliderRef}
                                     className="grid grid-cols-2 gap-3 md:flex md:flex-row md:flex-nowrap md:overflow-x-auto md:scroll-smooth md:gap-4 md:px-12 w-full items-center hide-scrollbar"
                                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                 >
                                     {isAdmin && (
-                                        <button 
+                                        <button
                                             onClick={onManageTags}
                                             className="flex items-center justify-center text-center font-medium border rounded-full transition-colors w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
                                         >
                                             <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                         </button>
                                     )}
-                                    <button 
+                                    <button
                                         onClick={() => onTagToggle('')}
                                         className={`flex items-center justify-center text-center font-medium border rounded-full transition-colors w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 ${selectedTag === '' ? 'bg-[#b91c1c] text-white border-[#b91c1c]' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                                     >
                                         Tất cả sản phẩm
                                     </button>
                                     {uniqueTags.map(tag => (
-                                        <button 
+                                        <button
                                             key={tag}
                                             onClick={() => onTagToggle(tag)}
                                             className={`flex items-center justify-center text-center font-medium border rounded-full transition-colors w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 ${selectedTag === tag ? 'bg-[#b91c1c] text-white border-[#b91c1c]' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
@@ -827,7 +853,7 @@ QUY TẮC:
         const AdminTagsModal = ({ isOpen, onClose, categories, fetchData }) => {
             const [newTag, setNewTag] = useState('');
             const [isLoading, setIsLoading] = useState(false);
-            
+
             if (!isOpen) return null;
 
             const handleAdd = async () => {
@@ -839,7 +865,7 @@ QUY TẮC:
                     setIsLoading(false);
                 }
             };
-            
+
             const handleEdit = async (index) => {
                 const oldName = categories[index];
                 const updated = prompt('Nhập tên danh mục mới:', oldName);
@@ -941,11 +967,11 @@ QUY TẮC:
             return (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row p-6 md:p-10 mb-8 animate-fade-in">
                     <div className="w-full md:w-1/2 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50 rounded-xl">
-                        <img 
-                            src={product.image_url || FallbackImage} 
-                            onError={(e) => {e.target.onerror = null; e.target.src = FallbackImage;}} 
-                            alt={product.name} 
-                            className="w-full max-h-[500px] object-contain mix-blend-multiply drop-shadow-md" 
+                        <img
+                            src={product.image_url || FallbackImage}
+                            onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
+                            alt={product.name}
+                            className="w-full max-h-[500px] object-contain mix-blend-multiply drop-shadow-md"
                         />
                     </div>
                     <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
@@ -954,7 +980,7 @@ QUY TẮC:
                         </button>
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
                         <p className="text-4xl font-black text-primary mb-6">{formatVND(product.price)}</p>
-                        
+
                         <div className="prose prose-sm text-gray-600 mb-8 flex-1">
                             <h4 className="font-semibold text-gray-900 mb-2 text-lg">Thông tin chi tiết</h4>
                             {product.description ? (
@@ -963,7 +989,7 @@ QUY TẮC:
                                 <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                             )}
                         </div>
-                        
+
                         <div className="mt-auto pt-6 border-t border-gray-100">
                             <div className="flex items-center gap-4 mb-6">
                                 <span className="text-base text-gray-600 font-medium">Tình trạng:</span>
@@ -971,7 +997,7 @@ QUY TẮC:
                                     {product.stock_status || 'Hàng sẵn tại kho'}
                                 </span>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => onAddToCart(product)}
                                 disabled={isOutOfStock}
                                 className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
@@ -1009,14 +1035,14 @@ QUY TẮC:
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
-            
+
             // UI State
             const [cart, setCart] = useState([]);
             const [isCartOpen, setIsCartOpen] = useState(false);
             const [searchQuery, setSearchQuery] = useState('');
             const [currentPage, setCurrentPage] = useState(1);
-            const ITEMS_PER_PAGE = 15; 
-            
+            const ITEMS_PER_PAGE = 15;
+
             // Filter States
             const [showFilters, setShowFilters] = useState(false);
             const [selectedTag, setSelectedTag] = useState('');
@@ -1028,7 +1054,7 @@ QUY TẮC:
             const [selectedProduct, setSelectedProduct] = useState(null);
             const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
             const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-            
+
             // Admin State
             const [isAdmin, setIsAdmin] = useState(false);
             const [editingProduct, setEditingProduct] = useState(null);
@@ -1046,7 +1072,7 @@ QUY TẮC:
                 try {
                     const { data: pData } = await supabase.from('products').select('*').order('id', { ascending: false });
                     if (pData) setProducts(pData);
-                    
+
                     const { data: sData } = await supabase.from('settings').select('*');
                     if (sData) {
                         const settingsObj = {};
@@ -1080,7 +1106,7 @@ QUY TẮC:
                 const file = e.target.files[0];
                 if (!file) return;
                 setLoading(true);
-                
+
                 try {
                     const fileName = `${Date.now()}_banner_${type}.jpg`;
                     const filePath = `banners/${fileName}`;
@@ -1091,7 +1117,7 @@ QUY TẮC:
                     if (uploadError) throw uploadError;
 
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-                    
+
                     const dbKey = type === 'mobile' ? 'banner_mobile_url' : 'banner_desktop_url';
                     await supabase.from('settings').upsert({ key: dbKey, value: data.publicUrl }, { onConflict: 'key' });
                     await fetchData();
@@ -1109,10 +1135,10 @@ QUY TẮC:
                         const isOutOfStock = p.stock_status && p.stock_status.toLowerCase() === 'hết hàng';
                         if (p.is_hidden || isOutOfStock) return false;
                     }
-                    
+
                     // Search
                     if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-                    
+
                     // Single-tag filter
                     if (selectedTag !== '') {
                         if (!p.tags) return false;
@@ -1123,16 +1149,16 @@ QUY TẮC:
                     const price = p.price || 0;
                     if (priceMin && price < Number(priceMin)) return false;
                     if (priceMax && price > Number(priceMax)) return false;
-                    
+
                     return true;
                 });
-                
+
                 if (sortOrder === 'asc') {
                     result.sort((a, b) => (a.price || 0) - (b.price || 0));
                 } else if (sortOrder === 'desc') {
                     result.sort((a, b) => (b.price || 0) - (a.price || 0));
                 }
-                
+
                 return result;
             }, [products, isAdmin, searchQuery, selectedTag, priceMin, priceMax, sortOrder]);
 
@@ -1175,19 +1201,19 @@ QUY TẮC:
                         alert("Sai mật khẩu!");
                     }
                 } else {
-                    setIsAdmin(false); 
+                    setIsAdmin(false);
                 }
             };
 
             const handleToggleVisibility = async (e, product) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 const { error } = await supabase.from('products').update({ is_hidden: !product.is_hidden }).eq('id', product.id);
                 if (!error) fetchData();
             };
 
             const handleEditClick = (e, product) => {
                 e.stopPropagation();
-                setEditingProduct(product); 
+                setEditingProduct(product);
                 setIsProductModalOpen(true);
             };
 
@@ -1197,7 +1223,7 @@ QUY TẮC:
                     try {
                         const { error } = await supabase.from('products').delete().eq('id', product.id);
                         if (error) throw error;
-                        
+
                         setProducts(prev => prev.filter(p => p.id !== product.id));
 
                         if (product.image_url && product.image_url.includes('supabase.co')) {
@@ -1216,15 +1242,15 @@ QUY TẮC:
                 const { id, name, price, stock_status, statusColor, image_url, description, tags } = productData;
                 let err;
                 if (id) {
-                    const {error} = await supabase.from('products').update({ name, price, stock_status, statusColor, image_url, description, tags }).eq('id', id);
+                    const { error } = await supabase.from('products').update({ name, price, stock_status, statusColor, image_url, description, tags }).eq('id', id);
                     err = error;
                 } else {
-                    const {error} = await supabase.from('products').insert([{ 
+                    const { error } = await supabase.from('products').insert([{
                         name, price, stock_status, statusColor, image_url, description, tags, sku: 'PVN' + Math.floor(Math.random() * 1000), is_hidden: false
                     }]);
                     err = error;
                 }
-                
+
                 if (err) {
                     alert('Lỗi lưu sản phẩm: ' + err.message);
                 } else {
@@ -1262,239 +1288,239 @@ QUY TẮC:
 
             return (
                 <div className="min-h-screen flex flex-col font-sans">
-                    <Header 
-                        cartCount={cart.reduce((a,c)=>a+c.qty, 0)} 
-                        onOpenCart={() => setIsCartOpen(true)} 
-                        onSearch={setSearchQuery} 
+                    <Header
+                        cartCount={cart.reduce((a, c) => a + c.qty, 0)}
+                        onOpenCart={() => setIsCartOpen(true)}
+                        onSearch={setSearchQuery}
                         onContactClick={() => setIsContactModalOpen(true)}
                         onProductsClick={() => setShowFilters(!showFilters)}
                     />
-                    
+
                     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                         <Routes>
                             <Route path="/" element={
                                 <>
                                     <HomeScrollRestoration />
-                                    <HeroBanner 
-                                        bannerMobileUrl={settings?.banner_mobile_url} 
-                                        bannerDesktopUrl={settings?.banner_desktop_url} 
-                                        isAdmin={isAdmin} 
-                                        onBannerMobileUpload={(e) => handleAppBannerUpload(e, 'mobile')} 
-                                        onBannerDesktopUpload={(e) => handleAppBannerUpload(e, 'desktop')} 
+                                    <HeroBanner
+                                        bannerMobileUrl={settings?.banner_mobile_url}
+                                        bannerDesktopUrl={settings?.banner_desktop_url}
+                                        isAdmin={isAdmin}
+                                        onBannerMobileUpload={(e) => handleAppBannerUpload(e, 'mobile')}
+                                        onBannerDesktopUpload={(e) => handleAppBannerUpload(e, 'desktop')}
                                     />
-                                    
+
                                     <main id="products-section" className="flex-1 py-6 w-full" ref={productsSectionRef}>
-                            
-                            {isAdmin && (
-                                <div className="mb-8 p-5 bg-primaryLight border border-red-200 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
-                                    <div className="flex items-center gap-3 text-primaryDark font-bold text-lg">
-                                        <span className="relative flex h-4 w-4">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
-                                        </span>
-                                        Chế độ Quản Trị (Admin)
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
-                                            <i className="fa-solid fa-plus"></i> Thêm sản phẩm
-                                        </button>
-                                        <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-900 shadow-sm transition-colors">
-                                            <i className="fa-solid fa-gear"></i> Cài đặt chung
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
 
-                            <div className="flex flex-col md:flex-row gap-6">
-                                
-                                {/* BỘ LỌC */}
-                                {showFilters && (
-                                    <aside className="hidden md:block w-full md:w-64 flex-shrink-0 animate-fade-in">
-                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
-                                            <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                                                <h3 className="text-xl font-black text-gray-800">Bộ Lọc</h3>
-                                                <button onClick={() => setShowFilters(false)} className="md:hidden text-gray-400 hover:text-red-500 bg-gray-100 w-8 h-8 rounded-full"><i className="fa-solid fa-xmark"></i></button>
-                                            </div>
-                                            
-                                            {/* Tag Filter */}
-                                            <div className="mb-6 border-b border-gray-100 pb-5">
-                                                <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Dòng Sản Phẩm <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
-                                                <div className="space-y-3 max-h-60 overflow-y-auto hide-scroll">
-                                                    {categories.map(tag => (
-                                                        <label key={tag} className="flex items-center gap-3 cursor-pointer group">
-                                                            <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer" 
-                                                                checked={selectedTag === tag}
-                                                                onChange={(e) => {
-                                                                    if (selectedTag === tag) setSelectedTag('');
-                                                                    else setSelectedTag(tag);
-                                                                }}
-                                                            />
-                                                            <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">{tag}</span>
-                                                        </label>
-                                                    ))}
+                                        {isAdmin && (
+                                            <div className="mb-8 p-5 bg-primaryLight border border-red-200 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
+                                                <div className="flex items-center gap-3 text-primaryDark font-bold text-lg">
+                                                    <span className="relative flex h-4 w-4">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
+                                                    </span>
+                                                    Chế độ Quản Trị (Admin)
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+                                                        <i className="fa-solid fa-plus"></i> Thêm sản phẩm
+                                                    </button>
+                                                    <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-900 shadow-sm transition-colors">
+                                                        <i className="fa-solid fa-gear"></i> Cài đặt chung
+                                                    </button>
                                                 </div>
                                             </div>
+                                        )}
 
-                                            {/* Price Filter */}
-                                            <div>
-                                                <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Khoảng Giá <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
-                                                <div className="flex items-center gap-2 mb-5">
-                                                    <input type="number" placeholder="Từ" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
-                                                    <span className="text-gray-400">-</span>
-                                                    <input type="number" placeholder="Đến" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
-                                                </div>
-                                                <div className="space-y-3">
-                                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                                        <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', 50000)} />
-                                                        <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Dưới 50.000đ</span>
-                                                    </label>
-                                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                                        <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(50000, 150000)} />
-                                                        <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000đ - 150.000đ</span>
-                                                    </label>
-                                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                                        <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(150000, '')} />
-                                                        <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000đ</span>
-                                                    </label>
-                                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                                        <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', '')} />
-                                                        <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Tất cả mức giá</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </aside>
-                                )}
-                                
-                                {/* KHU VỰC SẢN PHẨM */}
-                                <div className="flex-1 w-full max-w-7xl mx-auto pb-10 mb-8">
-                                    <TagsSlider uniqueTags={categories} selectedTag={selectedTag} onTagToggle={handleTagToggle} isAdmin={isAdmin} onManageTags={() => setIsTagsModalOpen(true)} />
+                                        <div className="flex flex-col md:flex-row gap-6">
 
-                                    <div className="hidden justify-center mt-4 mb-2">
-                                        <select 
-                                            className="w-[90%] md:w-48 p-2 border border-red-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-                                            onChange={(e) => {
-                                                const val = e.target.value;
-                                                if (val === 'all') {
-                                                    setPriceMin(''); setPriceMax(''); setSortOrder('');
-                                                } else if (val === 'under-50') {
-                                                    setPriceMin(''); setPriceMax(50000); setSortOrder('');
-                                                } else if (val === '50-100') {
-                                                    setPriceMin(50000); setPriceMax(100000); setSortOrder('');
-                                                } else if (val === 'over-100') {
-                                                    setPriceMin(100000); setPriceMax(''); setSortOrder('');
-                                                } else if (val === 'asc') {
-                                                    setPriceMin(''); setPriceMax(''); setSortOrder('asc');
-                                                } else if (val === 'desc') {
-                                                    setPriceMin(''); setPriceMax(''); setSortOrder('desc');
-                                                }
-                                            }}
-                                        >
-                                            <option value="all">Lọc theo giá (Tất cả)</option>
-                                            <option value="under-50">Dưới 50.000 đ</option>
-                                            <option value="50-100">50.000 đ - 100.000 đ</option>
-                                            <option value="over-100">Trên 100.000 đ</option>
-                                            <option value="asc">Giá: Thấp đến Cao</option>
-                                            <option value="desc">Giá: Cao đến Thấp</option>
-                                        </select>
-                                    </div>
+                                            {/* BỘ LỌC */}
+                                            {showFilters && (
+                                                <aside className="hidden md:block w-full md:w-64 flex-shrink-0 animate-fade-in">
+                                                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
+                                                        <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
+                                                            <h3 className="text-xl font-black text-gray-800">Bộ Lọc</h3>
+                                                            <button onClick={() => setShowFilters(false)} className="md:hidden text-gray-400 hover:text-red-500 bg-gray-100 w-8 h-8 rounded-full"><i className="fa-solid fa-xmark"></i></button>
+                                                        </div>
 
-                                    {loading ? (
-                                        <div className="flex justify-center py-32">
-                                            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
-                                        </div>
-                                    ) : filteredProducts.length === 0 ? (
-                                        <div className="text-center py-32 text-gray-500 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
-                                            <i className="fa-solid fa-box-open text-6xl text-gray-200 mb-4"></i>
-                                            <p className="text-lg">Không tìm thấy sản phẩm nào phù hợp.</p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full justify-center">
-                                                {currentProducts.map(product => {
-                                                    const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
-                                                    const CardLink = isAdmin ? 'div' : Link;
-                                                    const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.id}` };
-                                                    return (
-                                                    <div 
-                                                        key={product.id} 
-                                                        className={`group bg-white rounded-2xl shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 border border-gray-100 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
-                                                    >
-                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white p-4 flex items-center justify-center border-b border-gray-50 block cursor-pointer">
-                                                            <img 
-                                                                src={product.image_url || FallbackImage} 
-                                                                onError={(e) => {e.target.onerror = null; e.target.src = FallbackImage;}}
-                                                                alt={product.name} 
-                                                                className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
-                                                            />
-                                                            {isAdmin && (
-                                                                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Chỉnh sửa">
-                                                                        <i className="fa-solid fa-pen text-sm"></i>
-                                                                    </button>
-                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
-                                                                        <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
-                                                                    </button>
-                                                                    <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="Xóa sản phẩm">
-                                                                        <i className="fa-solid fa-trash-can text-sm"></i>
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                            {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
-                                                        </CardLink>
-                                                        
-                                                        <div className="p-5 flex flex-col flex-1 bg-white">
-                                                            <CardLink {...cardLinkProps}>
-                                                                <h3 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={product.name}>{product.name}</h3>
-                                                            </CardLink>
-                                                            <div className="mb-2">
-                                                                <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
-                                                                    {product.stock_status || 'Hàng sẵn tại kho'}
-                                                                </span>
+                                                        {/* Tag Filter */}
+                                                        <div className="mb-6 border-b border-gray-100 pb-5">
+                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Dòng Sản Phẩm <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
+                                                            <div className="space-y-3 max-h-60 overflow-y-auto hide-scroll">
+                                                                {categories.map(tag => (
+                                                                    <label key={tag} className="flex items-center gap-3 cursor-pointer group">
+                                                                        <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                                                                            checked={selectedTag === tag}
+                                                                            onChange={(e) => {
+                                                                                if (selectedTag === tag) setSelectedTag('');
+                                                                                else setSelectedTag(tag);
+                                                                            }}
+                                                                        />
+                                                                        <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">{tag}</span>
+                                                                    </label>
+                                                                ))}
                                                             </div>
-                                                            <div className="mt-auto pt-3">
-                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span></p>
-                                                                <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
-                                                                    disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
-                                                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-2"
-                                                                >
-                                                                    {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
-                                                                        <>Thêm vào giỏ</>
-                                                                    ) : (
-                                                                        <>Hết hàng</>
-                                                                    )}
-                                                                </button>
+                                                        </div>
+
+                                                        {/* Price Filter */}
+                                                        <div>
+                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Khoảng Giá <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
+                                                            <div className="flex items-center gap-2 mb-5">
+                                                                <input type="number" placeholder="Từ" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
+                                                                <span className="text-gray-400">-</span>
+                                                                <input type="number" placeholder="Đến" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
+                                                            </div>
+                                                            <div className="space-y-3">
+                                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                                    <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', 50000)} />
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Dưới 50.000đ</span>
+                                                                </label>
+                                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                                    <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(50000, 150000)} />
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000đ - 150.000đ</span>
+                                                                </label>
+                                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                                    <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(150000, '')} />
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000đ</span>
+                                                                </label>
+                                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                                    <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', '')} />
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Tất cả mức giá</span>
+                                                                </label>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    );
-                                                })}
-                                            </div>
+                                                </aside>
+                                            )}
 
-                                        </>
-                                    )}
-                                </div>
-                            </div>
+                                            {/* KHU VỰC SẢN PHẨM */}
+                                            <div className="flex-1 w-full max-w-7xl mx-auto pb-10 mb-8">
+                                                <TagsSlider uniqueTags={categories} selectedTag={selectedTag} onTagToggle={handleTagToggle} isAdmin={isAdmin} onManageTags={() => setIsTagsModalOpen(true)} />
+
+                                                <div className="hidden justify-center mt-4 mb-2">
+                                                    <select
+                                                        className="w-[90%] md:w-48 p-2 border border-red-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            if (val === 'all') {
+                                                                setPriceMin(''); setPriceMax(''); setSortOrder('');
+                                                            } else if (val === 'under-50') {
+                                                                setPriceMin(''); setPriceMax(50000); setSortOrder('');
+                                                            } else if (val === '50-100') {
+                                                                setPriceMin(50000); setPriceMax(100000); setSortOrder('');
+                                                            } else if (val === 'over-100') {
+                                                                setPriceMin(100000); setPriceMax(''); setSortOrder('');
+                                                            } else if (val === 'asc') {
+                                                                setPriceMin(''); setPriceMax(''); setSortOrder('asc');
+                                                            } else if (val === 'desc') {
+                                                                setPriceMin(''); setPriceMax(''); setSortOrder('desc');
+                                                            }
+                                                        }}
+                                                    >
+                                                        <option value="all">Lọc theo giá (Tất cả)</option>
+                                                        <option value="under-50">Dưới 50.000 đ</option>
+                                                        <option value="50-100">50.000 đ - 100.000 đ</option>
+                                                        <option value="over-100">Trên 100.000 đ</option>
+                                                        <option value="asc">Giá: Thấp đến Cao</option>
+                                                        <option value="desc">Giá: Cao đến Thấp</option>
+                                                    </select>
+                                                </div>
+
+                                                {loading ? (
+                                                    <div className="flex justify-center py-32">
+                                                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+                                                    </div>
+                                                ) : filteredProducts.length === 0 ? (
+                                                    <div className="text-center py-32 text-gray-500 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                                                        <i className="fa-solid fa-box-open text-6xl text-gray-200 mb-4"></i>
+                                                        <p className="text-lg">Không tìm thấy sản phẩm nào phù hợp.</p>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full justify-center">
+                                                            {currentProducts.map(product => {
+                                                                const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
+                                                                const CardLink = isAdmin ? 'div' : Link;
+                                                                const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.id}` };
+                                                                return (
+                                                                    <div
+                                                                        key={product.id}
+                                                                        className={`group bg-white rounded-2xl shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 border border-gray-100 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                    >
+                                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white p-4 flex items-center justify-center border-b border-gray-50 block cursor-pointer">
+                                                                            <img
+                                                                                src={product.image_url || FallbackImage}
+                                                                                onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
+                                                                                alt={product.name}
+                                                                                className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                                                            />
+                                                                            {isAdmin && (
+                                                                                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Chỉnh sửa">
+                                                                                        <i className="fa-solid fa-pen text-sm"></i>
+                                                                                    </button>
+                                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
+                                                                                        <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
+                                                                                    </button>
+                                                                                    <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="Xóa sản phẩm">
+                                                                                        <i className="fa-solid fa-trash-can text-sm"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                            {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
+                                                                        </CardLink>
+
+                                                                        <div className="p-5 flex flex-col flex-1 bg-white">
+                                                                            <CardLink {...cardLinkProps}>
+                                                                                <h3 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={product.name}>{product.name}</h3>
+                                                                            </CardLink>
+                                                                            <div className="mb-2">
+                                                                                <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
+                                                                                    {product.stock_status || 'Hàng sẵn tại kho'}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="mt-auto pt-3">
+                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span></p>
+                                                                                <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
+                                                                                    disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
+                                                                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-2"
+                                                                                >
+                                                                                    {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
+                                                                                        <>Thêm vào giỏ</>
+                                                                                    ) : (
+                                                                                        <>Hết hàng</>
+                                                                                    )}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
                                     </main>
-                                    
+
                                     {/* Pagination */}
                                     {totalPages > 1 && (
                                         <div className="w-full bg-white border-t border-gray-200 py-4 flex justify-center items-center gap-2">
-                                            <button 
-                                                onClick={() => handlePageChange(currentPage - 1)} 
+                                            <button
+                                                onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
                                                 className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                             >
                                                 Trang trước
                                             </button>
-                                            
+
                                             <div className="flex gap-1 hidden sm:flex">
-                                                {Array.from({length: totalPages}).map((_, idx) => {
+                                                {Array.from({ length: totalPages }).map((_, idx) => {
                                                     const page = idx + 1;
                                                     return (
-                                                        <button 
+                                                        <button
                                                             key={page}
                                                             onClick={() => handlePageChange(page)}
                                                             className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-colors shadow-sm ${currentPage === page ? 'bg-primary text-white border border-primary' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}`}
@@ -1508,8 +1534,8 @@ QUY TẮC:
                                                 {currentPage} / {totalPages}
                                             </div>
 
-                                            <button 
-                                                onClick={() => handlePageChange(currentPage + 1)} 
+                                            <button
+                                                onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages}
                                                 className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                             >
@@ -1552,11 +1578,11 @@ QUY TẮC:
                     <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} />
                     <ZaloWidget zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} settings={settings} />
-                    
-                    <ProductDetailsModal 
-                        isOpen={isDetailsModalOpen} 
-                        onClose={() => setIsDetailsModalOpen(false)} 
-                        product={selectedProduct} 
+
+                    <ProductDetailsModal
+                        isOpen={isDetailsModalOpen}
+                        onClose={() => setIsDetailsModalOpen(false)}
+                        product={selectedProduct}
                         onAddToCart={handleAddToCart}
                     />
 
@@ -1579,4 +1605,5 @@ QUY TẮC:
         );
     </script>
 </body>
+
 </html>

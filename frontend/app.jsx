@@ -292,7 +292,7 @@ QUY TẮC:
                                 className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-1 px-3 rounded shadow-sm flex items-center transition-all disabled:opacity-50"
                             >
                                 {isGenerating ? (
-                                    <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang phân tích ảnh...</>
+                                    <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang quét ảnh...</>
                                 ) : (
                                     <>✨ AI Tự Động Viết Mô Tả</>
                                 )}
