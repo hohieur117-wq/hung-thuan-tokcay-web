@@ -1,4 +1,3 @@
-import logo from './logo_new.png';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
@@ -73,7 +72,7 @@ import ReactDOM from 'react-dom/client';
                             {/* Logo */}
                             <div className="flex-1 flex justify-start items-center">
                                 <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0, 0); }}>
-                                    <img src={logo} alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
+                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
                                 </a>
                             </div>
 
@@ -349,7 +348,7 @@ import ReactDOM from 'react-dom/client';
                                     className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
                                 >
                                     <i className="fa-solid fa-cart-plus"></i>
-                                    {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ'}
+                                    {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ hàng'}
                                 </button>
                             </div>
                         </div>
@@ -893,7 +892,7 @@ QUY TẮC:
                                 className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
                             >
                                 <i className="fa-solid fa-cart-plus"></i>
-                                {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ'}
+                                {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ hàng'}
                             </button>
                         </div>
                     </div>
@@ -1369,7 +1368,7 @@ QUY TẮC:
                                                                                 </span>
                                                                             </div>
                                                                             <div className="mt-auto pt-3">
-                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá s�0/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên h�! Zalo</span></p>
+                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên h�! Zalo</span></p>
                                                                                 <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
@@ -1377,7 +1376,7 @@ QUY TẮC:
                                                                                     className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-2"
                                                                                 >
                                                                                     {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
-                                                                                        <>Thêm vào giỏ</>
+                                                                                        <>Thêm vào giỏ hàng</>
                                                                                     ) : (
                                                                                         <>Hết hàng</>
                                                                                     )}
