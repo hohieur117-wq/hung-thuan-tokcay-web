@@ -1,3 +1,4 @@
+import logo from './logo_new.png';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
@@ -72,7 +73,7 @@ import ReactDOM from 'react-dom/client';
                             {/* Logo */}
                             <div className="flex-1 flex justify-start items-center">
                                 <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0, 0); }}>
-                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
+                                    <img src={logo} alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
                                 </a>
                             </div>
 
