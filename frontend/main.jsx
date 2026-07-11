@@ -1269,7 +1269,7 @@ QUY TẮC:
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(150000, '')} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000�</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000đđ�</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', '')} />
