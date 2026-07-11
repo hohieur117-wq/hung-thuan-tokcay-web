@@ -93,9 +93,10 @@ import ReactDOM from 'react-dom/client';
 
                             {/* Navigation & Cart */}
                             <div className="flex-1 flex justify-end items-center gap-4 lg:gap-8">
-                                <nav className="hidden lg:flex items-center gap-6 text-white font-semibold text-sm">
+                                <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px'}} className="hidden lg:flex text-white font-semibold text-sm">
                                     <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sản phẩm</button>
-                                    <button onClick={() => alert('Hi�!n tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
+                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
+                                    <button onClick={onContactClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Liên hệ</button>
                                 </nav>
 
                                 <div className="flex items-center gap-2 sm:gap-4">
@@ -110,9 +111,9 @@ import ReactDOM from 'react-dom/client';
                                         <i className="fa-solid fa-box-open text-xl md:hidden"></i>
                                     </button>
 
-                                    <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center">
-                                    <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">LIÊN HỆ</span>
-                                        <i className="fa-solid fa-headset text-xl md:hidden"></i>
+                                    <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center lg:hidden">
+
+                                        <i className="fa-solid fa-headset text-xl"></i>
                                     </button>
 
                                     <button onClick={onOpenCart} className="relative p-2 text-white hover:text-yellow-300 transition-colors flex items-center justify-center">
@@ -264,7 +265,7 @@ import ReactDOM from 'react-dom/client';
                             {cart.length === 0 ? (
                                 <div className="text-center text-gray-500 mt-20 flex flex-col items-center">
                                     <i className="fa-solid fa-basket-shopping text-6xl text-gray-200 mb-4"></i>
-                                    <p>Giỏ hàng của bạn �ang tr�ng</p>
+                                    <p>Giỏ hàng của bạn đang trống</p>
                                 </div>
                             ) : (
                                 cart.map(item => (
@@ -288,7 +289,7 @@ import ReactDOM from 'react-dom/client';
                         </div>
                         <div className="border-t border-gray-100 p-5 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="flex justify-between text-lg font-bold text-gray-900 mb-5">
-                                <p>T�"ng tiền:</p>
+                                    <p>Tổng tiền:</p>
                                 <p className="text-primary text-xl">{formatVND(total)}</p>
                             </div>
                             <button
@@ -1458,7 +1459,7 @@ QUY TẮC:
                                     <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản dịch vụ</a>
                                 </div>
                                 <button onClick={handleAdminLogin} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                    {isAdmin ? 'ĐĒng xuất Admin' : 'Admin'}
+                                        {isAdmin ? 'Đăng xuất admin' : 'Admin'}
                                 </button>
                             </div>
                         </div>
