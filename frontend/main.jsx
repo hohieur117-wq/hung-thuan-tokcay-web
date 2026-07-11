@@ -758,7 +758,7 @@ QUY TẮC:
 
             const handleEdit = async (index) => {
                 const oldName = categories[index];
-                const updated = prompt('Nhập tên danh mục m�:i:', oldName);
+            const updated = prompt('Nhập tên danh mục mới:', oldName);
                 if (updated && updated.trim()) {
                     setIsLoading(true);
                     await supabase.from('tags').update({ name: updated.trim() }).eq('name', oldName);
@@ -768,7 +768,7 @@ QUY TẮC:
             };
 
             const handleDelete = async (index) => {
-                if (confirm('Bạn có chắc mu�n xóa danh mục này?')) {
+            if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này không?')) {
                     setIsLoading(true);
                     const oldName = categories[index];
                     await supabase.from('tags').delete().eq('name', oldName);
@@ -785,7 +785,7 @@ QUY TẮC:
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
                         </div>
                         <div className="p-5 flex gap-2">
-                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="Tên danh mục m�:i..." />
+                                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="Tên danh mục mới..." />
                             <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primaryDark transition-colors">Thêm</button>
                         </div>
                         <div className="p-5 overflow-y-auto space-y-3">
