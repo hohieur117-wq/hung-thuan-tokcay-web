@@ -93,7 +93,7 @@ import ReactDOM from 'react-dom/client';
 
                             {/* Navigation & Cart */}
                             <div className="flex-1 flex justify-end items-center gap-4 lg:gap-8">
-                                <nav style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px'}} className="hidden md:flex text-white font-semibold text-sm">
+                                <nav className="hidden md:flex justify-between items-center gap-5 text-white font-semibold text-sm">
                                     <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sản phẩm</button>
                                     <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
                                     <button onClick={onContactClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Liên hệ</button>
