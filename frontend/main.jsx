@@ -1,10 +1,10 @@
-﻿    <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef } = React;
-        const { BrowserRouter, Routes, Route, Link, useParams, useNavigate } = window.ReactRouterDOM;
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
+import ReactDOM from 'react-dom/client';
 
         // TÃ­ch há»£p Supabase
-        const SUPABASE_URL = 'https://ufffqeaurlulzfsmznmq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmZmZxZWF1cmx1bHpmc216bm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU5MTcsImV4cCI6MjA5ODQ5MTkxN30.Bcj8kkU7vIrxYlpb6DeouXFpZvdXxz2WaSsOnhNpvlU';
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const formatVND = (price) => {

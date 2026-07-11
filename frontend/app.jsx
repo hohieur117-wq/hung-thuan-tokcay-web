@@ -1,8 +1,8 @@
 import { Analytics } from '@vercel/analytics/react';
 const { useState, useEffect, useMemo } = React;
 
-const SUPABASE_URL = 'https://ufffqeaurlulzfsmznmq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmZmZxZWF1cmx1bHpmc216bm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU5MTcsImV4cCI6MjA5ODQ5MTkxN30.Bcj8kkU7vIrxYlpb6DeouXFpZvdXxz2WaSsOnhNpvlU';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- Icons ---
