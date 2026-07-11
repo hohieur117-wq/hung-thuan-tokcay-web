@@ -111,7 +111,7 @@ import ReactDOM from 'react-dom/client';
                                     </button>
 
                                     <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center">
-                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Liên h�!</span>
+                                    <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">LIÊN HỆ</span>
                                         <i className="fa-solid fa-headset text-xl md:hidden"></i>
                                     </button>
 
@@ -211,7 +211,7 @@ import ReactDOM from 'react-dom/client';
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-8 border border-gray-100">
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i className="fa-solid fa-xmark text-lg"></i></button>
-                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide border-b pb-4">Liên h�! v�:i chúng tôi</h3>
+                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide border-b pb-4">LIÊN HỆ VỚI CHÚNG TÔI</h3>
                         <div className="space-y-4">
                             <a href={zaloLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-white font-bold text-lg bg-[#0068FF] hover:bg-blue-700 transition-transform hover:scale-105 shadow-md">
                                 <i className="fa-solid fa-comment-dots text-2xl"></i> Chat Zalo
@@ -220,7 +220,7 @@ import ReactDOM from 'react-dom/client';
                                 <i className="fa-brands fa-facebook text-2xl"></i> Trang Facebook
                             </a>
                             <a href={mapsLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-gray-700 font-bold text-lg bg-white border border-gray-300 hover:bg-gray-50 transition-transform hover:scale-105 shadow-md">
-                                <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Bản �� Google Maps
+                                <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Bản đồ Google Maps
                             </a>
                         </div>
                     </div>
@@ -505,7 +505,7 @@ QUY TẮC:
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-                            <h3 className="text-xl font-bold text-gray-800">{product ? 'Ch�0nh sửa sản phẩm' : 'Thêm sản phẩm m�:i'}</h3>
+                            <h3 className="text-xl font-bold text-gray-800">{product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h3>
                             <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"><i className="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
@@ -551,7 +551,7 @@ QUY TẮC:
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự ��"ng cắt Vuông 1:1)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự động cắt Vuông 1:1)</label>
                                 <div className="flex gap-2">
                                     <input required type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
@@ -573,7 +573,7 @@ QUY TẮC:
                                         {isGenerating ? (
                                             <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang quét ảnh...</>
                                         ) : (
-                                            <>�S� AI Tự Đ�"ng Viết Mô Tả</>
+                                            <>✨ AI Tự Động Viết Mô Tả</>
                                         )}
                                     </button>
                                 </div>
@@ -1227,7 +1227,7 @@ QUY TẮC:
                                                 <aside className="hidden md:block w-full md:w-64 flex-shrink-0 animate-fade-in">
                                                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
                                                         <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                                                            <h3 className="text-xl font-black text-gray-800">B�" Lọc</h3>
+                                                            <h3 className="text-xl font-black text-gray-800">Bộ Lọc</h3>
                                                             <button onClick={() => setShowFilters(false)} className="md:hidden text-gray-400 hover:text-red-500 bg-gray-100 w-8 h-8 rounded-full"><i className="fa-solid fa-xmark"></i></button>
                                                         </div>
 
@@ -1261,15 +1261,15 @@ QUY TẮC:
                                                             <div className="space-y-3">
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', 50000)} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Dư�:i 50.000�</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Dưới 50.000đ</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(50000, 150000)} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000� - 150.000�</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000đ - 150.000đ</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(150000, '')} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000đđ�</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000đ</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', '')} />
@@ -1306,8 +1306,8 @@ QUY TẮC:
                                                         }}
                                                     >
                                                         <option value="all">Lọc theo giá (Tất cả)</option>
-                                                        <option value="under-50">Dư�:i 50.000 �</option>
-                                                        <option value="50-100">50.000 � - 100.000 �</option>
+                                                        <option value="under-50">Dưới 50.000đ</option>
+                                                        <option value="50-100">50.000đ - 150.000đ</option>
                                                         <option value="over-100">Trên 100.000 �</option>
                                                         <option value="asc">Giá: Thấp �ến Cao</option>
                                                         <option value="desc">Giá: Cao �ến Thấp</option>
@@ -1368,7 +1368,7 @@ QUY TẮC:
                                                                                 </span>
                                                                             </div>
                                                                             <div className="mt-auto pt-3">
-                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên h�! Zalo</span></p>
+                                                        <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span></p>
                                                                                 <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
@@ -1402,7 +1402,7 @@ QUY TẮC:
                                                 disabled={currentPage === 1}
                                                 className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                             >
-                                                Trang trư�:c
+                                                Trang trước
                                             </button>
 
                                             <div className="flex gap-1 hidden sm:flex">
@@ -1441,11 +1441,11 @@ QUY TẮC:
                     <footer className="w-full bg-white border-t border-gray-200 py-10 mt-auto">
                         <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row justify-between items-start gap-8">
                             <div className="flex flex-col space-y-2">
-                                <h4 className="text-base font-bold text-gray-800">C�NG TY TNHH H�"NG THUẬN TOKCAY KOREA FOODS</h4>
+                                <h4 className="text-base font-bold text-gray-800">CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h4>
                                 <div className="text-sm text-gray-600 space-y-1">
                                     <p>MST: 1801801902</p>
-                                    <p>Đ�9a ch�0: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành ph� Cần Thơ</p>
-                                    <p>Đi�!n thoại: 0902 631 632</p>
+                                    <p>Địa chỉ: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành phố Cần Thơ</p>
+                                    <p>Điện thoại: 0902 631 632</p>
                                     <p>Email: hungthuanfood@gmail.com</p>
                                 </div>
                                 <div className="text-gray-500 text-sm font-medium pt-4">
@@ -1455,7 +1455,7 @@ QUY TẮC:
                             <div className="flex flex-col md:items-end gap-4 text-sm">
                                 <div className="flex flex-wrap gap-6">
                                     <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Chính sách bảo mật</a>
-                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản d�9ch vụ</a>
+                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản dịch vụ</a>
                                 </div>
                                 <button onClick={handleAdminLogin} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                     {isAdmin ? 'ĐĒng xuất Admin' : 'Admin'}
