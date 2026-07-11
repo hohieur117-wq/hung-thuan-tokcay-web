@@ -2,13 +2,13 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 
-        // TÃ­ch há»£p Supabase
+        // Tích hợp Supabase
         const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
         const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const formatVND = (price) => {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace('â‚«', 'Ä‘');
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace('��', '�');
         };
 
         const FallbackImage = "/media__1783016111445.png";
@@ -34,10 +34,10 @@ import ReactDOM from 'react-dom/client';
                         let cropHeight = srcHeight;
 
                         if (srcRatio > targetRatio) {
-                            // áº¢nh gá»‘c quÃ¡ rá»™ng ngang => Cáº¯t bá»›t chiá»u ngang
+                            // Ảnh g�c quá r�"ng ngang => Cắt b�:t chiều ngang
                             cropWidth = srcHeight * targetRatio;
                         } else {
-                            // áº¢nh gá»‘c quÃ¡ cao => Cáº¯t bá»›t chiá»u cao
+                            // Ảnh g�c quá cao => Cắt b�:t chiều cao
                             cropHeight = srcWidth / targetRatio;
                         }
 
@@ -72,7 +72,7 @@ import ReactDOM from 'react-dom/client';
                             {/* Logo */}
                             <div className="flex-1 flex justify-start items-center">
                                 <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0, 0); }}>
-                                    <img src="/logo_new.png" alt="Logo HÃ¹ng Thuáº­n Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
+                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
                                 </a>
                             </div>
 
@@ -82,7 +82,7 @@ import ReactDOM from 'react-dom/client';
                                     <input
                                         type="text"
                                         className="block w-full pl-4 pr-12 py-2.5 rounded-l-md border-none leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
-                                        placeholder="TÃ¬m kiáº¿m sáº£n pháº©m..."
+                                        placeholder="Tìm kiếm sản phẩm..."
                                         onChange={(e) => onSearch(e.target.value)}
                                     />
                                     <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
@@ -94,8 +94,8 @@ import ReactDOM from 'react-dom/client';
                             {/* Navigation & Cart */}
                             <div className="flex-1 flex justify-end items-center gap-4 lg:gap-8">
                                 <nav className="hidden lg:flex items-center gap-6 text-white font-semibold text-sm">
-                                    <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sáº£n pháº©m</button>
-                                    <button onClick={() => alert('Hiá»‡n táº¡i chÆ°a cÃ³ chÆ°Æ¡ng trÃ¬nh khuyáº¿n mÃ£i nÃ o. Báº¡n vui lÃ²ng quay láº¡i sau nhÃ©!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyáº¿n mÃ£i</button>
+                                    <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sản phẩm</button>
+                                    <button onClick={() => alert('Hi�!n tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
                                 </nav>
 
                                 <div className="flex items-center gap-2 sm:gap-4">
@@ -106,12 +106,12 @@ import ReactDOM from 'react-dom/client';
                                             window.scrollTo({ top: y, behavior: 'smooth' });
                                         }
                                     }} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center lg:hidden">
-                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Sáº£n pháº©m</span>
+                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Sản phẩm</span>
                                         <i className="fa-solid fa-box-open text-xl md:hidden"></i>
                                     </button>
 
                                     <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center">
-                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">LiÃªn há»‡</span>
+                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Liên h�!</span>
                                         <i className="fa-solid fa-headset text-xl md:hidden"></i>
                                     </button>
 
@@ -133,7 +133,7 @@ import ReactDOM from 'react-dom/client';
                                 <input
                                     type="text"
                                     className="block w-full pl-4 pr-12 py-2 border-none leading-5 bg-white placeholder-gray-500 focus:outline-none sm:text-sm"
-                                    placeholder="TÃ¬m kiáº¿m sáº£n pháº©m..."
+                                    placeholder="Tìm kiếm sản phẩm..."
                                     onChange={(e) => onSearch(e.target.value)}
                                 />
                                 <button className="bg-gray-100 text-primary px-4 py-2">
@@ -166,13 +166,13 @@ import ReactDOM from 'react-dom/client';
                             <div>
                                 <input type="file" id="banner-mobile-upload" accept="image/*" className="hidden" onChange={onBannerMobileUpload} />
                                 <label htmlFor="banner-mobile-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
-                                    <i className="fa-solid fa-mobile-screen"></i> Thay Banner Äiá»‡n Thoáº¡i
+                                    <i className="fa-solid fa-mobile-screen"></i> Thay Banner Đi�!n Thoại
                                 </label>
                             </div>
                             <div>
                                 <input type="file" id="banner-desktop-upload" accept="image/*" className="hidden" onChange={onBannerDesktopUpload} />
                                 <label htmlFor="banner-desktop-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
-                                    <i className="fa-solid fa-desktop"></i> Thay Banner MÃ¡y TÃ­nh
+                                    <i className="fa-solid fa-desktop"></i> Thay Banner Máy Tính
                                 </label>
                             </div>
                         </div>
@@ -198,7 +198,7 @@ import ReactDOM from 'react-dom/client';
         const ContactModal = ({ isOpen, onClose, settings }) => {
             if (!isOpen) return null;
 
-            // CÃ¡c link máº·c Ä‘á»‹nh theo yÃªu cáº§u
+            // Các link mặc ��9nh theo yêu cầu
             const defaultFb = "https://www.facebook.com/share/18g7FWfpAP/";
             const defaultMaps = "https://maps.app.goo.gl/7XXZpNfJ3nQ6UUia6";
             const defaultZalo = "0902631632";
@@ -211,7 +211,7 @@ import ReactDOM from 'react-dom/client';
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-8 border border-gray-100">
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i className="fa-solid fa-xmark text-lg"></i></button>
-                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide border-b pb-4">LiÃªn há»‡ vá»›i chÃºng tÃ´i</h3>
+                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8 uppercase tracking-wide border-b pb-4">Liên h�! v�:i chúng tôi</h3>
                         <div className="space-y-4">
                             <a href={zaloLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-white font-bold text-lg bg-[#0068FF] hover:bg-blue-700 transition-transform hover:scale-105 shadow-md">
                                 <i className="fa-solid fa-comment-dots text-2xl"></i> Chat Zalo
@@ -220,7 +220,7 @@ import ReactDOM from 'react-dom/client';
                                 <i className="fa-brands fa-facebook text-2xl"></i> Trang Facebook
                             </a>
                             <a href={mapsLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-gray-700 font-bold text-lg bg-white border border-gray-300 hover:bg-gray-50 transition-transform hover:scale-105 shadow-md">
-                                <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Báº£n Ä‘á»“ Google Maps
+                                <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Bản �� Google Maps
                             </a>
                         </div>
                     </div>
@@ -240,11 +240,11 @@ import ReactDOM from 'react-dom/client';
 
             const handleCheckout = () => {
                 if (cart.length === 0) return;
-                let message = "Xin chÃ o shop, tÃ´i muá»‘n Ä‘áº·t hÃ ng:\n";
+                let message = "Xin chào shop, tôi mu�n �ặt hàng:\n";
                 cart.forEach((item, index) => {
-                    message += `${index + 1}. ${item.name} - Sá»‘ lÆ°á»£ng: ${item.qty}\n`;
+                    message += `${index + 1}. ${item.name} - S� lượng: ${item.qty}\n`;
                 });
-                message += `Tá»•ng táº¡m tÃ­nh: ${formatVND(total)}`;
+                message += `T�"ng tạm tính: ${formatVND(total)}`;
 
                 const encodedMessage = encodeURIComponent(message);
                 window.open(`https://zalo.me/0902631632?text=${encodedMessage}`, '_blank');
@@ -255,7 +255,7 @@ import ReactDOM from 'react-dom/client';
                     <div className="absolute inset-0 bg-black bg-opacity-60 transition-opacity" onClick={onClose}></div>
                     <div className={`fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
                         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-primaryLight">
-                            <h2 className="text-xl font-bold text-primaryDark">Giá» hÃ ng ({cart.reduce((a, c) => a + c.qty, 0)})</h2>
+                            <h2 className="text-xl font-bold text-primaryDark">Giỏ hàng ({cart.reduce((a, c) => a + c.qty, 0)})</h2>
                             <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full bg-white transition-colors">
                                 <i className="fa-solid fa-xmark text-xl"></i>
                             </button>
@@ -264,7 +264,7 @@ import ReactDOM from 'react-dom/client';
                             {cart.length === 0 ? (
                                 <div className="text-center text-gray-500 mt-20 flex flex-col items-center">
                                     <i className="fa-solid fa-basket-shopping text-6xl text-gray-200 mb-4"></i>
-                                    <p>Giá» hÃ ng cá»§a báº¡n Ä‘ang trá»‘ng</p>
+                                    <p>Giỏ hàng của bạn �ang tr�ng</p>
                                 </div>
                             ) : (
                                 cart.map(item => (
@@ -288,7 +288,7 @@ import ReactDOM from 'react-dom/client';
                         </div>
                         <div className="border-t border-gray-100 p-5 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="flex justify-between text-lg font-bold text-gray-900 mb-5">
-                                <p>Tá»•ng tiá»n:</p>
+                                <p>T�"ng tiền:</p>
                                 <p className="text-primary text-xl">{formatVND(total)}</p>
                             </div>
                             <button
@@ -296,7 +296,7 @@ import ReactDOM from 'react-dom/client';
                                 className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3.5 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                                 disabled={cart.length === 0}
                             >
-                                Äáº·t hÃ ng
+                                Đặt hàng
                             </button>
                         </div>
                     </div>
@@ -306,7 +306,7 @@ import ReactDOM from 'react-dom/client';
 
         const ProductDetailsModal = ({ isOpen, onClose, product, onAddToCart }) => {
             if (!isOpen || !product) return null;
-            const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'háº¿t hÃ ng';
+            const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
 
             return (
@@ -327,19 +327,19 @@ import ReactDOM from 'react-dom/client';
                             <p className="text-3xl font-black text-primary mb-6">{formatVND(product.price)}</p>
 
                             <div className="prose prose-sm text-gray-600 mb-8 flex-1">
-                                <h4 className="font-semibold text-gray-900 mb-2 text-base">ThÃ´ng tin chi tiáº¿t</h4>
+                                <h4 className="font-semibold text-gray-900 mb-2 text-base">Thông tin chi tiết</h4>
                                 {product.description ? (
                                     <div dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }} />
                                 ) : (
-                                    <p className="italic text-gray-400">ChÆ°a cÃ³ mÃ´ táº£ chi tiáº¿t cho sáº£n pháº©m nÃ y.</p>
+                                    <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                                 )}
                             </div>
 
                             <div className="mt-auto pt-4 border-t border-gray-100">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <span className="text-sm text-gray-600 font-medium">TÃ¬nh tráº¡ng:</span>
+                                    <span className="text-sm text-gray-600 font-medium">Tình trạng:</span>
                                     <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
-                                        {product.stock_status || 'HÃ ng sáºµn táº¡i kho'}
+                                        {product.stock_status || 'Hàng sẵn tại kho'}
                                     </span>
                                 </div>
                                 <button
@@ -348,7 +348,7 @@ import ReactDOM from 'react-dom/client';
                                     className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
                                 >
                                     <i className="fa-solid fa-cart-plus"></i>
-                                    {isOutOfStock ? 'Sáº£n pháº©m háº¿t hÃ ng' : 'ThÃªm vÃ o giá»'}
+                                    {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ'}
                                 </button>
                             </div>
                         </div>
@@ -359,7 +359,7 @@ import ReactDOM from 'react-dom/client';
 
         const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags }) => {
             const [formData, setFormData] = useState({
-                name: '', price: '', stock_status: 'HÃ ng sáºµn kho', statusColor: 'green', image_url: '', description: '', tags: []
+                name: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
             });
             const [tagsInput, setTagsInput] = useState('');
             const [uploading, setUploading] = useState(false);
@@ -367,9 +367,9 @@ import ReactDOM from 'react-dom/client';
 
             useEffect(() => {
                 if (product) {
-                    let oldStatus = product.stock_status || 'HÃ ng sáºµn kho';
-                    if (oldStatus === 'HÃ ng sáºµn' || oldStatus === 'HÃ ng sáºµn táº¡i kho' || oldStatus === 'CÃ²n hÃ ng') {
-                        oldStatus = 'HÃ ng sáºµn kho';
+                    let oldStatus = product.stock_status || 'Hàng sẵn kho';
+                    if (oldStatus === 'Hàng sẵn' || oldStatus === 'Hàng sẵn tại kho' || oldStatus === 'Còn hàng') {
+                        oldStatus = 'Hàng sẵn kho';
                     }
                     setFormData({
                         name: product.name || '',
@@ -382,7 +382,7 @@ import ReactDOM from 'react-dom/client';
                     });
                     setTagsInput((product.tags || []).join(', '));
                 } else {
-                    setFormData({ name: '', price: '', stock_status: 'HÃ ng sáºµn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
+                    setFormData({ name: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
                     setTagsInput('');
                 }
             }, [product, isOpen]);
@@ -395,7 +395,7 @@ import ReactDOM from 'react-dom/client';
                 setUploading(true);
 
                 try {
-                    // Cáº¯t áº£nh tá»‰ lá»‡ 1:1 cho sáº£n pháº©m
+                    // Cắt ảnh t�0 l�! 1:1 cho sản phẩm
                     const croppedBlob = await cropImage(file, 1);
 
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
@@ -410,7 +410,7 @@ import ReactDOM from 'react-dom/client';
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
                     setFormData({ ...formData, image_url: data.publicUrl });
                 } catch (error) {
-                    alert('Lá»—i xá»­ lÃ½ áº£nh: ' + error.message);
+                    alert('L�i xử lý ảnh: ' + error.message);
                 } finally {
                     setUploading(false);
                 }
@@ -437,26 +437,26 @@ import ReactDOM from 'react-dom/client';
 
             const generateDescriptionFromImage = async () => {
                 if (!formData.image_url) {
-                    alert("ChÆ°a cÃ³ áº£nh! Vui lÃ²ng chá»n áº£nh trÆ°á»›c khi dÃ¹ng AI phÃ¢n tÃ­ch.");
+                    alert("Chưa có ảnh! Vui lòng chọn ảnh trư�:c khi dùng AI phân tích.");
                     return;
                 }
                 setIsGenerating(true);
                 try {
-                    // Khá»Ÿi táº¡o model tá»« esm.sh do cháº¡y trá»±c tiáº¿p trÃªn trÃ¬nh duyá»‡t báº±ng Babel
-                    // Hoáº·c láº¥y tá»« file config náº¿u cÃ³ dÃ¹ng Vite (bundle)
+                    // Kh�xi tạo model từ esm.sh do chạy trực tiếp trên trình duy�!t bằng Babel
+                    // Hoặc lấy từ file config nếu có dùng Vite (bundle)
                     const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
 
-                    // Thá»­ láº¥y key tá»« import.meta.env (náº¿u dÃ¹ng Vite) hoáº·c yÃªu cáº§u nháº­p táº¡m náº¿u cháº¡y thuáº§n
+                    // Thử lấy key từ import.meta.env (nếu dùng Vite) hoặc yêu cầu nhập tạm nếu chạy thuần
                     let apiKey = '';
                     try {
                         apiKey = import.meta.env.VITE_GEMINI_API_KEY;
                     } catch (e) {
-                        // TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ import.meta.env
-                        apiKey = prompt("MÃ´i trÆ°á»ng khÃ´ng dÃ¹ng Vite. Vui lÃ²ng nháº­p táº¡m Gemini API Key Ä‘á»ƒ dÃ¹ng thá»­ (Hoáº·c cáº¥u hÃ¬nh Vite Ä‘á»ƒ Ä‘á»c tá»« .env):");
+                        // Trình duy�!t không h� trợ import.meta.env
+                        apiKey = prompt("Môi trường không dùng Vite. Vui lòng nhập tạm Gemini API Key �Ồ dùng thử (Hoặc cấu hình Vite �Ồ �ọc từ .env):");
                     }
 
                     if (!apiKey) {
-                        alert("KhÃ´ng tÃ¬m tháº¥y API Key!");
+                        alert("Không tìm thấy API Key!");
                         setIsGenerating(false);
                         return;
                     }
@@ -465,22 +465,22 @@ import ReactDOM from 'react-dom/client';
                     const visionModel = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
                     const imagePart = await imageToBase64InlineData(formData.image_url);
-                    const promptText = `Báº¡n lÃ  má»™t chuyÃªn gia kiá»ƒm Ä‘á»‹nh nhÃ£n mÃ¡c hÃ ng hÃ³a vÃ  lÃ  copywriter cho cá»­a hÃ ng thá»±c pháº©m HÃ n Quá»‘c. Nhiá»‡m vá»¥: soi Cá»°C Ká»² CHI TIáº¾T hÃ¬nh áº£nh bao bÃ¬ sáº£n pháº©m Ä‘Æ°á»£c cung cáº¥p.
-QUY Táº®C: 
-1. TrÃ­ch xuáº¥t chÃ­nh xÃ¡c 100% thÃ´ng tin (khá»‘i lÆ°á»£ng, thÃ nh pháº§n, thÆ°Æ¡ng hiá»‡u...).
-2. Tuyá»‡t Ä‘á»‘i khÃ´ng bá»‹a Ä‘áº·t sá»‘ liá»‡u. Náº¿u áº£nh má», dÃ¹ng kiáº¿n thá»©c thá»±c táº¿ vá» máº·t hÃ ng Ä‘Ã³ Ä‘á»ƒ suy luáº­n há»£p lÃ½.
-3. KHÃ”NG chÃ o há»i, KHÃ”NG dÃ¹ng markdown code block. CHá»ˆ TRáº¢ Vá»€ káº¿t quáº£ tuÃ¢n thá»§ Ä‘Ãºng biá»ƒu máº«u sau:
+                    const promptText = `Bạn là m�"t chuyên gia kiỒm ��9nh nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Qu�c. Nhi�!m vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm �ược cung cấp.
+QUY TẮC: 
+1. Trích xuất chính xác 100% thông tin (kh�i lượng, thành phần, thương hi�!u...).
+2. Tuy�!t ��i không b�9a �ặt s� li�!u. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng �ó �Ồ suy luận hợp lý.
+3. KH�NG chào hỏi, KH�NG dùng markdown code block. CH�� TRẢ VỬ kết quả tuân thủ �úng biỒu mẫu sau:
 
-* TÃªn sáº£n pháº©m: [Äiá»n tÃªn chuáº©n]
-* ThÆ°Æ¡ng hiá»‡u: [Äiá»n tÃªn thÆ°Æ¡ng hiá»‡u]
-* Khá»‘i lÆ°á»£ng tá»‹nh: [Äiá»n khá»‘i lÆ°á»£ng/thá»ƒ tÃ­ch]
-* ThÃ nh pháº§n: [Liá»‡t kÃª thÃ nh pháº§n chÃ­nh]
-* Dáº¡ng sáº£n pháº©m: [Bá»™t má»‹n, xá»‘t Ä‘áº·c, sá»£i khÃ´...]
-* HÆ°Æ¡ng vá»‹: [MÃ´ táº£ ngáº¯n gá»n]
-* CÃ´ng dá»¥ng: [CÃ¡ch cháº¿ biáº¿n]
-* Äá»‘i tÆ°á»£ng sá»­ dá»¥ng: [Gia Ä‘Ã¬nh, nhÃ  hÃ ng...]
-* Báº£o quáº£n: [HÆ°á»›ng dáº«n báº£o quáº£n]
-* Quy cÃ¡ch Ä‘Ã³ng gÃ³i: [TÃºi zip, chai thá»§y tinh...]`;
+* Tên sản phẩm: [Điền tên chuẩn]
+* Thương hi�!u: [Điền tên thương hi�!u]
+* Kh�i lượng t�9nh: [Điền kh�i lượng/thỒ tích]
+* Thành phần: [Li�!t kê thành phần chính]
+* Dạng sản phẩm: [B�"t m�9n, x�t �ặc, sợi khô...]
+* Hương v�9: [Mô tả ngắn gọn]
+* Công dụng: [Cách chế biến]
+* Đ�i tượng sử dụng: [Gia �ình, nhà hàng...]
+* Bảo quản: [Hư�:ng dẫn bảo quản]
+* Quy cách �óng gói: [Túi zip, chai thủy tinh...]`;
 
                     const result = await visionModel.generateContent([promptText, imagePart]);
                     const response = await result.response;
@@ -489,7 +489,7 @@ QUY Táº®C:
                     setFormData(prev => ({ ...prev, description: text }));
                 } catch (error) {
                     console.error("AI Error:", error);
-                    alert("Lá»—i AI: " + error.message);
+                    alert("L�i AI: " + error.message);
                 } finally {
                     setIsGenerating(false);
                 }
@@ -505,37 +505,37 @@ QUY Táº®C:
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-                            <h3 className="text-xl font-bold text-gray-800">{product ? 'Chá»‰nh sá»­a sáº£n pháº©m' : 'ThÃªm sáº£n pháº©m má»›i'}</h3>
+                            <h3 className="text-xl font-bold text-gray-800">{product ? 'Ch�0nh sửa sản phẩm' : 'Thêm sản phẩm m�:i'}</h3>
                             <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"><i className="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">TÃªn sáº£n pháº©m *</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
                                 <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">GiÃ¡ (VNÄ) *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Giá (VNĐ) *</label>
                                     <input required type="number" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">TÃ¬nh tráº¡ng *</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Tình trạng *</label>
                                     <div className="flex gap-2">
-                                        <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.stock_status} onChange={e => setFormData({ ...formData, stock_status: e.target.value })} placeholder="VD: HÃ ng sáºµn kho, Háº¿t hÃ ng..." />
+                                        <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.stock_status} onChange={e => setFormData({ ...formData, stock_status: e.target.value })} placeholder="VD: Hàng sẵn kho, Hết hàng..." />
                                         <select
                                             className="w-1/3 border border-gray-300 rounded-lg px-2 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all cursor-pointer"
                                             value={formData.statusColor}
                                             onChange={e => setFormData({ ...formData, statusColor: e.target.value })}
                                         >
-                                            <option value="green">MÃ u Xanh</option>
-                                            <option value="red">MÃ u Äá»</option>
+                                            <option value="green">Màu Xanh</option>
+                                            <option value="red">Màu Đỏ</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Tags (PhÃ¢n cÃ¡ch báº±ng dáº¥u pháº©y)</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="VD: BÃ¡nh gáº¡o/Tokbokki, Gia vá»‹ & Xá»‘t" />
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Tags (Phân cách bằng dấu phẩy)</label>
+                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="VD: Bánh gạo/Tokbokki, Gia v�9 & X�t" />
                                 {uniqueTags && uniqueTags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                         {uniqueTags.map(tag => (
@@ -551,11 +551,11 @@ QUY Táº®C:
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">HÃ¬nh áº£nh (Sáº½ tá»± Ä‘á»™ng cáº¯t VuÃ´ng 1:1)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự ��"ng cắt Vuông 1:1)</label>
                                 <div className="flex gap-2">
                                     <input required type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
-                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Äang xá»­ lÃ½...</span> : 'Chá»n áº£nh'}
+                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh'}
                                         <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
                                     </label>
                                 </div>
@@ -563,7 +563,7 @@ QUY Táº®C:
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <label className="block text-sm font-semibold text-gray-700">MÃ´ táº£ chi tiáº¿t</label>
+                                    <label className="block text-sm font-semibold text-gray-700">Mô tả chi tiết</label>
                                     <button
                                         type="button"
                                         onClick={generateDescriptionFromImage}
@@ -571,18 +571,18 @@ QUY Táº®C:
                                         className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-1 px-3 rounded shadow-sm flex items-center transition-all disabled:opacity-50"
                                     >
                                         {isGenerating ? (
-                                            <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Äang quÃ©t áº£nh...</>
+                                            <><i className="fa-solid fa-spinner fa-spin mr-1"></i> Đang quét ảnh...</>
                                         ) : (
-                                            <>âœ¨ AI Tá»± Äá»™ng Viáº¿t MÃ´ Táº£</>
+                                            <>�S� AI Tự Đ�"ng Viết Mô Tả</>
                                         )}
                                     </button>
                                 </div>
-                                <textarea rows="6" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Nháº­p mÃ´ táº£ sáº£n pháº©m hoáº·c dÃ¹ng AI..."></textarea>
+                                <textarea rows="6" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Nhập mô tả sản phẩm hoặc dùng AI..."></textarea>
                             </div>
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Há»§y</button>
-                            <button type="submit" onClick={handleSubmit} disabled={uploading} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">LÆ°u sáº£n pháº©m</button>
+                            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
+                            <button type="submit" onClick={handleSubmit} disabled={uploading} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">Lưu sản phẩm</button>
                         </div>
                     </div>
                 </div>
@@ -621,7 +621,7 @@ QUY Táº®C:
                         setFormData({ ...formData, banner_desktop_url: data.publicUrl });
                     }
                 } catch (error) {
-                    alert('Lá»—i xá»­ lÃ½ áº£nh: ' + error.message);
+                    alert('L�i xử lý ảnh: ' + error.message);
                 } finally {
                     setUploading(false);
                 }
@@ -631,13 +631,13 @@ QUY Táº®C:
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-                            <h3 className="text-lg font-bold text-gray-800">CÃ i Ä‘áº·t chung</h3>
+                            <h3 className="text-lg font-bold text-gray-800">Cài �ặt chung</h3>
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
                         </div>
                         <form onSubmit={e => { e.preventDefault(); onSave(formData); }} className="p-6 overflow-y-auto hide-scroll flex-1 space-y-5">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Link Zalo</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.link_zalo || ''} onChange={e => setFormData({ ...formData, link_zalo: e.target.value })} placeholder="VD: 0902631632 hoáº·c link zalo.me" />
+                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.link_zalo || ''} onChange={e => setFormData({ ...formData, link_zalo: e.target.value })} placeholder="VD: 0902631632 hoặc link zalo.me" />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Link Facebook</label>
@@ -648,22 +648,22 @@ QUY Táº®C:
                                 <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.maps_url || ''} onChange={e => setFormData({ ...formData, maps_url: e.target.value })} placeholder="https://maps.app.goo.gl/..." />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload áº¢nh Banner Äiá»‡n Thoáº¡i (KhÃ´ng cáº¯t xÃ©n)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Đi�!n Thoại (Không cắt xén)</label>
                                 <div className="flex gap-2">
                                     <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_mobile_url || ''} onChange={e => setFormData({ ...formData, banner_mobile_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2 rounded-lg font-semibold text-gray-700 whitespace-nowrap min-w-[140px] flex items-center justify-center">
-                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Äang xá»­ lÃ½...</span> : 'Chá»n áº£nh Mobile'}
+                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh Mobile'}
                                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleBannerUpload(e, 'mobile')} disabled={uploading} />
                                     </label>
                                 </div>
                                 {formData.banner_mobile_url && <img src={formData.banner_mobile_url} alt="Banner Mobile" className="mt-3 w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm max-h-40" />}
                             </div>
                             <div className="mt-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload áº¢nh Banner MÃ¡y TÃ­nh (KhÃ´ng cáº¯t xÃ©n)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Máy Tính (Không cắt xén)</label>
                                 <div className="flex gap-2">
                                     <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_desktop_url || ''} onChange={e => setFormData({ ...formData, banner_desktop_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2 rounded-lg font-semibold text-gray-700 whitespace-nowrap min-w-[140px] flex items-center justify-center">
-                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Äang xá»­ lÃ½...</span> : 'Chá»n áº£nh PC'}
+                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh PC'}
                                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleBannerUpload(e, 'desktop')} disabled={uploading} />
                                     </label>
                                 </div>
@@ -671,8 +671,8 @@ QUY Táº®C:
                             </div>
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Há»§y</button>
-                            <button type="button" onClick={() => onSave(formData)} disabled={uploading} className="px-5 py-2.5 bg-[#0068FF] text-white rounded-lg font-semibold hover:bg-blue-700 shadow-md transition-colors disabled:opacity-50">Cáº­p nháº­t</button>
+                            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Hủy</button>
+                            <button type="button" onClick={() => onSave(formData)} disabled={uploading} className="px-5 py-2.5 bg-[#0068FF] text-white rounded-lg font-semibold hover:bg-blue-700 shadow-md transition-colors disabled:opacity-50">Cập nhật</button>
                         </div>
                     </div>
                 </div>
@@ -695,7 +695,7 @@ QUY Táº®C:
                             display: none !important;
                         }
                     `}</style>
-                    <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-4 uppercase">DANH Má»¤C Sáº¢N PHáº¨M</h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-4 uppercase">DANH MỤC SẢN PHẨM</h3>
                     <div className="mb-6">
                         <div className="w-full bg-white border border-gray-100 rounded-xl shadow-sm p-4 md:py-2 md:px-0 relative overflow-hidden">
                             <div className="relative w-full max-w-4xl mx-auto flex items-center">
@@ -711,14 +711,14 @@ QUY Táº®C:
                                             onClick={onManageTags}
                                             className="flex items-center justify-center text-center font-medium border rounded-full transition-colors w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
                                         >
-                                            <i className="fa-solid fa-gear mr-1"></i> Quáº£n lÃ½
+                                            <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                         </button>
                                     )}
                                     <button
                                         onClick={() => onTagToggle('')}
                                         className={`flex items-center justify-center text-center font-medium border rounded-full transition-colors w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 ${selectedTag === '' ? 'bg-[#b91c1c] text-white border-[#b91c1c]' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                                     >
-                                        Táº¥t cáº£ sáº£n pháº©m
+                                        Tất cả sản phẩm
                                     </button>
                                     {uniqueTags.map(tag => (
                                         <button
@@ -757,7 +757,7 @@ QUY Táº®C:
 
             const handleEdit = async (index) => {
                 const oldName = categories[index];
-                const updated = prompt('Nháº­p tÃªn danh má»¥c má»›i:', oldName);
+                const updated = prompt('Nhập tên danh mục m�:i:', oldName);
                 if (updated && updated.trim()) {
                     setIsLoading(true);
                     await supabase.from('tags').update({ name: updated.trim() }).eq('name', oldName);
@@ -767,7 +767,7 @@ QUY Táº®C:
             };
 
             const handleDelete = async (index) => {
-                if (confirm('Báº¡n cÃ³ cháº¯c muá»‘n xÃ³a danh má»¥c nÃ y?')) {
+                if (confirm('Bạn có chắc mu�n xóa danh mục này?')) {
                     setIsLoading(true);
                     const oldName = categories[index];
                     await supabase.from('tags').delete().eq('name', oldName);
@@ -780,12 +780,12 @@ QUY Táº®C:
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-                            <h3 className="text-lg font-bold text-gray-800">Quáº£n lÃ½ Danh Má»¥c</h3>
+                            <h3 className="text-lg font-bold text-gray-800">Quản lý Danh Mục</h3>
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
                         </div>
                         <div className="p-5 flex gap-2">
-                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="TÃªn danh má»¥c má»›i..." />
-                            <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primaryDark transition-colors">ThÃªm</button>
+                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="Tên danh mục m�:i..." />
+                            <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primaryDark transition-colors">Thêm</button>
                         </div>
                         <div className="p-5 overflow-y-auto space-y-3">
                             {categories.map((cat, index) => (
@@ -847,10 +847,10 @@ QUY Táº®C:
             }
 
             if (!product) {
-                return <div className="text-center py-32 text-gray-500">KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m.</div>;
+                return <div className="text-center py-32 text-gray-500">Không tìm thấy sản phẩm.</div>;
             }
 
-            const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'háº¿t hÃ ng';
+            const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
 
             return (
@@ -865,25 +865,25 @@ QUY Táº®C:
                     </div>
                     <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
                         <button onClick={handleBack} className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 hover:text-gray-900 text-sm font-medium transition-all mb-5 active:scale-95 w-max cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Quay láº¡i
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Quay lại
                         </button>
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
                         <p className="text-4xl font-black text-primary mb-6">{formatVND(product.price)}</p>
 
                         <div className="prose prose-sm text-gray-600 mb-8 flex-1">
-                            <h4 className="font-semibold text-gray-900 mb-2 text-lg">ThÃ´ng tin chi tiáº¿t</h4>
+                            <h4 className="font-semibold text-gray-900 mb-2 text-lg">Thông tin chi tiết</h4>
                             {product.description ? (
                                 <div dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }} />
                             ) : (
-                                <p className="italic text-gray-400">ChÆ°a cÃ³ mÃ´ táº£ chi tiáº¿t cho sáº£n pháº©m nÃ y.</p>
+                                <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                             )}
                         </div>
 
                         <div className="mt-auto pt-6 border-t border-gray-100">
                             <div className="flex items-center gap-4 mb-6">
-                                <span className="text-base text-gray-600 font-medium">TÃ¬nh tráº¡ng:</span>
+                                <span className="text-base text-gray-600 font-medium">Tình trạng:</span>
                                 <span className={`px-3 py-1.5 rounded-lg text-sm font-bold ${colorClass}`}>
-                                    {product.stock_status || 'HÃ ng sáºµn táº¡i kho'}
+                                    {product.stock_status || 'Hàng sẵn tại kho'}
                                 </span>
                             </div>
                             <button
@@ -892,7 +892,7 @@ QUY Táº®C:
                                 className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
                             >
                                 <i className="fa-solid fa-cart-plus"></i>
-                                {isOutOfStock ? 'Sáº£n pháº©m háº¿t hÃ ng' : 'ThÃªm vÃ o giá»'}
+                                {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ'}
                             </button>
                         </div>
                     </div>
@@ -1011,7 +1011,7 @@ QUY Táº®C:
                     await supabase.from('settings').upsert({ key: dbKey, value: data.publicUrl }, { onConflict: 'key' });
                     await fetchData();
                 } catch (error) {
-                    alert('Lá»—i xá»­ lÃ½ banner: ' + error.message);
+                    alert('L�i xử lý banner: ' + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -1021,7 +1021,7 @@ QUY Táº®C:
                 return products.filter(p => {
                     // Hidden/Stock logic
                     if (!isAdmin) {
-                        const isOutOfStock = p.stock_status && p.stock_status.toLowerCase() === 'háº¿t hÃ ng';
+                        const isOutOfStock = p.stock_status && p.stock_status.toLowerCase() === 'hết hàng';
                         if (p.is_hidden || isOutOfStock) return false;
                     }
 
@@ -1083,11 +1083,11 @@ QUY Táº®C:
 
             const handleAdminLogin = () => {
                 if (!isAdmin) {
-                    const pwd = prompt("Nháº­p máº­t kháº©u Admin:");
+                    const pwd = prompt("Nhập mật khẩu Admin:");
                     if (pwd === "admin@1993") {
                         setIsAdmin(true);
                     } else if (pwd !== null) {
-                        alert("Sai máº­t kháº©u!");
+                        alert("Sai mật khẩu!");
                     }
                 } else {
                     setIsAdmin(false);
@@ -1108,7 +1108,7 @@ QUY Táº®C:
 
             const handleDeleteProduct = async (e, product) => {
                 e.stopPropagation();
-                if (window.confirm("Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a sáº£n pháº©m nÃ y khÃ´ng? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.")) {
+                if (window.confirm("Bạn có chắc chắn mu�n xóa sản phẩm này không? Hành ��"ng này không thỒ hoàn tác.")) {
                     try {
                         const { error } = await supabase.from('products').delete().eq('id', product.id);
                         if (error) throw error;
@@ -1122,7 +1122,7 @@ QUY Táº®C:
                             }
                         }
                     } catch (error) {
-                        alert('Lá»—i xÃ³a sáº£n pháº©m: ' + error.message);
+                        alert('L�i xóa sản phẩm: ' + error.message);
                     }
                 }
             };
@@ -1141,10 +1141,10 @@ QUY Táº®C:
                 }
 
                 if (err) {
-                    alert('Lá»—i lÆ°u sáº£n pháº©m: ' + err.message);
+                    alert('L�i lưu sản phẩm: ' + err.message);
                 } else {
                     setIsProductModalOpen(false);
-                    fetchData(); // Cáº­p nháº­t láº¡i state products ngay láº­p tá»©c
+                    fetchData(); // Cập nhật lại state products ngay lập tức
                 }
             };
 
@@ -1207,14 +1207,14 @@ QUY Táº®C:
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                                                     </span>
-                                                    Cháº¿ Ä‘á»™ Quáº£n Trá»‹ (Admin)
+                                                    Chế ��" Quản Tr�9 (Admin)
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
-                                                        <i className="fa-solid fa-plus"></i> ThÃªm sáº£n pháº©m
+                                                        <i className="fa-solid fa-plus"></i> Thêm sản phẩm
                                                     </button>
                                                     <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-900 shadow-sm transition-colors">
-                                                        <i className="fa-solid fa-gear"></i> CÃ i Ä‘áº·t chung
+                                                        <i className="fa-solid fa-gear"></i> Cài �ặt chung
                                                     </button>
                                                 </div>
                                             </div>
@@ -1222,18 +1222,18 @@ QUY Táº®C:
 
                                         <div className="flex flex-col md:flex-row gap-6">
 
-                                            {/* Bá»˜ Lá»ŒC */}
+                                            {/* B�� L�RC */}
                                             {showFilters && (
                                                 <aside className="hidden md:block w-full md:w-64 flex-shrink-0 animate-fade-in">
                                                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
                                                         <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                                                            <h3 className="text-xl font-black text-gray-800">Bá»™ Lá»c</h3>
+                                                            <h3 className="text-xl font-black text-gray-800">B�" Lọc</h3>
                                                             <button onClick={() => setShowFilters(false)} className="md:hidden text-gray-400 hover:text-red-500 bg-gray-100 w-8 h-8 rounded-full"><i className="fa-solid fa-xmark"></i></button>
                                                         </div>
 
                                                         {/* Tag Filter */}
                                                         <div className="mb-6 border-b border-gray-100 pb-5">
-                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">DÃ²ng Sáº£n Pháº©m <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
+                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Dòng Sản Phẩm <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
                                                             <div className="space-y-3 max-h-60 overflow-y-auto hide-scroll">
                                                                 {categories.map(tag => (
                                                                     <label key={tag} className="flex items-center gap-3 cursor-pointer group">
@@ -1252,28 +1252,28 @@ QUY Táº®C:
 
                                                         {/* Price Filter */}
                                                         <div>
-                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Khoáº£ng GiÃ¡ <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
+                                                            <h4 className="font-bold text-gray-700 mb-3 flex items-center justify-between">Khoảng Giá <i className="fa-solid fa-chevron-up text-xs text-gray-400"></i></h4>
                                                             <div className="flex items-center gap-2 mb-5">
-                                                                <input type="number" placeholder="Tá»«" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
+                                                                <input type="number" placeholder="Từ" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
                                                                 <span className="text-gray-400">-</span>
-                                                                <input type="number" placeholder="Äáº¿n" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
+                                                                <input type="number" placeholder="Đến" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
                                                             </div>
                                                             <div className="space-y-3">
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', 50000)} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">DÆ°á»›i 50.000Ä‘</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Dư�:i 50.000�</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(50000, 150000)} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000Ä‘ - 150.000Ä‘</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">50.000� - 150.000�</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice(150000, '')} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">TrÃªn 150.000Ä‘</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Trên 150.000�</span>
                                                                 </label>
                                                                 <label className="flex items-center gap-3 cursor-pointer group">
                                                                     <input type="radio" name="price" className="text-primary focus:ring-primary w-4 h-4 cursor-pointer" onChange={() => handlePresetPrice('', '')} />
-                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Táº¥t cáº£ má»©c giÃ¡</span>
+                                                                    <span className="text-gray-600 text-sm font-medium group-hover:text-primary transition-colors">Tất cả mức giá</span>
                                                                 </label>
                                                             </div>
                                                         </div>
@@ -1281,7 +1281,7 @@ QUY Táº®C:
                                                 </aside>
                                             )}
 
-                                            {/* KHU Vá»°C Sáº¢N PHáº¨M */}
+                                            {/* KHU VỰC SẢN PHẨM */}
                                             <div className="flex-1 w-full max-w-7xl mx-auto pb-10 mb-8">
                                                 <TagsSlider uniqueTags={categories} selectedTag={selectedTag} onTagToggle={handleTagToggle} isAdmin={isAdmin} onManageTags={() => setIsTagsModalOpen(true)} />
 
@@ -1305,12 +1305,12 @@ QUY Táº®C:
                                                             }
                                                         }}
                                                     >
-                                                        <option value="all">Lá»c theo giÃ¡ (Táº¥t cáº£)</option>
-                                                        <option value="under-50">DÆ°á»›i 50.000 Ä‘</option>
-                                                        <option value="50-100">50.000 Ä‘ - 100.000 Ä‘</option>
-                                                        <option value="over-100">TrÃªn 100.000 Ä‘</option>
-                                                        <option value="asc">GiÃ¡: Tháº¥p Ä‘áº¿n Cao</option>
-                                                        <option value="desc">GiÃ¡: Cao Ä‘áº¿n Tháº¥p</option>
+                                                        <option value="all">Lọc theo giá (Tất cả)</option>
+                                                        <option value="under-50">Dư�:i 50.000 �</option>
+                                                        <option value="50-100">50.000 � - 100.000 �</option>
+                                                        <option value="over-100">Trên 100.000 �</option>
+                                                        <option value="asc">Giá: Thấp �ến Cao</option>
+                                                        <option value="desc">Giá: Cao �ến Thấp</option>
                                                     </select>
                                                 </div>
 
@@ -1321,7 +1321,7 @@ QUY Táº®C:
                                                 ) : filteredProducts.length === 0 ? (
                                                     <div className="text-center py-32 text-gray-500 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
                                                         <i className="fa-solid fa-box-open text-6xl text-gray-200 mb-4"></i>
-                                                        <p className="text-lg">KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m nÃ o phÃ¹ há»£p.</p>
+                                                        <p className="text-lg">Không tìm thấy sản phẩm nào phù hợp.</p>
                                                     </div>
                                                 ) : (
                                                     <>
@@ -1344,18 +1344,18 @@ QUY Táº®C:
                                                                             />
                                                                             {isAdmin && (
                                                                                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Chá»‰nh sá»­a">
+                                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Ch�0nh sửa">
                                                                                         <i className="fa-solid fa-pen text-sm"></i>
                                                                                     </button>
-                                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiá»‡n sáº£n pháº©m' : 'áº¨n sáº£n pháº©m'}>
+                                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hi�!n sản phẩm' : 'Ẩn sản phẩm'}>
                                                                                         <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
                                                                                     </button>
-                                                                                    <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="XÃ³a sáº£n pháº©m">
+                                                                                    <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="Xóa sản phẩm">
                                                                                         <i className="fa-solid fa-trash-can text-sm"></i>
                                                                                     </button>
                                                                                 </div>
                                                                             )}
-                                                                            {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Äang áº©n</div>}
+                                                                            {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
                                                                         </CardLink>
 
                                                                         <div className="p-5 flex flex-col flex-1 bg-white">
@@ -1364,21 +1364,21 @@ QUY Táº®C:
                                                                             </CardLink>
                                                                             <div className="mb-2">
                                                                                 <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
-                                                                                    {product.stock_status || 'HÃ ng sáºµn táº¡i kho'}
+                                                                                    {product.stock_status || 'Hàng sẵn tại kho'}
                                                                                 </span>
                                                                             </div>
                                                                             <div className="mt-auto pt-3">
-                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">GiÃ¡ sá»‰/thÃ¹ng: <span className="font-bold cursor-pointer no-underline text-blue-600">liÃªn há»‡ Zalo</span></p>
-                                                                                <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">GiÃ¡ bÃ¡n láº»: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
+                                                                                <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá s�0/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên h�! Zalo</span></p>
+                                                                                <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
-                                                                                    disabled={product.stock_status && product.stock_status.toLowerCase() === 'háº¿t hÃ ng'}
+                                                                                    disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
                                                                                     className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-2"
                                                                                 >
-                                                                                    {!(product.stock_status && product.stock_status.toLowerCase() === 'háº¿t hÃ ng') ? (
-                                                                                        <>ThÃªm vÃ o giá»</>
+                                                                                    {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
+                                                                                        <>Thêm vào giỏ</>
                                                                                     ) : (
-                                                                                        <>Háº¿t hÃ ng</>
+                                                                                        <>Hết hàng</>
                                                                                     )}
                                                                                 </button>
                                                                             </div>
@@ -1402,7 +1402,7 @@ QUY Táº®C:
                                                 disabled={currentPage === 1}
                                                 className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                             >
-                                                Trang trÆ°á»›c
+                                                Trang trư�:c
                                             </button>
 
                                             <div className="flex gap-1 hidden sm:flex">
@@ -1441,24 +1441,24 @@ QUY Táº®C:
                     <footer className="w-full bg-white border-t border-gray-200 py-10 mt-auto">
                         <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row justify-between items-start gap-8">
                             <div className="flex flex-col space-y-2">
-                                <h4 className="text-base font-bold text-gray-800">CÃ”NG TY TNHH HÃ™NG THUáº¬N TOKCAY KOREA FOODS</h4>
+                                <h4 className="text-base font-bold text-gray-800">C�NG TY TNHH H�"NG THUẬN TOKCAY KOREA FOODS</h4>
                                 <div className="text-sm text-gray-600 space-y-1">
                                     <p>MST: 1801801902</p>
-                                    <p>Äá»‹a chá»‰: 92B5, KDC HÆ°ng PhÃº 1, KV9, PhÆ°á»ng HÆ°ng PhÃº, ThÃ nh phá»‘ Cáº§n ThÆ¡</p>
-                                    <p>Äiá»‡n thoáº¡i: 0902 631 632</p>
+                                    <p>Đ�9a ch�0: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành ph� Cần Thơ</p>
+                                    <p>Đi�!n thoại: 0902 631 632</p>
                                     <p>Email: hungthuanfood@gmail.com</p>
                                 </div>
                                 <div className="text-gray-500 text-sm font-medium pt-4">
-                                    &copy; 2026 HÃ¹ng Thuáº­n Tokcay. All rights reserved.
+                                    &copy; 2026 Hùng Thuận Tokcay. All rights reserved.
                                 </div>
                             </div>
                             <div className="flex flex-col md:items-end gap-4 text-sm">
                                 <div className="flex flex-wrap gap-6">
-                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">ChÃ­nh sÃ¡ch báº£o máº­t</a>
-                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Äiá»u khoáº£n dá»‹ch vá»¥</a>
+                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Chính sách bảo mật</a>
+                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản d�9ch vụ</a>
                                 </div>
                                 <button onClick={handleAdminLogin} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                    {isAdmin ? 'ÄÄƒng xuáº¥t Admin' : 'Admin'}
+                                    {isAdmin ? 'ĐĒng xuất Admin' : 'Admin'}
                                 </button>
                             </div>
                         </div>
