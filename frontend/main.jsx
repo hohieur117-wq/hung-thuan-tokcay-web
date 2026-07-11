@@ -1108,7 +1108,7 @@ QUY TẮC:
 
             const handleDeleteProduct = async (e, product) => {
                 e.stopPropagation();
-                if (window.confirm("Bạn có chắc chắn mu�n xóa sản phẩm này không? Hành ��"ng này không thỒ hoàn tác.")) {
+                if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.")) {
                     try {
                         const { error } = await supabase.from('products').delete().eq('id', product.id);
                         if (error) throw error;
