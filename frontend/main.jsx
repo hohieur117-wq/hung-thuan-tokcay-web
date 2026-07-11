@@ -167,7 +167,7 @@ import ReactDOM from 'react-dom/client';
                             <div>
                                 <input type="file" id="banner-mobile-upload" accept="image/*" className="hidden" onChange={onBannerMobileUpload} />
                                 <label htmlFor="banner-mobile-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
-                                    <i className="fa-solid fa-mobile-screen"></i> Thay Banner Đi�!n Thoại
+                                    <i className="fa-solid fa-mobile-screen"></i> Thay Banner Điện Thoại
                                 </label>
                             </div>
                             <div>
@@ -536,7 +536,7 @@ QUY TẮC:
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tags (Phân cách bằng dấu phẩy)</label>
-                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="VD: Bánh gạo/Tokbokki, Gia v�9 & X�t" />
+                                        <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="VD: Bánh gạo/Tokbokki, Gia vị & Xốt" />
                                 {uniqueTags && uniqueTags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                         {uniqueTags.map(tag => (
@@ -632,7 +632,7 @@ QUY TẮC:
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-                            <h3 className="text-lg font-bold text-gray-800">Cài �ặt chung</h3>
+                                <h3 className="text-lg font-bold text-gray-800">Cài đặt chung</h3>
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
                         </div>
                         <form onSubmit={e => { e.preventDefault(); onSave(formData); }} className="p-6 overflow-y-auto hide-scroll flex-1 space-y-5">
@@ -649,7 +649,7 @@ QUY TẮC:
                                 <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" value={formData.maps_url || ''} onChange={e => setFormData({ ...formData, maps_url: e.target.value })} placeholder="https://maps.app.goo.gl/..." />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Đi�!n Thoại (Không cắt xén)</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Ảnh Banner Điện Thoại (Không cắt xén)</label>
                                 <div className="flex gap-2">
                                     <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none" value={formData.banner_mobile_url || ''} onChange={e => setFormData({ ...formData, banner_mobile_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2 rounded-lg font-semibold text-gray-700 whitespace-nowrap min-w-[140px] flex items-center justify-center">
@@ -1208,14 +1208,14 @@ QUY TẮC:
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                                                     </span>
-                                                    Chế ��" Quản Tr�9 (Admin)
+                                        Chế độ Quản Trị (Admin)
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
                                                         <i className="fa-solid fa-plus"></i> Thêm sản phẩm
                                                     </button>
                                                     <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-900 shadow-sm transition-colors">
-                                                        <i className="fa-solid fa-gear"></i> Cài �ặt chung
+                                        <i className="fa-solid fa-gear"></i> Cài đặt chung
                                                     </button>
                                                 </div>
                                             </div>
