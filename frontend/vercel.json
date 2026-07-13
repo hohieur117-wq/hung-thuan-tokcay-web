@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/san-pham/:id",
-      "destination": "/api/product-preview.js?id=:id"
+      "source": "/san-pham/:slug",
+      "destination": "/api/product-preview.js?slug=:slug"
     },
     {
       "source": "/(.*)",

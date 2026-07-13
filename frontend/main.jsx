@@ -8,7 +8,26 @@ import ReactDOM from 'react-dom/client';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const formatVND = (price) => {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace('��', '�');
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace(' ', ' ');
+        };
+
+        const generateSlug = (text) => {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a")
+                .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e")
+                .replace(/ì|í|ị|ỉ|ĩ/g, "i")
+                .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o")
+                .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u")
+                .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y")
+                .replace(/đ/g, "d")
+                .replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "")
+                .replace(/\u02C6|\u0306|\u031B/g, "")
+                .replace(/[^a-z0-9 -]/g, "")
+                .replace(/\s+/g, "-")
+                .replace(/-+/g, "-")
+                .replace(/^-+/, "")
+                .replace(/-+$/, "");
         };
 
         const FallbackImage = "/media__1783016111445.png";
@@ -360,7 +379,7 @@ import ReactDOM from 'react-dom/client';
 
         const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags }) => {
             const [formData, setFormData] = useState({
-                name: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
+                name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
             });
             const [tagsInput, setTagsInput] = useState('');
             const [uploading, setUploading] = useState(false);
@@ -374,6 +393,7 @@ import ReactDOM from 'react-dom/client';
                     }
                     setFormData({
                         name: product.name || '',
+                        slug: product.slug || '',
                         price: product.price ?? '',
                         stock_status: oldStatus,
                         statusColor: product.statusColor || 'green',
@@ -383,7 +403,7 @@ import ReactDOM from 'react-dom/client';
                     });
                     setTagsInput((product.tags || []).join(', '));
                 } else {
-                    setFormData({ name: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
+                    setFormData({ name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
                     setTagsInput('');
                 }
             }, [product, isOpen]);
@@ -512,7 +532,14 @@ QUY TẮC:
                         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
-                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => {
+                                    const newName = e.target.value;
+                                    setFormData(prev => ({ ...prev, name: newName, slug: generateSlug(newName) }));
+                                }} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Slug (URL) *</label>
+                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
@@ -805,7 +832,7 @@ QUY TẮC:
         };
 
         const ProductDetail = ({ onAddToCart }) => {
-            const { id } = useParams();
+            const { slug } = useParams();
             const [product, setProduct] = useState(null);
             const [loading, setLoading] = useState(true);
             const navigate = useNavigate();
@@ -827,7 +854,7 @@ QUY TẮC:
                 const fetchProductDetail = async () => {
                     setLoading(true);
                     try {
-                        const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+                        const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
                         if (error) throw error;
                         setProduct(data);
                     } catch (error) {
@@ -837,7 +864,7 @@ QUY TẮC:
                     }
                 };
                 fetchProductDetail();
-            }, [id]);
+            }, [slug]);
 
             if (loading) {
                 return (
@@ -1129,14 +1156,14 @@ QUY TẮC:
             };
 
             const handleSaveProduct = async (productData) => {
-                const { id, name, price, stock_status, statusColor, image_url, description, tags } = productData;
+                const { id, name, slug, price, stock_status, statusColor, image_url, description, tags } = productData;
                 let err;
                 if (id) {
-                    const { error } = await supabase.from('products').update({ name, price, stock_status, statusColor, image_url, description, tags }).eq('id', id);
+                    const { error } = await supabase.from('products').update({ name, slug, price, stock_status, statusColor, image_url, description, tags }).eq('id', id);
                     err = error;
                 } else {
                     const { error } = await supabase.from('products').insert([{
-                        name, price, stock_status, statusColor, image_url, description, tags, sku: 'PVN' + Math.floor(Math.random() * 1000), is_hidden: false
+                        name, slug, price, stock_status, statusColor, image_url, description, tags, sku: 'PVN' + Math.floor(Math.random() * 1000), is_hidden: false
                     }]);
                     err = error;
                 }
@@ -1330,7 +1357,7 @@ QUY TẮC:
                                                             {currentProducts.map(product => {
                                                                 const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
                                                                 const CardLink = isAdmin ? 'div' : Link;
-                                                                const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.id}` };
+                                                                const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.slug || product.id}` };
                                                                 return (
                                                                     <div
                                                                         key={product.id}
@@ -1435,7 +1462,7 @@ QUY TẮC:
                                     )}
                                 </>
                             } />
-                            <Route path="/san-pham/:id" element={<ProductDetail onAddToCart={handleAddToCart} />} />
+                            <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} />} />
                         </Routes>
                     </div>
 

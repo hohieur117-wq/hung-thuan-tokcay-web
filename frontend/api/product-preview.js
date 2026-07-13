@@ -1,9 +1,9 @@
 module.exports = async (req, res) => {
     try {
-        const { id } = req.query;
+        const { slug } = req.query;
 
-        if (!id) {
-            return res.status(400).send('Missing product ID');
+        if (!slug) {
+            return res.status(400).send('Missing product slug');
         }
 
         const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
         }
 
         // Gọi API Supabase để lấy thông tin sản phẩm
-        const fetchUrl = `${supabaseUrl}/rest/v1/products?id=eq.${id}&select=*`;
+        const fetchUrl = `${supabaseUrl}/rest/v1/products?slug=eq.${slug}&select=*`;
         const response = await fetch(fetchUrl, {
             headers: {
                 'apikey': supabaseKey,
@@ -57,8 +57,8 @@ module.exports = async (req, res) => {
     <meta name="twitter:image" content="${image}">
     
     <!-- Chuyển hướng người dùng thật về đúng route của Frontend -->
-    <meta http-equiv="refresh" content="0;url=/?product=${id}">
-    <script>window.location.replace("/?product=${id}");</script>
+    <meta http-equiv="refresh" content="0;url=/san-pham/${slug}">
+    <script>window.location.replace("/san-pham/${slug}");</script>
 </head>
 <body>
     <p>Đang tải thông tin sản phẩm...</p>
