@@ -485,10 +485,9 @@ import ReactDOM from 'react-dom/client';
             );
         };
 
-        const ImageUploaderWithAI = ({ imageUrl, onImageChange, onFileChange, uploading }) => {
+        const ImageUploaderWithAI = ({ imageUrl, onImageChange, onFileChange, uploading, isProcessing, setIsProcessing, cancelRef }) => {
             const [rawImage, setRawImage] = useState(null);
             const [processedImage, setProcessedImage] = useState(null);
-            const [isProcessing, setIsProcessing] = useState(false);
             const [previewUrl, setPreviewUrl] = useState('');
 
             useEffect(() => {
@@ -506,6 +505,12 @@ import ReactDOM from 'react-dom/client';
                     if (url && (processedImage || rawImage)) URL.revokeObjectURL(url);
                 };
             }, [processedImage, rawImage, imageUrl]);
+
+            useEffect(() => {
+                return () => {
+                    if (cancelRef) cancelRef.current = true;
+                };
+            }, [cancelRef]);
 
             const handleFileSelect = (e) => {
                 const file = e.target.files[0];
@@ -547,11 +552,17 @@ import ReactDOM from 'react-dom/client';
 
             const handleProcessImage = async () => {
                 if (!rawImage) return;
+                if (cancelRef) cancelRef.current = false;
                 setIsProcessing(true);
                 try {
                     const compressedBlob = await compressImageBeforeAI(rawImage);
+                    if (cancelRef && cancelRef.current) return;
+                    
                     const { removeBackground } = await import('@imgly/background-removal');
-                    const bgRemovedBlob = await removeBackground(compressedBlob);
+                    if (cancelRef && cancelRef.current) return;
+
+                    const bgRemovedBlob = await removeBackground(compressedBlob, { model: 'isnet' });
+                    if (cancelRef && cancelRef.current) return;
                     
                     const img = new Image();
                     img.src = URL.createObjectURL(bgRemovedBlob);
@@ -559,6 +570,7 @@ import ReactDOM from 'react-dom/client';
                         img.onload = res;
                         img.onerror = rej;
                     });
+                    if (cancelRef && cancelRef.current) return;
 
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
@@ -569,18 +581,23 @@ import ReactDOM from 'react-dom/client';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0);
                     
-                    ctx.font = `bold ${canvas.width * 0.05}px sans-serif`;
-                    ctx.shadowColor = 'rgba(255,255,255,0.8)';
-                    ctx.shadowBlur = 4;
-                    ctx.fillStyle = 'rgba(220, 20, 20, 0.35)';
-                    
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate(-Math.PI / 4);
+                    const fontSize = canvas.width * 0.055;
+                    ctx.font = `bold ${fontSize}px "Arial", sans-serif`;
                     ctx.textAlign = 'center';
-                    ctx.fillText('www.tokcayfood.com', 0, 0);
-                    ctx.shadowBlur = 0;
+                    ctx.textBaseline = 'bottom';
+                    const text = 'www.tokcayfood.com';
+                    const x = canvas.width / 2;
+                    const y = canvas.height - (canvas.height * 0.03);
+                    
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = fontSize * 0.2;
+                    ctx.strokeText(text, x, y);
+                    
+                    ctx.fillStyle = '#E3000F';
+                    ctx.fillText(text, x, y);
                     
                     canvas.toBlob((blob) => {
+                        if (cancelRef && cancelRef.current) return;
                         setProcessedImage(blob);
                         onFileChange(blob); // Pass processed blob up
                         setIsProcessing(false);
@@ -588,6 +605,7 @@ import ReactDOM from 'react-dom/client';
                     
                     URL.revokeObjectURL(img.src);
                 } catch (error) {
+                    if (cancelRef && cancelRef.current) return;
                     console.error('Processing error:', error);
                     alert('Lỗi xử lý ảnh: ' + error.message);
                     setIsProcessing(false);
@@ -634,6 +652,15 @@ import ReactDOM from 'react-dom/client';
             const [uploading, setUploading] = useState(false);
             const [isGenerating, setIsGenerating] = useState(false);
             const [selectedFile, setSelectedFile] = useState(null);
+
+            const [isProcessing, setIsProcessing] = useState(false);
+            const cancelRef = useRef(false);
+
+            const handleClose = () => {
+                cancelRef.current = true;
+                setIsProcessing(false);
+                onClose();
+            };
 
             useEffect(() => {
                 if (product) {
@@ -774,7 +801,7 @@ QUY TẮC:
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
                             <h3 className="text-xl font-bold text-gray-800">{product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h3>
-                            <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"><i className="fa-solid fa-xmark"></i></button>
+                            <button type="button" onClick={handleClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"><i className="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
@@ -835,6 +862,9 @@ QUY TẮC:
                                 onImageChange={(url) => setFormData({ ...formData, image_url: url })}
                                 onFileChange={(file) => setSelectedFile(file)}
                                 uploading={uploading}
+                                isProcessing={isProcessing}
+                                setIsProcessing={setIsProcessing}
+                                cancelRef={cancelRef}
                             />
                             <div>
                                 <div className="flex justify-between items-center mb-1">
@@ -856,8 +886,8 @@ QUY TẮC:
                             </div>
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
-                            <button type="submit" onClick={handleSubmit} disabled={uploading} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
+                            <button type="button" onClick={handleClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
+                            <button type="submit" onClick={handleSubmit} disabled={uploading || isProcessing} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
                                 {uploading ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</> : 'Lưu sản phẩm'}
                             </button>
                         </div>
