@@ -485,43 +485,11 @@ import ReactDOM from 'react-dom/client';
             );
         };
 
-        const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags }) => {
-            const [formData, setFormData] = useState({
-                name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
-            });
-            const [tagsInput, setTagsInput] = useState('');
-            const [uploading, setUploading] = useState(false);
-            const [isGenerating, setIsGenerating] = useState(false);
-            
+        const ImageUploaderWithAI = ({ imageUrl, onImageChange, onFileChange, uploading }) => {
             const [rawImage, setRawImage] = useState(null);
             const [processedImage, setProcessedImage] = useState(null);
             const [isProcessing, setIsProcessing] = useState(false);
             const [previewUrl, setPreviewUrl] = useState('');
-
-            useEffect(() => {
-                if (product) {
-                    let oldStatus = product.stock_status || 'Hàng sẵn kho';
-                    if (oldStatus === 'Hàng sẵn' || oldStatus === 'Hàng sẵn tại kho' || oldStatus === 'Còn hàng') {
-                        oldStatus = 'Hàng sẵn kho';
-                    }
-                    setFormData({
-                        name: product.name || '',
-                        slug: product.slug || '',
-                        price: product.price ?? '',
-                        stock_status: oldStatus,
-                        statusColor: product.statusColor || 'green',
-                        image_url: product.image_url || '',
-                        description: product.description || '',
-                        tags: product.tags || []
-                    });
-                    setTagsInput((product.tags || []).join(', '));
-                } else {
-                    setFormData({ name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
-                    setTagsInput('');
-                }
-                setRawImage(null);
-                setProcessedImage(null);
-            }, [product, isOpen]);
 
             useEffect(() => {
                 let url = '';
@@ -532,20 +500,19 @@ import ReactDOM from 'react-dom/client';
                     url = URL.createObjectURL(rawImage);
                     setPreviewUrl(url);
                 } else {
-                    setPreviewUrl(formData.image_url);
+                    setPreviewUrl(imageUrl);
                 }
                 return () => {
                     if (url && (processedImage || rawImage)) URL.revokeObjectURL(url);
                 };
-            }, [processedImage, rawImage, formData.image_url]);
-
-            if (!isOpen) return null;
+            }, [processedImage, rawImage, imageUrl]);
 
             const handleFileSelect = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 setRawImage(file);
                 setProcessedImage(null);
+                onFileChange(file); // Pass raw file up
             };
 
             const compressImageBeforeAI = (file, maxWidth = 1000, maxHeight = 1000) => {
@@ -615,6 +582,7 @@ import ReactDOM from 'react-dom/client';
                     
                     canvas.toBlob((blob) => {
                         setProcessedImage(blob);
+                        onFileChange(blob); // Pass processed blob up
                         setIsProcessing(false);
                     }, 'image/webp', 0.8);
                     
@@ -625,6 +593,73 @@ import ReactDOM from 'react-dom/client';
                     setIsProcessing(false);
                 }
             };
+
+            return (
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự động cắt Vuông 1:1)</label>
+                    <div className="flex gap-2">
+                        <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={imageUrl} onChange={e => onImageChange(e.target.value)} placeholder="https://..." />
+                        <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
+                            {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</span> : 'Chọn ảnh'}
+                            <input type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={uploading} />
+                        </label>
+                    </div>
+                    
+                    {previewUrl && (
+                        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                            <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                            <div className="flex flex-col gap-2">
+                                <button 
+                                    type="button" 
+                                    onClick={handleProcessImage} 
+                                    disabled={!rawImage || isProcessing}
+                                    className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[180px]"
+                                >
+                                    {isProcessing ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý...</> : <>✨ Xử lý tự động</>}
+                                </button>
+                                {isProcessing && <p className="text-xs text-gray-500 animate-pulse">Đang tách nền & đóng mộc tinh tế...</p>}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+
+        const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags }) => {
+            const [formData, setFormData] = useState({
+                name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
+            });
+            const [tagsInput, setTagsInput] = useState('');
+            const [uploading, setUploading] = useState(false);
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [selectedFile, setSelectedFile] = useState(null);
+
+            useEffect(() => {
+                if (product) {
+                    let oldStatus = product.stock_status || 'Hàng sẵn kho';
+                    if (oldStatus === 'Hàng sẵn' || oldStatus === 'Hàng sẵn tại kho' || oldStatus === 'Còn hàng') {
+                        oldStatus = 'Hàng sẵn kho';
+                    }
+                    setFormData({
+                        name: product.name || '',
+                        slug: product.slug || '',
+                        price: product.price ?? '',
+                        stock_status: oldStatus,
+                        statusColor: product.statusColor || 'green',
+                        image_url: product.image_url || '',
+                        description: product.description || '',
+                        tags: product.tags || []
+                    });
+                    setTagsInput((product.tags || []).join(', '));
+                } else {
+                    setFormData({ name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
+                    setTagsInput('');
+                }
+                setSelectedFile(null);
+            }, [product, isOpen]);
+
+            if (!isOpen) return null;
 
             const imageToBase64InlineData = async (url) => {
                 const response = await fetch(url);
@@ -710,7 +745,7 @@ QUY TẮC:
                 setUploading(true);
                 let finalImageUrl = formData.image_url;
                 try {
-                    let fileToUpload = processedImage || rawImage;
+                    let fileToUpload = selectedFile;
                     if (fileToUpload) {
                         const croppedBlob = await cropImage(fileToUpload, 1);
                         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
@@ -795,33 +830,12 @@ QUY TẮC:
                                     </div>
                                 )}
                             </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự động cắt Vuông 1:1)</label>
-                                <div className="flex gap-2">
-                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
-                                    <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
-                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</span> : 'Chọn ảnh'}
-                                        <input type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={uploading} />
-                                    </label>
-                                </div>
-                                
-                                {previewUrl && (
-                                    <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                                        <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg border border-gray-200 shadow-sm" />
-                                        <div className="flex flex-col gap-2">
-                                            <button 
-                                                type="button" 
-                                                onClick={handleProcessImage} 
-                                                disabled={!rawImage || isProcessing}
-                                                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[180px]"
-                                            >
-                                                {isProcessing ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý...</> : <>✨ Xử lý tự động</>}
-                                            </button>
-                                            {isProcessing && <p className="text-xs text-gray-500 animate-pulse">Đang tách nền & đóng mộc tinh tế...</p>}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <ImageUploaderWithAI 
+                                imageUrl={formData.image_url}
+                                onImageChange={(url) => setFormData({ ...formData, image_url: url })}
+                                onFileChange={(file) => setSelectedFile(file)}
+                                uploading={uploading}
+                            />
                             <div>
                                 <div className="flex justify-between items-center mb-1">
                                     <label className="block text-sm font-semibold text-gray-700">Mô tả chi tiết</label>
@@ -843,7 +857,7 @@ QUY TẮC:
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                             <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
-                            <button type="submit" onClick={handleSubmit} disabled={uploading || isProcessing} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
+                            <button type="submit" onClick={handleSubmit} disabled={uploading} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
                                 {uploading ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</> : 'Lưu sản phẩm'}
                             </button>
                         </div>
