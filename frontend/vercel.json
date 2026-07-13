@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/san-pham/:id",
+      "destination": "/api/product-preview.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
