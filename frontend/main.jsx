@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 
         // Tích hợp Supabase
@@ -32,6 +32,104 @@ import ReactDOM from 'react-dom/client';
 
         const FallbackImage = "/media__1783016111445.png";
         const LogoImage = "./logo.png";
+
+        const useDebounce = (value, delay) => {
+            const [debouncedValue, setDebouncedValue] = useState(value);
+            useEffect(() => {
+                const handler = setTimeout(() => { setDebouncedValue(value); }, delay);
+                return () => clearTimeout(handler);
+            }, [value, delay]);
+            return debouncedValue;
+        };
+
+        const LiveSearchBar = () => {
+            const [searchTerm, setSearchTerm] = useState('');
+            const debouncedTerm = useDebounce(searchTerm, 400);
+            const [results, setResults] = useState([]);
+            const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+            const searchCache = useRef({});
+            const wrapperRef = useRef(null);
+            const navigate = useNavigate();
+
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                        setIsDropdownOpen(false);
+                    }
+                };
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => document.removeEventListener("mousedown", handleClickOutside);
+            }, []);
+
+            useEffect(() => {
+                const fetchResults = async () => {
+                    if (!debouncedTerm.trim()) {
+                        setResults([]);
+                        setIsDropdownOpen(false);
+                        return;
+                    }
+                    if (searchCache.current[debouncedTerm]) {
+                        setResults(searchCache.current[debouncedTerm]);
+                        setIsDropdownOpen(true);
+                        return;
+                    }
+                    try {
+                        const { data, error } = await supabase
+                            .from('products')
+                            .select('name, slug, image_url')
+                            .ilike('name', `%${debouncedTerm}%`)
+                            .limit(5);
+                        if (error) throw error;
+                        searchCache.current[debouncedTerm] = data || [];
+                        setResults(data || []);
+                        setIsDropdownOpen(true);
+                    } catch (err) {
+                        console.error('Lỗi tìm kiếm:', err);
+                    }
+                };
+                fetchResults();
+            }, [debouncedTerm]);
+
+            return (
+                <div ref={wrapperRef} className="relative flex shadow-inner rounded-lg overflow-visible bg-white/10 p-1 w-full max-w-md">
+                    <input
+                        type="text"
+                        className="block w-full pl-4 pr-12 py-2.5 rounded-l-md border-none leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
+                        placeholder="Tìm kiếm sản phẩm..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
+                    />
+                    <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
+                        <i className="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    
+                    {isDropdownOpen && results.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-[100]">
+                            {results.map(product => (
+                                <div 
+                                    key={product.slug || product.name} 
+                                    onClick={() => {
+                                        setIsDropdownOpen(false);
+                                        setSearchTerm('');
+                                        navigate(`/san-pham/${product.slug}`);
+                                    }}
+                                    className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors"
+                                >
+                                    <img src={product.image_url || FallbackImage} alt={product.name} className="w-[50px] h-[50px] object-cover rounded-md flex-shrink-0" loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} />
+                                    <span className="text-sm font-semibold text-gray-800 line-clamp-2">{product.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {isDropdownOpen && debouncedTerm.trim() && results.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 p-4 text-center text-sm text-gray-500 z-[100]">
+                            Không tìm thấy sản phẩm nào.
+                        </div>
+                    )}
+                </div>
+            );
+        };
 
         // --- Helper: Crop Image using Canvas ---
         const cropImage = (file, targetRatio) => {
@@ -83,7 +181,7 @@ import ReactDOM from 'react-dom/client';
         };
 
         // --- Components ---
-        const Header = ({ cartCount, onOpenCart, onSearch, onContactClick, onProductsClick }) => {
+        const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick }) => {
             return (
                 <header className="sticky top-0 z-40 bg-primary shadow-lg border-b border-primaryDark">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,18 +194,8 @@ import ReactDOM from 'react-dom/client';
                             </div>
 
                             {/* Search */}
-                            <div className="flex-1 hidden md:flex justify-center items-center">
-                                <div className="relative flex shadow-inner rounded-lg overflow-hidden bg-white/10 p-1 w-full max-w-md">
-                                    <input
-                                        type="text"
-                                        className="block w-full pl-4 pr-12 py-2.5 rounded-l-md border-none leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
-                                        placeholder="Tìm kiếm sản phẩm..."
-                                        onChange={(e) => onSearch(e.target.value)}
-                                    />
-                                    <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
-                                        <i className="fa-solid fa-magnifying-glass"></i>
-                                    </button>
-                                </div>
+                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50">
+                                <LiveSearchBar />
                             </div>
 
                             {/* Navigation & Cart */}
@@ -148,18 +236,8 @@ import ReactDOM from 'react-dom/client';
                         </div>
 
                         {/* Mobile Search */}
-                        <div className="md:hidden pb-4">
-                            <div className="relative flex rounded-md overflow-hidden">
-                                <input
-                                    type="text"
-                                    className="block w-full pl-4 pr-12 py-2 border-none leading-5 bg-white placeholder-gray-500 focus:outline-none sm:text-sm"
-                                    placeholder="Tìm kiếm sản phẩm..."
-                                    onChange={(e) => onSearch(e.target.value)}
-                                />
-                                <button className="bg-gray-100 text-primary px-4 py-2">
-                                    <i className="fa-solid fa-magnifying-glass"></i>
-                                </button>
-                            </div>
+                        <div className="md:hidden pb-4 relative z-50">
+                            <LiveSearchBar />
                         </div>
                     </div>
                 </header>
@@ -289,7 +367,7 @@ import ReactDOM from 'react-dom/client';
                             ) : (
                                 cart.map(item => (
                                     <div key={item.id} className="flex gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative pr-10">
-                                        <img src={item.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={item.name} className="w-20 h-20 object-cover rounded-lg border border-gray-100" />
+                                        <img src={item.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={item.name} loading="lazy" className="w-20 h-20 object-cover rounded-lg border border-gray-100" />
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug" title={item.name}>{item.name}</h4>
                                             <div className="flex justify-between items-end mt-2">
@@ -338,7 +416,7 @@ import ReactDOM from 'react-dom/client';
 
                         {/* Image Section */}
                         <div className="w-full sm:w-1/2 bg-gray-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100">
-                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} className="w-full max-h-[40vh] sm:max-h-full object-contain mix-blend-multiply drop-shadow-md" />
+                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" className="w-full max-h-[40vh] sm:max-h-full object-cover mix-blend-multiply drop-shadow-md" />
                         </div>
 
                         {/* Content Section */}
@@ -534,7 +612,12 @@ QUY TẮC:
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
                                 <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => {
                                     const newName = e.target.value;
-                                    setFormData(prev => ({ ...prev, name: newName, slug: generateSlug(newName) }));
+                                    setFormData(prev => {
+                                        if (!product || prev.slug === '') {
+                                            return { ...prev, name: newName, slug: generateSlug(newName) };
+                                        }
+                                        return { ...prev, name: newName };
+                                    });
                                 }} />
                             </div>
                             <div>
@@ -888,7 +971,8 @@ QUY TẮC:
                             src={product.image_url || FallbackImage}
                             onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                             alt={product.name}
-                            className="w-full max-h-[500px] object-contain mix-blend-multiply drop-shadow-md"
+                            loading="lazy"
+                            className="w-full max-h-[500px] object-cover mix-blend-multiply drop-shadow-md"
                         />
                     </div>
                     <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
@@ -952,12 +1036,13 @@ QUY TẮC:
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
+            const [totalCount, setTotalCount] = useState(0);
 
             // UI State
             const [cart, setCart] = useState([]);
             const [isCartOpen, setIsCartOpen] = useState(false);
-            const [searchQuery, setSearchQuery] = useState('');
-            const [currentPage, setCurrentPage] = useState(1);
+            const [searchParams, setSearchParams] = useSearchParams();
+            const currentPage = parseInt(searchParams.get('page') || '1', 10);
             const ITEMS_PER_PAGE = 15;
 
             // Filter States
@@ -987,10 +1072,39 @@ QUY TẮC:
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const { data: pData } = await supabase.from('products').select('*').order('id', { ascending: false });
-                    if (pData) setProducts(pData);
+                    let query = supabase.from('products').select('*', { count: 'exact' });
 
-                    const { data: sData } = await supabase.from('settings').select('*');
+                    if (!isAdmin) {
+                        query = query.eq('is_hidden', false);
+                        if (selectedTag) query = query.contains('tags', [selectedTag]);
+                        if (priceMin) query = query.gte('price', Number(priceMin));
+                        if (priceMax) query = query.lte('price', Number(priceMax));
+                        
+                        if (sortOrder === 'asc') query = query.order('price', { ascending: true });
+                        else if (sortOrder === 'desc') query = query.order('price', { ascending: false });
+                        else query = query.order('id', { ascending: false });
+
+                        const from = (currentPage - 1) * ITEMS_PER_PAGE;
+                        const to = from + ITEMS_PER_PAGE - 1;
+                        query = query.range(from, to);
+                    } else {
+                        query = query.order('id', { ascending: false });
+                    }
+
+                    const { data: pData, count, error: pError } = await query;
+                    if (pError) throw pError;
+                    
+                    if (pData) {
+                        setProducts(pData);
+                        if (!isAdmin) {
+                            setTotalCount(count || 0);
+                        } else {
+                            setTotalCount(pData.length);
+                        }
+                    }
+
+                    const { data: sData, error: sError } = await supabase.from('settings').select('*');
+                    if (sError) throw sError;
                     if (sData) {
                         const settingsObj = {};
                         sData.forEach(item => {
@@ -999,12 +1113,13 @@ QUY TẮC:
                         setSettings(settingsObj);
                     }
 
-                    const { data: tData } = await supabase.from('tags').select('*').order('created_at', { ascending: true });
+                    const { data: tData, error: tError } = await supabase.from('tags').select('*').order('created_at', { ascending: true });
+                    if (tError) throw tError;
                     if (tData) {
                         setCategories(tData.map(t => t.name));
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error('Lỗi khi tải dữ liệu:', error);
                 } finally {
                     setLoading(false);
                 }
@@ -1012,12 +1127,13 @@ QUY TẮC:
 
             useEffect(() => {
                 fetchData();
-            }, []);
+            }, [currentPage, selectedTag, priceMin, priceMax, sortOrder, isAdmin]);
 
-            // Reset page to 1 on filter change
             useEffect(() => {
-                setCurrentPage(1);
-            }, [searchQuery, selectedTag, priceMin, priceMax, sortOrder]);
+                if (currentPage !== 1) {
+                    setSearchParams({ page: '1' });
+                }
+            }, [selectedTag, priceMin, priceMax, sortOrder]);
 
             const handleAppBannerUpload = async (e, type) => {
                 const file = e.target.files[0];
@@ -1046,27 +1162,13 @@ QUY TẮC:
             };
 
             const filteredProducts = useMemo(() => {
-                return products.filter(p => {
-                    // Hidden/Stock logic
-                    if (!isAdmin) {
-                        const isOutOfStock = p.stock_status && p.stock_status.toLowerCase() === 'hết hàng';
-                        if (p.is_hidden || isOutOfStock) return false;
-                    }
-
-                    // Search
-                    if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-
-                    // Single-tag filter
-                    if (selectedTag !== '') {
-                        if (!p.tags) return false;
-                        if (!p.tags.includes(selectedTag)) return false;
-                    }
-
-                    // Price filter
+                if (!isAdmin) return products; // Server side already filtered
+                
+                let result = products.filter(p => {
+                    if (selectedTag !== '' && (!p.tags || !p.tags.includes(selectedTag))) return false;
                     const price = p.price || 0;
                     if (priceMin && price < Number(priceMin)) return false;
                     if (priceMax && price > Number(priceMax)) return false;
-
                     return true;
                 });
 
@@ -1077,10 +1179,10 @@ QUY TẮC:
                 }
 
                 return result;
-            }, [products, isAdmin, searchQuery, selectedTag, priceMin, priceMax, sortOrder]);
+            }, [products, isAdmin, selectedTag, priceMin, priceMax, sortOrder]);
 
-            const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-            const currentProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+            const totalPages = isAdmin ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : Math.ceil(totalCount / ITEMS_PER_PAGE);
+            const currentProducts = isAdmin ? filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE) : products;
 
             // Handlers
             const handleAddToCart = (product) => {
@@ -1096,7 +1198,7 @@ QUY TẮC:
 
             const handlePageChange = (newPage) => {
                 if (newPage >= 1 && newPage <= totalPages) {
-                    setCurrentPage(newPage);
+                    setSearchParams({ page: newPage.toString() });
                     if (productsSectionRef.current) {
                         const y = productsSectionRef.current.getBoundingClientRect().top + window.scrollY - 100;
                         window.scrollTo({ top: y, behavior: 'smooth' });
@@ -1208,7 +1310,6 @@ QUY TẮC:
                     <Header
                         cartCount={cart.reduce((a, c) => a + c.qty, 0)}
                         onOpenCart={() => setIsCartOpen(true)}
-                        onSearch={setSearchQuery}
                         onContactClick={() => setIsContactModalOpen(true)}
                         onProductsClick={() => setShowFilters(!showFilters)}
                     />
@@ -1368,7 +1469,8 @@ QUY TẮC:
                                                                                 src={product.image_url || FallbackImage}
                                                                                 onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                                                                 alt={product.name}
-                                                                                className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                                                                loading="lazy"
+                                                                                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                                                                             />
                                                                             {isAdmin && (
                                                                                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -1463,6 +1565,19 @@ QUY TẮC:
                                 </>
                             } />
                             <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} />} />
+                            <Route path="/admin/*" element={
+                                <div className="p-20 text-center flex flex-col items-center justify-center min-h-[50vh]">
+                                    <i className="fa-solid fa-shield-halved text-6xl text-primary mb-6"></i>
+                                    <h2 className="text-3xl font-black text-gray-800 mb-4">Khu Vực Quản Trị</h2>
+                                    <p className="text-gray-500 mb-8 max-w-md">Khu vực này dành riêng cho Admin. Vui lòng đăng nhập để thao tác thêm, sửa, xóa sản phẩm và cài đặt hệ thống.</p>
+                                    <button onClick={handleAdminLogin} className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
+                                        Đăng nhập Admin
+                                    </button>
+                                    {isAdmin && (
+                                        <p className="mt-4 text-green-600 font-bold animate-pulse">Bạn đã đăng nhập! Vui lòng quay lại trang chủ để quản lý sản phẩm.</p>
+                                    )}
+                                </div>
+                            } />
                         </Routes>
                     </div>
 
