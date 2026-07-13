@@ -42,6 +42,13 @@ import ReactDOM from 'react-dom/client';
             return debouncedValue;
         };
 
+        const removeAccents = (str) => {
+            return str.normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                      .toLowerCase();
+        };
+
         const LiveSearchBar = () => {
             const [searchTerm, setSearchTerm] = useState('');
             const debouncedTerm = useDebounce(searchTerm, 400);
@@ -78,10 +85,29 @@ import ReactDOM from 'react-dom/client';
                             .from('products')
                             .select('name, slug, image_url')
                             .ilike('name', `%${debouncedTerm}%`)
-                            .limit(5);
+                            .limit(20);
                         if (error) throw error;
-                        searchCache.current[debouncedTerm] = data || [];
-                        setResults(data || []);
+                        
+                        let rawData = data || [];
+                        const normalizedTerm = removeAccents(debouncedTerm.trim());
+
+                        rawData.sort((a, b) => {
+                            const nameA = removeAccents(a.name);
+                            const nameB = removeAccents(b.name);
+                            
+                            const getScore = (name) => {
+                                if (name.startsWith(normalizedTerm)) return 3;
+                                if (name.includes(' ' + normalizedTerm)) return 2;
+                                if (name.includes(normalizedTerm)) return 1;
+                                return 0;
+                            };
+
+                            return getScore(nameB) - getScore(nameA);
+                        });
+
+                        const finalData = rawData.slice(0, 4);
+                        searchCache.current[debouncedTerm] = finalData;
+                        setResults(finalData);
                         setIsDropdownOpen(true);
                     } catch (err) {
                         console.error('Lỗi tìm kiếm:', err);
@@ -99,6 +125,10 @@ import ReactDOM from 'react-dom/client';
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck="false"
                     />
                     <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
                         <i className="fa-solid fa-magnifying-glass"></i>
@@ -116,7 +146,7 @@ import ReactDOM from 'react-dom/client';
                                     }}
                                     className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors"
                                 >
-                                    <img src={product.image_url || FallbackImage} alt={product.name} className="w-[50px] h-[50px] object-cover rounded-md flex-shrink-0" loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} />
+                                    <img src={product.image_url || FallbackImage} alt={product.name} className="w-[50px] h-[50px] object-cover rounded-md flex-shrink-0" loading="lazy" decoding="async" onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} />
                                     <span className="text-sm font-semibold text-gray-800 line-clamp-2">{product.name}</span>
                                 </div>
                             ))}
