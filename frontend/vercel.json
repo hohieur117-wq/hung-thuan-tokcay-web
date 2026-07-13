@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/san-pham/:id",
-      "destination": "/api/product-preview.js"
+      "destination": "/api/product-preview.js?id=:id"
     },
     {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "/index.html"
     }
   ]
 }
