@@ -492,6 +492,11 @@ import ReactDOM from 'react-dom/client';
             const [tagsInput, setTagsInput] = useState('');
             const [uploading, setUploading] = useState(false);
             const [isGenerating, setIsGenerating] = useState(false);
+            
+            const [rawImage, setRawImage] = useState(null);
+            const [processedImage, setProcessedImage] = useState(null);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const [previewUrl, setPreviewUrl] = useState('');
 
             useEffect(() => {
                 if (product) {
@@ -514,34 +519,110 @@ import ReactDOM from 'react-dom/client';
                     setFormData({ name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: [] });
                     setTagsInput('');
                 }
+                setRawImage(null);
+                setProcessedImage(null);
             }, [product, isOpen]);
+
+            useEffect(() => {
+                let url = '';
+                if (processedImage) {
+                    url = URL.createObjectURL(processedImage);
+                    setPreviewUrl(url);
+                } else if (rawImage) {
+                    url = URL.createObjectURL(rawImage);
+                    setPreviewUrl(url);
+                } else {
+                    setPreviewUrl(formData.image_url);
+                }
+                return () => {
+                    if (url && (processedImage || rawImage)) URL.revokeObjectURL(url);
+                };
+            }, [processedImage, rawImage, formData.image_url]);
 
             if (!isOpen) return null;
 
-            const handleFileUpload = async (e) => {
+            const handleFileSelect = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                setUploading(true);
+                setRawImage(file);
+                setProcessedImage(null);
+            };
 
+            const compressImageBeforeAI = (file, maxWidth = 1000, maxHeight = 1000) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > maxWidth || height > maxHeight) {
+                                const ratio = Math.min(maxWidth / width, maxHeight / height);
+                                width *= ratio;
+                                height *= ratio;
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob((blob) => {
+                                resolve(blob);
+                            }, file.type || 'image/jpeg', 0.9);
+                        };
+                        img.onerror = reject;
+                    };
+                    reader.onerror = reject;
+                });
+            };
+
+            const handleProcessImage = async () => {
+                if (!rawImage) return;
+                setIsProcessing(true);
                 try {
-                    // Cắt ảnh t�0 l�! 1:1 cho sản phẩm
-                    const croppedBlob = await cropImage(file, 1);
-
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-                    const filePath = `products/${fileName}`;
-
-                    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, croppedBlob, {
-                        contentType: 'image/jpeg'
+                    const compressedBlob = await compressImageBeforeAI(rawImage);
+                    const { removeBackground } = await import('@imgly/background-removal');
+                    const bgRemovedBlob = await removeBackground(compressedBlob);
+                    
+                    const img = new Image();
+                    img.src = URL.createObjectURL(bgRemovedBlob);
+                    await new Promise((res, rej) => {
+                        img.onload = res;
+                        img.onerror = rej;
                     });
 
-                    if (uploadError) throw uploadError;
-
-                    const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-                    setFormData({ ...formData, image_url: data.publicUrl });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    ctx.font = `bold ${canvas.width * 0.05}px sans-serif`;
+                    ctx.shadowColor = 'rgba(255,255,255,0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillStyle = 'rgba(220, 20, 20, 0.35)';
+                    
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(-Math.PI / 4);
+                    ctx.textAlign = 'center';
+                    ctx.fillText('www.tokcayfood.com', 0, 0);
+                    ctx.shadowBlur = 0;
+                    
+                    canvas.toBlob((blob) => {
+                        setProcessedImage(blob);
+                        setIsProcessing(false);
+                    }, 'image/webp', 0.8);
+                    
+                    URL.revokeObjectURL(img.src);
                 } catch (error) {
-                    alert('L�i xử lý ảnh: ' + error.message);
-                } finally {
-                    setUploading(false);
+                    console.error('Processing error:', error);
+                    alert('Lỗi xử lý ảnh: ' + error.message);
+                    setIsProcessing(false);
                 }
             };
 
@@ -624,10 +705,33 @@ QUY TẮC:
                 }
             };
 
-            const handleSubmit = (e) => {
+            const handleSubmit = async (e) => {
                 e.preventDefault();
-                const processedTags = tagsInput.split(',').map(t => t.trim()).filter(t => t !== '');
-                onSave({ ...(product || {}), ...formData, price: formData.price === '' ? 0 : Number(formData.price), tags: processedTags });
+                setUploading(true);
+                let finalImageUrl = formData.image_url;
+                try {
+                    let fileToUpload = processedImage || rawImage;
+                    if (fileToUpload) {
+                        const croppedBlob = await cropImage(fileToUpload, 1);
+                        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+                        const filePath = `products/${fileName}`;
+
+                        const { error: uploadError } = await supabase.storage.from('images').upload(filePath, croppedBlob, {
+                            contentType: fileToUpload.type === 'image/webp' ? 'image/webp' : 'image/jpeg'
+                        });
+
+                        if (uploadError) throw uploadError;
+                        const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+                        finalImageUrl = data.publicUrl;
+                    }
+
+                    const processedTags = tagsInput.split(',').map(t => t.trim()).filter(t => t !== '');
+                    await onSave({ ...(product || {}), ...formData, image_url: finalImageUrl, price: formData.price === '' ? 0 : Number(formData.price), tags: processedTags });
+                } catch (err) {
+                    alert('Lỗi khi lưu sản phẩm: ' + err.message);
+                } finally {
+                    setUploading(false);
+                }
             };
 
             return (
@@ -694,13 +798,29 @@ QUY TẮC:
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Hình ảnh (Sẽ tự động cắt Vuông 1:1)</label>
                                 <div className="flex gap-2">
-                                    <input required type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
+                                    <input type="text" className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
                                     <label className="bg-gray-100 hover:bg-gray-200 border border-gray-300 cursor-pointer px-4 py-2.5 rounded-lg font-semibold text-gray-700 whitespace-nowrap transition-colors flex items-center justify-center min-w-[140px]">
-                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang xử lý...</span> : 'Chọn ảnh'}
-                                        <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                                        {uploading ? <span className="text-blue-600"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</span> : 'Chọn ảnh'}
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={uploading} />
                                     </label>
                                 </div>
-                                {formData.image_url && <img src={formData.image_url} alt="Preview" className="mt-3 h-32 w-32 object-cover rounded-lg border border-gray-200 shadow-sm" />}
+                                
+                                {previewUrl && (
+                                    <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                        <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                                        <div className="flex flex-col gap-2">
+                                            <button 
+                                                type="button" 
+                                                onClick={handleProcessImage} 
+                                                disabled={!rawImage || isProcessing}
+                                                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[180px]"
+                                            >
+                                                {isProcessing ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý...</> : <>✨ Xử lý tự động</>}
+                                            </button>
+                                            {isProcessing && <p className="text-xs text-gray-500 animate-pulse">Đang tách nền & đóng mộc tinh tế...</p>}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
@@ -723,7 +843,9 @@ QUY TẮC:
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                             <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
-                            <button type="submit" onClick={handleSubmit} disabled={uploading} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">Lưu sản phẩm</button>
+                            <button type="submit" onClick={handleSubmit} disabled={uploading || isProcessing} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
+                                {uploading ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</> : 'Lưu sản phẩm'}
+                            </button>
                         </div>
                     </div>
                 </div>
