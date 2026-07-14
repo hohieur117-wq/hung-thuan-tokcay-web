@@ -919,7 +919,7 @@ QUY TẮC:
             );
         };
 
-        const AdminSettingsModal = ({ isOpen, onClose, settings, onSave }) => {
+        const AdminSettingsModal = ({ isOpen, onClose, settings, onSave, session }) => {
             const [formData, setFormData] = useState({});
             const [uploading, setUploading] = useState(false);
 
@@ -1000,22 +1000,30 @@ QUY TẮC:
                                 {formData.banner_desktop_url && <img src={formData.banner_desktop_url} alt="Banner PC" className="mt-3 w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm max-h-40" />}
                             </div>
 
-                            {isWebAuthnSupported && (
+                            {!session ? (
+                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                    <h4 className="font-bold text-gray-800 mb-3">Đăng nhập quản trị</h4>
+                                    <input type="email" placeholder="Email" className="w-full border p-2 mb-2 rounded" value={loginData.email} onChange={e => setLoginData({...loginData, email: e.target.value})} />
+                                    <input type="password" placeholder="Mật khẩu" className="w-full border p-2 mb-2 rounded" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} />
+                                    <button type="button" onClick={async () => {
+                                        const { error } = await supabase.auth.signInWithPassword(loginData);
+                                        if (error) alert(error.message); else window.location.reload();
+                                    }} className="w-full bg-blue-600 text-white p-2 rounded">Đăng nhập</button>
+                                </div>
+                            ) : (
                                 <div className="mt-6 pt-6 border-t border-gray-200">
                                     <h4 className="font-bold text-gray-800 mb-3">Bảo mật tài khoản</h4>
                                     <button 
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                // Ép client nhận diện token từ Context/LocalStorage nếu cần
-                                                const { data: { session } } = await supabase.auth.getSession();
-                                                if (!session) throw new Error("Chưa đồng bộ được Token, hệ thống đang bị tách biệt state.");
+                                                if (!session) return alert("LỖI: Vẫn chưa nhận được Session từ Parent Component truyền xuống!");
                                                 
                                                 const { data: enrollData, error: enrollErr } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
-                                                if (enrollErr) return alert("LỖI 2: " + enrollErr.message);
+                                                if (enrollErr) return alert("Lỗi Enroll: " + enrollErr.message);
                                                 
                                                 const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
-                                                if (verifyErr) return alert("LỖI 3: " + verifyErr.message);
+                                                if (verifyErr) return alert("Lỗi Verify: " + verifyErr.message);
                                                 
                                                 alert("🎉 THÀNH CÔNG! Đã đúc Passkey.");
                                             } catch (err) {
@@ -1328,6 +1336,20 @@ QUY TẮC:
 
             // Admin State
             const [isAdmin, setIsAdmin] = useState(false);
+            const [session, setSession] = useState(null);
+
+            useEffect(() => {
+                supabase.auth.getSession().then(({ data: { session } }) => {
+                    setSession(session);
+                    if (session) setIsAdmin(true);
+                });
+                const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                    setSession(session);
+                    if (session) setIsAdmin(true);
+                    else setIsAdmin(false);
+                });
+                return () => subscription.unsubscribe();
+            }, []);
             const [editingProduct, setEditingProduct] = useState(null);
             const [isProductModalOpen, setIsProductModalOpen] = useState(false);
             const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -1480,18 +1502,13 @@ QUY TẮC:
                 setIsDetailsModalOpen(true);
             };
 
-            const handleAdminLogin = () => {
-                if (!isAdmin) {
-                    const pwd = prompt("Nhập mật khẩu Admin:");
-                    if (pwd === "admin@1993") {
-                        setIsAdmin(true);
-                        navigate('/');
-                    } else if (pwd !== null) {
-                        alert("Sai mật khẩu!");
-                    }
-                } else {
-                    setIsAdmin(false);
-                }
+            const handleAdminLoginSubmit = async (e) => {
+                e.preventDefault();
+                const email = e.target.email.value;
+                const pwd = e.target.password.value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+                if (error) alert("Sai thông tin đăng nhập!");
+                else navigate('/');
             };
 
             const handlePasskeyLogin = async () => {
@@ -1859,11 +1876,17 @@ QUY TẮC:
                                     <i className="fa-solid fa-shield-halved text-6xl text-primary mb-6"></i>
                                     <h2 className="text-3xl font-black text-gray-800 mb-4">Khu Vực Quản Trị</h2>
                                     <p className="text-gray-500 mb-8 max-w-md">Khu vực này dành riêng cho Admin. Vui lòng đăng nhập để thao tác thêm, sửa, xóa sản phẩm và cài đặt hệ thống.</p>
-                                    <button onClick={handleAdminLogin} className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
-                                        Đăng nhập Admin
-                                    </button>
+                                    {!isAdmin && (
+                                        <form onSubmit={handleAdminLoginSubmit} className="w-full max-w-sm mt-4 flex flex-col gap-3">
+                                            <input name="email" type="email" placeholder="Email Admin" required autoComplete="username webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            <input name="password" type="password" placeholder="Mật khẩu" required autoComplete="current-password webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            <button type="submit" className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
+                                                Đăng nhập Admin
+                                            </button>
+                                        </form>
+                                    )}
                                     {isWebAuthnSupported && !isAdmin && (
-                                        <button onClick={handlePasskeyLogin} className="mt-4 bg-gray-800 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
+                                        <button onClick={handlePasskeyLogin} className="mt-4 w-full max-w-sm bg-gray-800 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
                                             <i className="fa-solid fa-fingerprint text-2xl"></i> Đăng nhập bằng FaceID / Vân tay
                                         </button>
                                     )}
@@ -1917,7 +1940,7 @@ QUY TẮC:
                     {isAdmin && (
                         <>
                             <AdminProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} uniqueTags={categories} />
-                            <AdminSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} settings={settings} onSave={handleSaveSettings} />
+                            <AdminSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} settings={settings} onSave={handleSaveSettings} session={session} />
                             <AdminTagsModal isOpen={isTagsModalOpen} onClose={() => setIsTagsModalOpen(false)} categories={categories} fetchData={fetchData} />
                         </>
                     )}
