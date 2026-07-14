@@ -1005,21 +1005,14 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                // 1. Force refresh session để lấy JWT mới nhất
-                                                const { data: sessionData, error: refreshError } = await supabase.auth.refreshSession();
-                                                if (refreshError || !sessionData.session) throw new Error("Phiên đăng nhập hết hạn, vui lòng tải lại trang.");
+                                                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                                                if (sessionError || !session) throw new Error("Vui lòng đăng nhập lại để thiết lập tính năng này.");
                                                 
-                                                // 2. Lấy thông tin user hiện tại
-                                                const { data: userData, error: userError } = await supabase.auth.getUser();
-                                                if (userError || !userData.user) throw new Error("Không xác định được danh tính người dùng.");
-                                                
-                                                // 3. Thực hiện enroll
                                                 const { data: enrollData, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
-                                                if (enrollError) throw enrollError;
+                                                if (enrollError) throw new Error(enrollError.message);
                                                 
-                                                // 4. Verify popup sinh trắc học
                                                 const { data: verifyData, error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
-                                                if (verifyError) throw verifyError;
+                                                if (verifyError) throw new Error(verifyError.message);
                                                 
                                                 alert('Thêm thiết bị bảo mật thành công!');
                                             } catch (error) {
