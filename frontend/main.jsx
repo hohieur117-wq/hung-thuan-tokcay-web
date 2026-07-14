@@ -1303,6 +1303,7 @@ QUY TẮC:
 
         // --- Main App ---
         const App = () => {
+            const navigate = useNavigate();
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -1486,6 +1487,7 @@ QUY TẮC:
                     const pwd = prompt("Nhập mật khẩu Admin:");
                     if (pwd === "admin@1993") {
                         setIsAdmin(true);
+                        navigate('/');
                     } else if (pwd !== null) {
                         alert("Sai mật khẩu!");
                     }
@@ -1500,6 +1502,7 @@ QUY TẮC:
                     if (error) throw new Error("Đăng nhập thất bại: " + error.message);
                     if (data?.session || data?.user) {
                         setIsAdmin(true);
+                        navigate('/');
                     }
                 } catch (error) {
                     console.log('User canceled or error:', error);
@@ -1867,7 +1870,9 @@ QUY TẮC:
                                         </button>
                                     )}
                                     {isAdmin && (
-                                        <p className="mt-4 text-green-600 font-bold animate-pulse">Bạn đã đăng nhập! Vui lòng quay lại trang chủ để quản lý sản phẩm.</p>
+                                        <button onClick={() => navigate('/')} className="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
+                                            👉 Vào trang Quản trị
+                                        </button>
                                     )}
                                 </div>
                             } />
