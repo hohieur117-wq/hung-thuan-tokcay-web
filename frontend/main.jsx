@@ -1007,18 +1007,21 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                const { data, error } = await supabase.auth.registerPasskey();
-                                                if (error) throw new Error("Lỗi đăng ký Passkey: " + error.message);
+                                                // Bước 1: Check Session
+                                                const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+                                                if (sessionErr || !sessionData.session) return alert("LỖI 1: Không tìm thấy phiên đăng nhập. Hãy đăng nhập lại!");
                                                 
-                                                alert('Thêm thiết bị bảo mật thành công!');
-                                            } catch (error) {
-                                                console.error(error);
-                                                const errorMsg = error.message || '';
-                                                if (error.name === 'NotAllowedError' || errorMsg.toLowerCase().includes('cancel') || errorMsg.includes('timed out') || errorMsg.includes('The operation either timed out or was not allowed')) {
-                                                    alert('Đã hủy thao tác quét vân tay.');
-                                                } else {
-                                                    alert('Lỗi khi thêm thiết bị: ' + errorMsg);
-                                                }
+                                                // Bước 2: Gọi Enroll
+                                                const { data: enrollData, error: enrollErr } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
+                                                if (enrollErr) return alert("LỖI 2 (Từ máy chủ): " + enrollErr.message);
+                                                
+                                                // Bước 3: Kích hoạt quét vân tay
+                                                const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
+                                                if (verifyErr) return alert("LỖI 3 (Hủy hoặc thiết bị từ chối): " + verifyErr.message);
+                                                
+                                                alert("🎉 THÀNH CÔNG! Thiết bị đã được cấp Passkey.");
+                                            } catch (err) {
+                                                alert("LỖI HỆ THỐNG: " + err.message);
                                             }
                                         }} 
                                         className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
