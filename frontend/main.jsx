@@ -577,18 +577,14 @@ import ReactDOM from 'react-dom/client';
                     const { removeBackground } = await import('@imgly/background-removal');
                     if (cancelRef && cancelRef.current) return;
 
-                    const bgRemovedBlob = await removeBackground(compressedBlob, { 
-                        model: 'isnet_fp16',
-                        device: 'gpu',
-                        fetchArgs: { cache: 'force-cache' }
-                    });
+                    const bgRemovedBlob = await removeBackground(compressedBlob, { model: 'isnet' });
                     if (cancelRef && cancelRef.current) return;
                     
                     const img = new Image();
                     img.src = URL.createObjectURL(bgRemovedBlob);
-                    await new Promise((res, rej) => {
-                        img.onload = res;
-                        img.onerror = rej;
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
                     });
                     if (cancelRef && cancelRef.current) return;
 
@@ -611,14 +607,15 @@ import ReactDOM from 'react-dom/client';
                     ctx.textBaseline = 'bottom';
                     const text = 'www.tokcayfood.com';
                     const x = canvas.width / 2;
-                    const y = Math.min(canvas.height - 20, productBottomY + 15);
+                    const marginInside = canvas.height * 0.03;
+                    const watermarkY = productBottomY - marginInside;
                     
                     ctx.strokeStyle = '#FFFFFF';
                     ctx.lineWidth = fontSize * 0.2;
-                    ctx.strokeText(text, x, y);
+                    ctx.strokeText(text, x, watermarkY);
                     
                     ctx.fillStyle = '#E3000F';
-                    ctx.fillText(text, x, y);
+                    ctx.fillText(text, x, watermarkY);
                     
                     canvas.toBlob((blob) => {
                         if (cancelRef && cancelRef.current) return;
