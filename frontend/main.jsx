@@ -1007,23 +1007,21 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                // Bước 1: Check Session
-                                                const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
-                                                if (sessionErr || !sessionData.session) return alert("LỖI 1: Không tìm thấy phiên đăng nhập. Hãy đăng nhập lại!");
+                                                // Ép client nhận diện token từ Context/LocalStorage nếu cần
+                                                const { data: { session } } = await supabase.auth.getSession();
+                                                if (!session) throw new Error("Chưa đồng bộ được Token, hệ thống đang bị tách biệt state.");
                                                 
-                                                // Bước 2: Gọi Enroll
                                                 const { data: enrollData, error: enrollErr } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
-                                                if (enrollErr) return alert("LỖI 2 (Từ máy chủ): " + enrollErr.message);
+                                                if (enrollErr) return alert("LỖI 2: " + enrollErr.message);
                                                 
-                                                // Bước 3: Kích hoạt quét vân tay
                                                 const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
-                                                if (verifyErr) return alert("LỖI 3 (Hủy hoặc thiết bị từ chối): " + verifyErr.message);
+                                                if (verifyErr) return alert("LỖI 3: " + verifyErr.message);
                                                 
-                                                alert("🎉 THÀNH CÔNG! Thiết bị đã được cấp Passkey.");
+                                                alert("🎉 THÀNH CÔNG! Đã đúc Passkey.");
                                             } catch (err) {
                                                 alert("LỖI HỆ THỐNG: " + err.message);
                                             }
-                                        }} 
+                                        }}
                                         className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
                                     >
                                         <i className="fa-solid fa-fingerprint text-lg"></i> 🔐 Thêm thiết bị đăng nhập (FaceID/Vân tay)
