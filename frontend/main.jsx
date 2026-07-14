@@ -520,6 +520,20 @@ import ReactDOM from 'react-dom/client';
                 onFileChange(file); // Pass raw file up
             };
 
+            const getProductBottomY = (ctx, width, height) => {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                for (let y = height - 1; y >= 0; y--) {
+                    for (let x = 0; x < width; x++) {
+                        const index = (y * width + x) * 4;
+                        if (data[index + 3] > 15) {
+                            return y;
+                        }
+                    }
+                }
+                return height;
+            };
+
             const compressImageBeforeAI = (file, maxWidth = 1000, maxHeight = 1000) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -561,7 +575,11 @@ import ReactDOM from 'react-dom/client';
                     const { removeBackground } = await import('@imgly/background-removal');
                     if (cancelRef && cancelRef.current) return;
 
-                    const bgRemovedBlob = await removeBackground(compressedBlob, { model: 'isnet' });
+                    const bgRemovedBlob = await removeBackground(compressedBlob, { 
+                        model: 'isnet_fp16',
+                        device: 'gpu',
+                        fetchArgs: { cache: 'force-cache' }
+                    });
                     if (cancelRef && cancelRef.current) return;
                     
                     const img = new Image();
@@ -577,9 +595,13 @@ import ReactDOM from 'react-dom/client';
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     
+                    ctx.drawImage(img, 0, 0);
+                    const productBottomY = getProductBottomY(ctx, canvas.width, canvas.height);
+                    
+                    ctx.globalCompositeOperation = 'destination-over';
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
+                    ctx.globalCompositeOperation = 'source-over';
                     
                     const fontSize = canvas.width * 0.055;
                     ctx.font = `bold ${fontSize}px "Arial", sans-serif`;
@@ -587,7 +609,7 @@ import ReactDOM from 'react-dom/client';
                     ctx.textBaseline = 'bottom';
                     const text = 'www.tokcayfood.com';
                     const x = canvas.width / 2;
-                    const y = canvas.height - (canvas.height * 0.03);
+                    const y = Math.min(canvas.height - 20, productBottomY + 15);
                     
                     ctx.strokeStyle = '#FFFFFF';
                     ctx.lineWidth = fontSize * 0.2;
