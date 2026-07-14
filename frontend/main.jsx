@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom/client';
         // Tích hợp Supabase
         const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
         const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { experimental: { passkey: true } } });
 
         const formatVND = (price) => {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace(' ', ' ');
@@ -1005,17 +1005,8 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                // 1. Lấy Session hiện tại
-                                                const { data: { session } } = await supabase.auth.getSession();
-                                                if (!session) throw new Error("Vui lòng đăng nhập lại để thiết lập tính năng này.");
-                                                
-                                                // 2. Tiến hành Enroll WebAuthn
-                                                const { data: enrollData, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
-                                                if (enrollError) throw new Error("Lỗi máy chủ Supabase: " + enrollError.message);
-                                                
-                                                // 3. Kích hoạt quét Sinh trắc học của thiết bị
-                                                const { data: verifyData, error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
-                                                if (verifyError) throw new Error("Lỗi thiết bị: " + verifyError.message);
+                                                const { data, error } = await supabase.auth.registerPasskey();
+                                                if (error) throw new Error("Lỗi đăng ký Passkey: " + error.message);
                                                 
                                                 alert('Thêm thiết bị bảo mật thành công!');
                                             } catch (error) {
@@ -1495,8 +1486,8 @@ QUY TẮC:
 
             const handlePasskeyLogin = async () => {
                 try {
-                    const { data, error } = await supabase.auth.signInWithWebAuthn();
-                    if (error) throw error;
+                    const { data, error } = await supabase.auth.signInWithPasskey();
+                    if (error) throw new Error("Đăng nhập thất bại: " + error.message);
                     if (data?.session || data?.user) {
                         setIsAdmin(true);
                     }
