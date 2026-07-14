@@ -1017,17 +1017,11 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                if (!session) return alert("LỖI: Vẫn chưa nhận được Session từ Parent Component truyền xuống!");
-                                                
-                                                const { data: enrollData, error: enrollErr } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
-                                                if (enrollErr) return alert("Lỗi Enroll: " + enrollErr.message);
-                                                
-                                                const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
-                                                if (verifyErr) return alert("Lỗi Verify: " + verifyErr.message);
-                                                
-                                                alert("🎉 THÀNH CÔNG! Đã đúc Passkey.");
+                                                const { data, error } = await supabase.auth.registerPasskey();
+                                                if (error) return alert("❌ Lỗi Native Passkey: " + error.message);
+                                                alert("🎉 THÀNH CÔNG! Đã tạo Passkey Native.");
                                             } catch (err) {
-                                                alert("LỖI HỆ THỐNG: " + err.message);
+                                                alert("Lỗi thiết bị: " + err.message);
                                             }
                                         }}
                                         className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
