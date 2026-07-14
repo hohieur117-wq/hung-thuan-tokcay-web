@@ -1301,6 +1301,13 @@ QUY TẮC:
             return null;
         };
 
+        const ScrollToTopAdmin = () => {
+            useEffect(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }, []);
+            return null;
+        };
+
         // --- Main App ---
         const App = () => {
             const navigate = useNavigate();
@@ -1883,6 +1890,7 @@ QUY TẮC:
                             <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} />} />
                             <Route path="/admin/*" element={
                                 <div className="p-20 text-center flex flex-col items-center justify-center min-h-[50vh]">
+                                    <ScrollToTopAdmin />
                                     <i className="fa-solid fa-shield-halved text-6xl text-primary mb-6"></i>
                                     <h2 className="text-3xl font-black text-gray-800 mb-4">Khu Vực Quản Trị</h2>
                                     <p className="text-gray-500 mb-8 max-w-md">Khu vực này dành riêng cho Admin. Vui lòng đăng nhập để thao tác thêm, sửa, xóa sản phẩm và cài đặt hệ thống.</p>
@@ -1929,9 +1937,15 @@ QUY TẮC:
                                     <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Chính sách bảo mật</a>
                                     <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản dịch vụ</a>
                                 </div>
-                                <button onClick={handleAdminLogin} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                        {isAdmin ? 'Đăng xuất admin' : 'Admin'}
-                                </button>
+                                {isAdmin ? (
+                                    <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                        Đăng xuất admin
+                                    </button>
+                                ) : (
+                                    <Link to="/admin" onClick={() => window.scrollTo(0, 0)} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                        Admin
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </footer>
