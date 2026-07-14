@@ -119,7 +119,8 @@ import ReactDOM from 'react-dom/client';
             return (
                 <div ref={wrapperRef} className="relative flex shadow-inner rounded-lg overflow-visible bg-white/10 p-1 w-full max-w-md">
                     <input
-                        type="text"
+                        type="search"
+                        name="tokcay_search_query"
                         className="block w-full pl-4 pr-12 py-2.5 rounded-l-md border-none leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
                         placeholder="Tìm kiếm sản phẩm..."
                         value={searchTerm}
@@ -127,8 +128,9 @@ import ReactDOM from 'react-dom/client';
                         onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
                         autoComplete="off"
                         autoCorrect="off"
-                        autoCapitalize="off"
+                        autoCapitalize="none"
                         spellCheck="false"
+                        inputMode="search"
                     />
                     <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
                         <i className="fa-solid fa-magnifying-glass"></i>
@@ -1146,6 +1148,21 @@ QUY TẮC:
                 }
             };
 
+            const handleShare = async () => {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: product?.name || 'Tokcayfood',
+                            text: 'Xem ngay sản phẩm này trên Tokcay Korea Foods!',
+                            url: window.location.href,
+                        });
+                    } catch (error) { console.log('User canceled share'); }
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Đã copy đường link sản phẩm!');
+                }
+            };
+
             useEffect(() => {
                 window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             }, []);
@@ -1194,9 +1211,14 @@ QUY TẮC:
                         />
                     </div>
                     <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
-                        <button onClick={handleBack} className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 hover:text-gray-900 text-sm font-medium transition-all mb-5 active:scale-95 w-max cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Quay lại
-                        </button>
+                        <div className="flex items-center gap-3 mb-5">
+                            <button onClick={handleBack} className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 hover:text-gray-900 text-sm font-medium transition-all active:scale-95 w-max cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Quay lại
+                            </button>
+                            <button onClick={handleShare} className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 hover:text-gray-900 text-sm font-medium transition-all active:scale-95 w-max cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" /></svg> Chia sẻ
+                            </button>
+                        </div>
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
                         <p className="text-4xl font-black text-primary mb-6">{formatVND(product.price)}</p>
 
