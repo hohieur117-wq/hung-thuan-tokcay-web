@@ -1502,13 +1502,29 @@ QUY TẮC:
                 setIsDetailsModalOpen(true);
             };
 
-            const handleAdminLoginSubmit = async (e) => {
-                e.preventDefault();
-                const email = e.target.email.value;
-                const pwd = e.target.password.value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-                if (error) alert("Sai thông tin đăng nhập!");
-                else navigate('/');
+            const handleAdminLogin = async (e) => {
+                if (e && e.preventDefault) e.preventDefault();
+                
+                if (e && e.target && e.target.email) {
+                    const emailInput = e.target.email.value;
+                    const passwordInput = e.target.password.value;
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email: emailInput,
+                        password: passwordInput,
+                    });
+                    if (error) {
+                        alert("Đăng nhập thất bại: " + error.message);
+                    } else {
+                        navigate('/');
+                    }
+                } else {
+                    if (isAdmin) {
+                        await supabase.auth.signOut();
+                        navigate('/');
+                    } else {
+                        navigate('/admin');
+                    }
+                }
             };
 
             const handlePasskeyLogin = async () => {
@@ -1877,7 +1893,7 @@ QUY TẮC:
                                     <h2 className="text-3xl font-black text-gray-800 mb-4">Khu Vực Quản Trị</h2>
                                     <p className="text-gray-500 mb-8 max-w-md">Khu vực này dành riêng cho Admin. Vui lòng đăng nhập để thao tác thêm, sửa, xóa sản phẩm và cài đặt hệ thống.</p>
                                     {!isAdmin && (
-                                        <form onSubmit={handleAdminLoginSubmit} className="w-full max-w-sm mt-4 flex flex-col gap-3">
+                                        <form onSubmit={handleAdminLogin} className="w-full max-w-sm mt-4 flex flex-col gap-3">
                                             <input name="email" type="email" placeholder="Email Admin" required autoComplete="username webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
                                             <input name="password" type="password" placeholder="Mật khẩu" required autoComplete="current-password webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
                                             <button type="submit" className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
