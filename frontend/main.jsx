@@ -997,6 +997,34 @@ QUY TẮC:
                                 </div>
                                 {formData.banner_desktop_url && <img src={formData.banner_desktop_url} alt="Banner PC" className="mt-3 w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm max-h-40" />}
                             </div>
+
+                            {window.PublicKeyCredential && (
+                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                    <h4 className="font-bold text-gray-800 mb-3">Bảo mật tài khoản</h4>
+                                    <button 
+                                        type="button"
+                                        onClick={async () => {
+                                            try {
+                                                const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
+                                                if (error) throw error;
+                                                
+                                                const { error: challengeError } = await supabase.auth.mfa.challengeAndVerify({
+                                                    factorId: data.id
+                                                });
+                                                
+                                                if (challengeError) throw challengeError;
+                                                alert('Thêm thiết bị (FaceID/Vân tay) thành công!');
+                                            } catch (error) {
+                                                console.error(error);
+                                                alert('Lỗi khi thêm thiết bị: ' + error.message);
+                                            }
+                                        }} 
+                                        className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <i className="fa-solid fa-fingerprint text-lg"></i> 🔐 Thêm thiết bị đăng nhập (FaceID/Vân tay)
+                                    </button>
+                                </div>
+                            )}
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                             <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Hủy</button>
@@ -1461,6 +1489,19 @@ QUY TẮC:
                 }
             };
 
+            const handlePasskeyLogin = async () => {
+                try {
+                    const { data, error } = await supabase.auth.signInWithWebAuthn();
+                    if (error) throw error;
+                    if (data?.session || data?.user) {
+                        setIsAdmin(true);
+                    }
+                } catch (error) {
+                    console.log('User canceled or error:', error);
+                    alert('Lỗi đăng nhập bằng FaceID/Vân tay: ' + error.message);
+                }
+            };
+
             const handleToggleVisibility = async (e, product) => {
                 e.stopPropagation();
                 const { error } = await supabase.from('products').update({ is_hidden: !product.is_hidden }).eq('id', product.id);
@@ -1810,6 +1851,11 @@ QUY TẮC:
                                     <button onClick={handleAdminLogin} className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
                                         Đăng nhập Admin
                                     </button>
+                                    {window.PublicKeyCredential && !isAdmin && (
+                                        <button onClick={handlePasskeyLogin} className="mt-4 bg-gray-800 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
+                                            <i className="fa-solid fa-fingerprint text-2xl"></i> Đăng nhập bằng FaceID / Vân tay
+                                        </button>
+                                    )}
                                     {isAdmin && (
                                         <p className="mt-4 text-green-600 font-bold animate-pulse">Bạn đã đăng nhập! Vui lòng quay lại trang chủ để quản lý sản phẩm.</p>
                                     )}
