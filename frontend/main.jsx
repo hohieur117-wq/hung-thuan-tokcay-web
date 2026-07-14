@@ -1005,21 +1005,15 @@ QUY TẮC:
                                         type="button"
                                         onClick={async () => {
                                             try {
-                                                // 1. Lấy Token đang có sẵn trên trình duyệt
+                                                // 1. Lấy Session hiện tại
                                                 const { data: { session } } = await supabase.auth.getSession();
-                                                if (!session) throw new Error("Trình duyệt không tìm thấy Token. Hãy đăng xuất và đăng nhập lại.");
+                                                if (!session) throw new Error("Vui lòng đăng nhập lại để thiết lập tính năng này.");
                                                 
-                                                // 2. Ép Supabase Client phải áp dụng lại Token này để gắn vào Header cho các request tiếp theo
-                                                await supabase.auth.setSession({ 
-                                                    access_token: session.access_token, 
-                                                    refresh_token: session.refresh_token 
-                                                });
-                                                
-                                                // 3. Tiến hành Enroll WebAuthn
+                                                // 2. Tiến hành Enroll WebAuthn
                                                 const { data: enrollData, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' });
                                                 if (enrollError) throw new Error("Lỗi máy chủ Supabase: " + enrollError.message);
                                                 
-                                                // 4. Kích hoạt quét Sinh trắc học của thiết bị
+                                                // 3. Kích hoạt quét Sinh trắc học của thiết bị
                                                 const { data: verifyData, error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId: enrollData.id });
                                                 if (verifyError) throw new Error("Lỗi thiết bị: " + verifyError.message);
                                                 
