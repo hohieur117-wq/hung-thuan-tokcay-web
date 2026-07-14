@@ -7,6 +7,8 @@ import ReactDOM from 'react-dom/client';
         const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { experimental: { passkey: true } } });
 
+        const isWebAuthnSupported = typeof window !== 'undefined' && window.PublicKeyCredential !== undefined;
+
         const formatVND = (price) => {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace(' ', ' ');
         };
@@ -998,7 +1000,7 @@ QUY TẮC:
                                 {formData.banner_desktop_url && <img src={formData.banner_desktop_url} alt="Banner PC" className="mt-3 w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm max-h-40" />}
                             </div>
 
-                            {window.PublicKeyCredential && (
+                            {isWebAuthnSupported && (
                                 <div className="mt-6 pt-6 border-t border-gray-200">
                                     <h4 className="font-bold text-gray-800 mb-3">Bảo mật tài khoản</h4>
                                     <button 
@@ -1011,7 +1013,12 @@ QUY TẮC:
                                                 alert('Thêm thiết bị bảo mật thành công!');
                                             } catch (error) {
                                                 console.error(error);
-                                                alert('Lỗi khi thêm thiết bị: ' + error.message);
+                                                const errorMsg = error.message || '';
+                                                if (error.name === 'NotAllowedError' || errorMsg.toLowerCase().includes('cancel') || errorMsg.includes('timed out') || errorMsg.includes('The operation either timed out or was not allowed')) {
+                                                    alert('Đã hủy thao tác quét vân tay.');
+                                                } else {
+                                                    alert('Lỗi khi thêm thiết bị: ' + errorMsg);
+                                                }
                                             }
                                         }} 
                                         className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
@@ -1493,7 +1500,12 @@ QUY TẮC:
                     }
                 } catch (error) {
                     console.log('User canceled or error:', error);
-                    alert('Lỗi đăng nhập bằng FaceID/Vân tay: ' + error.message);
+                    const errorMsg = error.message || '';
+                    if (error.name === 'NotAllowedError' || errorMsg.toLowerCase().includes('cancel') || errorMsg.includes('timed out') || errorMsg.includes('The operation either timed out or was not allowed')) {
+                        alert('Đã hủy thao tác quét vân tay.');
+                    } else {
+                        alert('Lỗi đăng nhập bằng FaceID/Vân tay: ' + errorMsg);
+                    }
                 }
             };
 
@@ -1846,7 +1858,7 @@ QUY TẮC:
                                     <button onClick={handleAdminLogin} className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
                                         Đăng nhập Admin
                                     </button>
-                                    {window.PublicKeyCredential && !isAdmin && (
+                                    {isWebAuthnSupported && !isAdmin && (
                                         <button onClick={handlePasskeyLogin} className="mt-4 bg-gray-800 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
                                             <i className="fa-solid fa-fingerprint text-2xl"></i> Đăng nhập bằng FaceID / Vân tay
                                         </button>
