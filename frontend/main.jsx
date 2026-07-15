@@ -1310,9 +1310,7 @@ QUY TẮC:
             const [priceMin, setPriceMin] = useState('');
             const [priceMax, setPriceMax] = useState('');
 
-            useEffect(() => {
-                supabase.auth.signInWithPasskey().catch(() => {});
-            }, []);
+
             const [sortOrder, setSortOrder] = useState('');
 
             // Modals
@@ -1529,11 +1527,15 @@ QUY TẮC:
             const handleAdminClick = async (e) => {
                 e.preventDefault();
                 try {
+                    // CHỈ GỌI PASSKEY KHI USER CHỦ ĐỘNG BẤM NÚT NÀY
                     const { data, error } = await supabase.auth.signInWithPasskey();
-                    if (error) throw error;
-                    window.location.href = '/'; 
+                    if (error) throw error; 
+                    
+                    // Quét thành công -> Vào thẳng nhà (không qua /login)
+                    window.location.href = '/'; // Hoặc router.push('/') nếu có trang Dashboard riêng
                 } catch (err) {
-                    navigate('/admin');
+                    // Lỗi, chưa có passkey, hoặc user bấm Hủy -> Sang trang Login
+                    window.location.href = '/login'; 
                 }
             };
 
