@@ -1501,13 +1501,17 @@ QUY TẮC:
                     if (error) {
                         alert("Đăng nhập thất bại: " + error.message);
                     } else {
-                        const wantPasskey = window.confirm("Đăng nhập thành công! Sếp có muốn lưu Passkey (Vân tay/FaceID) trên thiết bị này để lần sau đăng nhập nhanh không?");
-                        if (wantPasskey) {
-                            try {
-                                await supabase.auth.registerPasskey();
-                                alert("✅ Đã lưu Passkey thành công cho thiết bị này!");
-                            } catch (err) {
-                                console.log("Người dùng hủy hoặc lỗi tạo Passkey", err);
+                        const hasPrompted = localStorage.getItem('passkey_prompted');
+                        if (!hasPrompted) {
+                            const wantPasskey = window.confirm("Đăng nhập thành công! Sếp có muốn lưu Vân tay/FaceID trên máy này để lần sau chạm là vào không?");
+                            localStorage.setItem('passkey_prompted', 'true');
+                            if (wantPasskey) {
+                                try {
+                                    await supabase.auth.registerPasskey();
+                                    alert("✅ Đã đúc Passkey thành công!");
+                                } catch (err) {
+                                    console.log("Người dùng hủy hoặc lỗi tạo Passkey", err);
+                                }
                             }
                         }
                         window.location.href = '/';
@@ -1519,6 +1523,17 @@ QUY TẮC:
                     } else {
                         navigate('/admin');
                     }
+                }
+            };
+
+            const handleAdminClick = async (e) => {
+                e.preventDefault();
+                try {
+                    const { data, error } = await supabase.auth.signInWithPasskey();
+                    if (error) throw error;
+                    window.location.href = '/'; 
+                } catch (err) {
+                    navigate('/admin');
                 }
             };
 
@@ -1932,9 +1947,9 @@ QUY TẮC:
                                         Đăng xuất admin
                                     </button>
                                 ) : (
-                                    <Link to="/admin" onClick={() => window.scrollTo(0, 0)} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                    <button onClick={(e) => { window.scrollTo(0, 0); handleAdminClick(e); }} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                         Admin
-                                    </Link>
+                                    </button>
                                 )}
                             </div>
                         </div>
