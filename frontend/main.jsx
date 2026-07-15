@@ -1010,26 +1010,7 @@ QUY TẮC:
                                         if (error) alert(error.message); else window.location.reload();
                                     }} className="w-full bg-blue-600 text-white p-2 rounded">Đăng nhập</button>
                                 </div>
-                            ) : (
-                                <div className="mt-6 pt-6 border-t border-gray-200">
-                                    <h4 className="font-bold text-gray-800 mb-3">Bảo mật tài khoản</h4>
-                                    <button 
-                                        type="button"
-                                        onClick={async () => {
-                                            try {
-                                                const { data, error } = await supabase.auth.registerPasskey();
-                                                if (error) return alert("❌ Lỗi Native Passkey: " + error.message);
-                                                alert("🎉 THÀNH CÔNG! Đã tạo Passkey Native.");
-                                            } catch (err) {
-                                                alert("Lỗi thiết bị: " + err.message);
-                                            }
-                                        }}
-                                        className="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
-                                    >
-                                        <i className="fa-solid fa-fingerprint text-lg"></i> 🔐 Thêm thiết bị đăng nhập (FaceID/Vân tay)
-                                    </button>
-                                </div>
-                            )}
+                            ) : null}
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                             <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Hủy</button>
@@ -1328,6 +1309,10 @@ QUY TẮC:
             const [selectedTag, setSelectedTag] = useState('');
             const [priceMin, setPriceMin] = useState('');
             const [priceMax, setPriceMax] = useState('');
+
+            useEffect(() => {
+                supabase.auth.signInWithPasskey().catch(() => {});
+            }, []);
             const [sortOrder, setSortOrder] = useState('');
 
             // Modals
@@ -1516,7 +1501,16 @@ QUY TẮC:
                     if (error) {
                         alert("Đăng nhập thất bại: " + error.message);
                     } else {
-                        navigate('/');
+                        const wantPasskey = window.confirm("Đăng nhập thành công! Sếp có muốn lưu Passkey (Vân tay/FaceID) trên thiết bị này để lần sau đăng nhập nhanh không?");
+                        if (wantPasskey) {
+                            try {
+                                await supabase.auth.registerPasskey();
+                                alert("✅ Đã lưu Passkey thành công cho thiết bị này!");
+                            } catch (err) {
+                                console.log("Người dùng hủy hoặc lỗi tạo Passkey", err);
+                            }
+                        }
+                        window.location.href = '/';
                     }
                 } else {
                     if (isAdmin) {
@@ -1903,11 +1897,7 @@ QUY TẮC:
                                             </button>
                                         </form>
                                     )}
-                                    {isWebAuthnSupported && !isAdmin && (
-                                        <button onClick={handlePasskeyLogin} className="mt-4 w-full max-w-sm bg-gray-800 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
-                                            <i className="fa-solid fa-fingerprint text-2xl"></i> Đăng nhập bằng FaceID / Vân tay
-                                        </button>
-                                    )}
+
                                     {isAdmin && (
                                         <button onClick={() => navigate('/')} className="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
                                             👉 Vào trang Quản trị
