@@ -1535,7 +1535,7 @@ QUY TẮC:
                     window.location.href = '/'; // Hoặc router.push('/') nếu có trang Dashboard riêng
                 } catch (err) {
                     // Lỗi, chưa có passkey, hoặc user bấm Hủy -> Sang trang Login
-                    window.location.href = '/login'; 
+                    window.location.href = '/admin'; 
                 }
             };
 
@@ -1949,7 +1949,7 @@ QUY TẮC:
                                         Đăng xuất admin
                                     </button>
                                 ) : (
-                                    <button onClick={(e) => { window.scrollTo(0, 0); handleAdminClick(e); }} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                    <button onClick={(e) => handleAdminClick(e)} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                         Admin
                                     </button>
                                 )}
