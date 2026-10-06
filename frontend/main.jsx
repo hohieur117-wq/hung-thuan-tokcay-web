@@ -284,7 +284,7 @@ import ReactDOM from 'react-dom/client';
             return (
                 <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
                     {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
-                    <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_50px_-10px_rgba(220,38,38,0.25)] border border-red-100 overflow-hidden bg-white">
+                    <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_80px_-15px_rgba(220,38,38,0.4)] border border-red-200 overflow-hidden bg-white">
                         <img
                             src={finalMobileBanner}
                             className="w-full h-auto object-contain block md:hidden"
@@ -1803,7 +1803,7 @@ QUY TẮC:
                                                                 return (
                                                                     <div
                                                                         key={product.id}
-                                                                        className={`group bg-white rounded-2xl shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 border border-gray-100 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                        className={`group bg-white rounded-2xl border border-red-50 shadow-[0_0_30px_-10px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_-5px_rgba(220,38,38,0.35)] transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
                                                                     >
                                                                         <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white p-4 flex items-center justify-center border-b border-gray-50 block cursor-pointer">
                                                                             <img

@@ -60,7 +60,7 @@ const Header = ({ cartCount, onOpenCart, onSearch }) => {
 const HeroBanner = () => (
     <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
-        <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_50px_-10px_rgba(220,38,38,0.25)] border border-red-100 overflow-hidden bg-white">
+        <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_80px_-15px_rgba(220,38,38,0.4)] border border-red-200 overflow-hidden bg-white">
             <img 
                 className="w-full h-auto object-contain block opacity-80" 
                 src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=2070&auto=format&fit=crop" 
@@ -507,7 +507,7 @@ const App = () => {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
                         {filteredProducts.map(product => (
-                            <div key={product.id} className={`group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}>
+                            <div key={product.id} className={`group bg-white rounded-2xl border border-red-50 shadow-[0_0_30px_-10px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_-5px_rgba(220,38,38,0.35)] transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}>
                                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                                     <img 
                                         src={product.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80'} 
