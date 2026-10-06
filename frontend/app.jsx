@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
-import { DoodleDecorations } from './DoodleDecorations';
+import { DoodleBackground } from './DoodleBackground';
 const { useState, useEffect, useMemo } = React;
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -458,7 +458,7 @@ const App = () => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Background Doodle Parallax */}
-            <DoodleDecorations />
+            <DoodleBackground />
             <Header cartCount={cart.reduce((a,c)=>a+c.qty, 0)} onOpenCart={() => setIsCartOpen(true)} onSearch={setSearchQuery} />
             <HeroBanner />
             
