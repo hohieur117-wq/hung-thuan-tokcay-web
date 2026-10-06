@@ -282,31 +282,31 @@ import ReactDOM from 'react-dom/client';
             const finalMobileBanner = bannerMobileUrl || "./media__1783108509497.png";
             const finalDesktopBanner = bannerDesktopUrl || "./media__1783108509497.png";
             return (
-                <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] mb-8 group">
-                    {/* Lớp 1: Ảnh nền có mặt nạ làm mờ chân */}
+                <div className="relative w-full h-auto mb-8 group">
+                    {/* Lớp 1: Ảnh nền có mặt nạ làm mờ 4 góc */}
                     <div 
-                        className="absolute inset-0 z-0"
+                        className="w-full h-auto"
                         style={{
-                            WebkitMaskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)',
-                            maskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)'
+                            WebkitMaskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)',
+                            maskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)'
                         }}
                     >
                         <img
                             src={finalMobileBanner}
-                            className="w-full h-full object-cover block md:hidden"
+                            className="w-full h-auto object-contain block md:hidden"
                             alt="Banner Mobile"
                         />
                         <img
                             src={finalDesktopBanner}
-                            className="w-full h-full object-cover hidden md:block"
+                            className="w-full h-auto object-contain hidden md:block"
                             alt="Banner PC"
                         />
                     </div>
 
                     {/* Lớp 2: Nội dung Text, Button đè lên trên, tuyệt đối không bị mờ */}
-                    <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4">
+                    <div className="absolute inset-0 z-10 w-full h-full p-4 pointer-events-none">
                         {isAdmin && (
-                            <div className="absolute top-2 right-2 flex flex-col gap-2">
+                            <div className="absolute top-2 right-2 flex flex-col gap-2 pointer-events-auto">
                                 <div>
                                     <input type="file" id="banner-mobile-upload" accept="image/*" className="hidden" onChange={onBannerMobileUpload} />
                                     <label htmlFor="banner-mobile-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">

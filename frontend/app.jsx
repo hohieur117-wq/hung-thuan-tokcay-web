@@ -58,25 +58,25 @@ const Header = ({ cartCount, onOpenCart, onSearch }) => {
 };
 
 const HeroBanner = () => (
-    <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[70vh] bg-primary">
-        {/* Lớp 1: Ảnh nền có mặt nạ làm mờ chân */}
+    <div className="relative w-full h-auto bg-primary">
+        {/* Lớp 1: Ảnh nền có mặt nạ làm mờ 4 góc */}
         <div 
-            className="absolute inset-0 z-0"
+            className="w-full h-auto"
             style={{
-                WebkitMaskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)',
-                maskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)'
+                WebkitMaskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)',
+                maskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)'
             }}
         >
             <img 
-                className="w-full h-full object-cover opacity-80" 
+                className="w-full h-auto object-contain block opacity-80" 
                 src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=2070&auto=format&fit=crop" 
                 alt="Korean Food" 
             />
         </div>
 
         {/* Lớp 2: Nội dung Text, Button (nếu có) đè lên trên, tuyệt đối không bị mờ */}
-        <div className="relative z-10 w-full h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="sm:text-center lg:text-left">
+        <div className="absolute inset-0 z-10 w-full h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
+            <div className="sm:text-center lg:text-left pointer-events-auto">
                 <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
                     <span className="block xl:inline">Hương vị chuẩn Hàn</span>{' '}
                     <span className="block text-yellow-300 xl:inline">tại nhà bạn</span>
