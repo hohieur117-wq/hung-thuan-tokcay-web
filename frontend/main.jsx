@@ -1648,6 +1648,19 @@ QUY TẮC:
 
             return (
                 <div className="min-h-screen flex flex-col font-sans">
+                    {/* Background Doodle Parallax */}
+                    <div className="fixed inset-0 z-[-1] pointer-events-none hidden lg:flex justify-between overflow-hidden mix-blend-multiply opacity-15 grayscale contrast-125">
+                        {/* Cột trái */}
+                        <div 
+                            className="w-1/4 h-full bg-repeat-y bg-[length:400px] bg-fixed animate-float-slow"
+                            style={{ backgroundImage: "url('./media__1783111654073.png')" }}
+                        ></div>
+                        {/* Cột phải */}
+                        <div 
+                            className="w-1/4 h-full bg-repeat-y bg-[length:400px] bg-fixed animate-float-slow"
+                            style={{ backgroundImage: "url('./media__1783111654073.png')", animationDelay: '1s' }}
+                        ></div>
+                    </div>
                     <Header
                         cartCount={cart.reduce((a, c) => a + c.qty, 0)}
                         onOpenCart={() => setIsCartOpen(true)}
