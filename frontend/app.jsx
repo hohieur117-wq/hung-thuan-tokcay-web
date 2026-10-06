@@ -63,8 +63,8 @@ const HeroBanner = () => (
         <div 
             className="absolute inset-0 z-0"
             style={{
-                WebkitMaskImage: 'linear-gradient(to bottom, white 60%, transparent 100%)',
-                maskImage: 'linear-gradient(to bottom, white 60%, transparent 100%)'
+                WebkitMaskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)',
+                maskImage: 'radial-gradient(ellipse 95% 95% at 50% 50%, black 85%, transparent 100%)'
             }}
         >
             <img 
