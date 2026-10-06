@@ -457,17 +457,26 @@ const App = () => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Background Doodle Parallax */}
-            <div className="fixed inset-0 z-[-1] pointer-events-none hidden lg:flex justify-between overflow-hidden mix-blend-multiply opacity-15 grayscale contrast-125">
-                {/* Cột trái */}
-                <div 
-                    className="w-1/4 h-full bg-repeat-y bg-[length:400px] bg-fixed animate-float-slow"
-                    style={{ backgroundImage: "url('./media__1783111654073.png')" }}
-                ></div>
-                {/* Cột phải */}
-                <div 
-                    className="w-1/4 h-full bg-repeat-y bg-[length:400px] bg-fixed animate-float-slow"
-                    style={{ backgroundImage: "url('./media__1783111654073.png')", animationDelay: '1s' }}
-                ></div>
+            <div className="fixed inset-0 z-[-1] pointer-events-none hidden lg:flex justify-between overflow-hidden">
+                {/* CỘT TRÁI */}
+                <div className="relative w-32 h-full flex flex-col justify-around items-center opacity-30 mix-blend-multiply grayscale">
+                    {/* Icon 1: Bát mì (Góc trái trên) */}
+                    <div className="w-24 h-24 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:0%_0%] animate-float-slow"></div>
+                    {/* Icon 2: Củ tỏi */}
+                    <div className="w-20 h-20 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:25%_33%]" style={{ animation: 'float-slow 3s infinite alternate' }}></div>
+                    {/* Icon 3: Chữ Hàn */}
+                    <div className="w-24 h-24 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:0%_66%] animate-float-slow"></div>
+                </div>
+
+                {/* CỘT PHẢI */}
+                <div className="relative w-32 h-full flex flex-col justify-around items-center opacity-30 mix-blend-multiply grayscale">
+                    {/* Icon 4: Xiên nướng */}
+                    <div className="w-20 h-20 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:50%_0%]" style={{ animation: 'float-slow 4s infinite alternate' }}></div>
+                    {/* Icon 5: Đền Hàn Quốc */}
+                    <div className="w-28 h-24 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:0%_100%] animate-float-slow"></div>
+                    {/* Icon 6: Thái cực */}
+                    <div className="w-20 h-20 bg-[url('/korean-doodle.png')] bg-[length:500%_400%] bg-[position:100%_100%]" style={{ animation: 'float-slow 2.5s infinite alternate' }}></div>
+                </div>
             </div>
             <Header cartCount={cart.reduce((a,c)=>a+c.qty, 0)} onOpenCart={() => setIsCartOpen(true)} onSearch={setSearchQuery} />
             <HeroBanner />
