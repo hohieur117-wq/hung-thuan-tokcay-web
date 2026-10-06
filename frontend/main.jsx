@@ -450,7 +450,7 @@ import ReactDOM from 'react-dom/client';
 
                         {/* Image Section */}
                         <div className="w-full sm:w-1/2 bg-gray-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100">
-                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" className="w-full max-h-[40vh] sm:max-h-full object-cover mix-blend-multiply drop-shadow-md" />
+                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" className="w-full max-h-[40vh] sm:max-h-full object-cover drop-shadow-md" />
                         </div>
 
                         {/* Content Section */}
@@ -1218,7 +1218,7 @@ QUY TẮC:
                             onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                             alt={product.name}
                             loading="lazy"
-                            className="w-full max-h-[500px] object-cover mix-blend-multiply drop-shadow-md"
+                            className="w-full max-h-[500px] object-cover drop-shadow-md"
                         />
                     </div>
                     <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
@@ -1804,7 +1804,7 @@ QUY TẮC:
                                                                                 onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                                                                 alt={product.name}
                                                                                 loading="lazy"
-                                                                                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                                             />
                                                                             {isAdmin && (
                                                                                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">

@@ -75,7 +75,7 @@ const HeroBanner = () => (
             </div>
         </div>
         <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-            <img className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full mix-blend-multiply opacity-80" src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=2070&auto=format&fit=crop" alt="Korean Food" />
+            <img className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full opacity-80" src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=2070&auto=format&fit=crop" alt="Korean Food" />
         </div>
     </div>
 );
