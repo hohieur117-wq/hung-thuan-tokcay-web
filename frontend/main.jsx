@@ -282,15 +282,9 @@ import ReactDOM from 'react-dom/client';
             const finalMobileBanner = bannerMobileUrl || "./media__1783108509497.png";
             const finalDesktopBanner = bannerDesktopUrl || "./media__1783108509497.png";
             return (
-                <div className="relative w-full h-auto mb-8 group">
-                    {/* Lớp 1: Ảnh nền có mặt nạ làm mờ 4 góc */}
-                    <div 
-                        className="w-full h-auto"
-                        style={{
-                            WebkitMaskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)',
-                            maskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)'
-                        }}
-                    >
+                <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
+                    {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
+                    <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_50px_-10px_rgba(220,38,38,0.25)] border border-red-100 overflow-hidden bg-white">
                         <img
                             src={finalMobileBanner}
                             className="w-full h-auto object-contain block md:hidden"
@@ -301,26 +295,26 @@ import ReactDOM from 'react-dom/client';
                             className="w-full h-auto object-contain hidden md:block"
                             alt="Banner PC"
                         />
-                    </div>
-
-                    {/* Lớp 2: Nội dung Text, Button đè lên trên, tuyệt đối không bị mờ */}
-                    <div className="absolute inset-0 z-10 w-full h-full p-4 pointer-events-none">
-                        {isAdmin && (
-                            <div className="absolute top-2 right-2 flex flex-col gap-2 pointer-events-auto">
-                                <div>
-                                    <input type="file" id="banner-mobile-upload" accept="image/*" className="hidden" onChange={onBannerMobileUpload} />
-                                    <label htmlFor="banner-mobile-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
-                                        <i className="fa-solid fa-mobile-screen"></i> Thay Banner Điện Thoại
-                                    </label>
+                        
+                        {/* Lớp 2: Nội dung Button đè lên trên */}
+                        <div className="absolute inset-0 z-10 w-full h-full p-4 pointer-events-none">
+                            {isAdmin && (
+                                <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto">
+                                    <div>
+                                        <input type="file" id="banner-mobile-upload" accept="image/*" className="hidden" onChange={onBannerMobileUpload} />
+                                        <label htmlFor="banner-mobile-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
+                                            <i className="fa-solid fa-mobile-screen"></i> Thay Banner Điện Thoại
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <input type="file" id="banner-desktop-upload" accept="image/*" className="hidden" onChange={onBannerDesktopUpload} />
+                                        <label htmlFor="banner-desktop-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
+                                            <i className="fa-solid fa-desktop"></i> Thay Banner Máy Tính
+                                        </label>
+                                    </div>
                                 </div>
-                                <div>
-                                    <input type="file" id="banner-desktop-upload" accept="image/*" className="hidden" onChange={onBannerDesktopUpload} />
-                                    <label htmlFor="banner-desktop-upload" className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 text-sm font-bold py-2 px-4 rounded shadow-md flex items-center gap-2 border border-gray-200 transition-colors">
-                                        <i className="fa-solid fa-desktop"></i> Thay Banner Máy Tính
-                                    </label>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             );

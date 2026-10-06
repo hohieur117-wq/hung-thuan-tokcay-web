@@ -58,32 +58,26 @@ const Header = ({ cartCount, onOpenCart, onSearch }) => {
 };
 
 const HeroBanner = () => (
-    <div className="relative w-full h-auto bg-primary">
-        {/* Lớp 1: Ảnh nền có mặt nạ làm mờ 4 góc */}
-        <div 
-            className="w-full h-auto"
-            style={{
-                WebkitMaskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)',
-                maskImage: 'radial-gradient(ellipse at center, black 85%, transparent 100%)'
-            }}
-        >
+    <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
+        <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_50px_-10px_rgba(220,38,38,0.25)] border border-red-100 overflow-hidden bg-white">
             <img 
                 className="w-full h-auto object-contain block opacity-80" 
                 src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=2070&auto=format&fit=crop" 
                 alt="Korean Food" 
             />
-        </div>
-
-        {/* Lớp 2: Nội dung Text, Button (nếu có) đè lên trên, tuyệt đối không bị mờ */}
-        <div className="absolute inset-0 z-10 w-full h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
-            <div className="sm:text-center lg:text-left pointer-events-auto">
-                <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-                    <span className="block xl:inline">Hương vị chuẩn Hàn</span>{' '}
-                    <span className="block text-yellow-300 xl:inline">tại nhà bạn</span>
-                </h1>
-                <p className="mt-3 text-base text-red-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                    Khám phá thế giới ẩm thực Hàn Quốc phong phú với các loại bánh gạo, mì cay, rong biển và vô vàn gia vị đặc trưng. Nấu ăn chưa bao giờ dễ dàng đến thế!
-                </p>
+            
+            {/* Lớp 2: Nội dung Text, Button đè lên trên, tuyệt đối không bị mờ */}
+            <div className="absolute inset-0 z-10 w-full h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pointer-events-none">
+                <div className="sm:text-center lg:text-left pointer-events-auto">
+                    <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                        <span className="block xl:inline">Hương vị chuẩn Hàn</span>{' '}
+                        <span className="block text-yellow-300 xl:inline">tại nhà bạn</span>
+                    </h1>
+                    <p className="mt-3 text-base text-red-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                        Khám phá thế giới ẩm thực Hàn Quốc phong phú với các loại bánh gạo, mì cay, rong biển và vô vàn gia vị đặc trưng. Nấu ăn chưa bao giờ dễ dàng đến thế!
+                    </p>
+                </div>
             </div>
         </div>
     </div>
