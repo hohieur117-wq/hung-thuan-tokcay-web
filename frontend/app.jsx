@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
-import { DoodleBackground } from './DoodleBackground';
+import DynamicBackground from './components/DynamicBackground';
 const { useState, useEffect, useMemo } = React;
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -458,11 +458,12 @@ const App = () => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Background Doodle Parallax */}
-            <DoodleBackground />
-            <Header cartCount={cart.reduce((a,c)=>a+c.qty, 0)} onOpenCart={() => setIsCartOpen(true)} onSearch={setSearchQuery} />
-            <HeroBanner />
-            
-            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <DynamicBackground />
+            <main className="relative z-10 bg-transparent flex flex-col flex-1">
+                <Header cartCount={cart.reduce((a,c)=>a+c.qty, 0)} onOpenCart={() => setIsCartOpen(true)} onSearch={setSearchQuery} />
+                <HeroBanner />
+                
+                <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
                 
                 {isAdmin && (
                     <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
@@ -549,26 +550,27 @@ const App = () => {
                         ))}
                     </div>
                 )}
-            </main>
-
-            <footer className="bg-white border-t py-8 mt-auto">
-                <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm text-gray-500">
-                    <p>&copy; 2026 Hùng Thuận Tokcay. All rights reserved.</p>
-                    <button onClick={handleAdminLogin} className="hover:text-primary transition-colors cursor-pointer focus:outline-none">
-                        {isAdmin ? 'Thoát Admin' : 'Admin'}
-                    </button>
                 </div>
-            </footer>
-
-            <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} />
-            <ZaloWidget zaloNumber={settings?.zalo_number} />
             
-            {isAdmin && (
-                <>
-                    <ProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} />
-                    <ZaloModal isOpen={isZaloModalOpen} onClose={() => setIsZaloModalOpen(false)} currentNumber={settings?.zalo_number} onSave={handleSaveZalo} />
-                </>
-            )}
+                <footer className="bg-white border-t py-8 mt-auto">
+                    <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm text-gray-500">
+                        <p>&copy; 2026 Hùng Thuận Tokcay. All rights reserved.</p>
+                        <button onClick={handleAdminLogin} className="hover:text-primary transition-colors cursor-pointer focus:outline-none">
+                            {isAdmin ? 'Thoát Admin' : 'Admin'}
+                        </button>
+                    </div>
+                </footer>
+
+                <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} />
+                <ZaloWidget zaloNumber={settings?.zalo_number} />
+                
+                {isAdmin && (
+                    <>
+                        <ProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} />
+                        <ZaloModal isOpen={isZaloModalOpen} onClose={() => setIsZaloModalOpen(false)} currentNumber={settings?.zalo_number} onSave={handleSaveZalo} />
+                    </>
+                )}
+            </main>
         </div>
     );
 };
