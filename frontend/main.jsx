@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
-import { DoodleBackground } from './DoodleBackground';
+import DynamicBackground from './components/DynamicBackground';
 
         // Tích hợp Supabase
         const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -1650,7 +1650,7 @@ QUY TẮC:
             return (
                 <div className="min-h-screen flex flex-col font-sans">
                     {/* Background Doodle Parallax */}
-                    <DoodleBackground />
+                    <DynamicBackground />
                     <Header
                         cartCount={cart.reduce((a, c) => a + c.qty, 0)}
                         onOpenCart={() => setIsCartOpen(true)}
