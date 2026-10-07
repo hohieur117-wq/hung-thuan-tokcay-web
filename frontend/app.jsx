@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
-import DynamicBackground from './components/DynamicBackground';
+
 const { useState, useEffect, useMemo } = React;
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -457,9 +457,7 @@ const App = () => {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Background Doodle Parallax */}
-            <DynamicBackground />
-            <main className="relative z-10 bg-transparent flex flex-col flex-1">
+
                 <Header cartCount={cart.reduce((a,c)=>a+c.qty, 0)} onOpenCart={() => setIsCartOpen(true)} onSearch={setSearchQuery} />
                 <HeroBanner />
                 
@@ -570,7 +568,7 @@ const App = () => {
                         <ZaloModal isOpen={isZaloModalOpen} onClose={() => setIsZaloModalOpen(false)} currentNumber={settings?.zalo_number} onSave={handleSaveZalo} />
                     </>
                 )}
-            </main>
+
         </div>
     );
 };
