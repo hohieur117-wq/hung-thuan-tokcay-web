@@ -84,10 +84,16 @@ import ReactDOM from 'react-dom/client';
                         return;
                     }
                     try {
+                        const trimmedTerm = debouncedTerm.trim();
+                        const slugTerm = generateSlug(trimmedTerm);
+                        const searchFilter = slugTerm
+                            ? `name.ilike.%${trimmedTerm}%,slug.ilike.%${slugTerm}%`
+                            : `name.ilike.%${trimmedTerm}%`;
                         const { data, error } = await supabase
                             .from('products')
                             .select('name, slug, image_url')
-                            .ilike('name', `%${debouncedTerm}%`)
+                            .eq('is_hidden', false)
+                            .or(searchFilter)
                             .limit(20);
                         if (error) throw error;
                         

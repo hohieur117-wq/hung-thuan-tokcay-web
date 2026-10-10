@@ -14,8 +14,15 @@ module.exports = async (req, res) => {
             return res.status(500).send('Server Configuration Error');
         }
 
+        const escapeHtml = (str) => String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
         // Gọi API Supabase để lấy thông tin sản phẩm
-        const fetchUrl = `${supabaseUrl}/rest/v1/products?slug=eq.${slug}&select=*`;
+        const fetchUrl = `${supabaseUrl}/rest/v1/products?slug=eq.${encodeURIComponent(slug)}&is_hidden=eq.false&select=name,description,image_url`;
         const response = await fetch(fetchUrl, {
             headers: {
                 'apikey': supabaseKey,
@@ -41,24 +48,29 @@ module.exports = async (req, res) => {
             }
         }
 
+        const safeTitle = escapeHtml(title);
+        const safeDesc = escapeHtml(description);
+        const safeImage = escapeHtml(image);
+        const safeSlug = encodeURIComponent(slug);
+
         // Tạo Raw HTML với Meta Tags và Redirect
         const rawHtml = `<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>${title}</title>
-    <meta property="og:title" content="${title} - Hùng Thuận Tokcay">
-    <meta property="og:description" content="${description}">
-    <meta property="og:image" content="${image}">
+    <title>${safeTitle}</title>
+    <meta property="og:title" content="${safeTitle} - Hùng Thuận Tokcay">
+    <meta property="og:description" content="${safeDesc}">
+    <meta property="og:image" content="${safeImage}">
     <meta property="og:type" content="product">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${title}">
-    <meta name="twitter:description" content="${description}">
-    <meta name="twitter:image" content="${image}">
+    <meta name="twitter:title" content="${safeTitle}">
+    <meta name="twitter:description" content="${safeDesc}">
+    <meta name="twitter:image" content="${safeImage}">
     
     <!-- Chuyển hướng người dùng thật về đúng route của Frontend -->
-    <meta http-equiv="refresh" content="0;url=/san-pham/${slug}">
-    <script>window.location.replace("/san-pham/${slug}");</script>
+    <meta http-equiv="refresh" content="0;url=/san-pham/${safeSlug}">
+    <script>window.location.replace("/san-pham/${safeSlug}");</script>
 </head>
 <body>
     <p>Đang tải thông tin sản phẩm...</p>
