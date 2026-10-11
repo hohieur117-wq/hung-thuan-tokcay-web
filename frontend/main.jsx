@@ -1052,7 +1052,7 @@ QUY TẮC:
                     `}</style>
                     <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-4 uppercase">DANH MỤC SẢN PHẨM</h3>
                     <div className="mb-6">
-                        <div className="w-full bg-white border border-gray-100 rounded-xl shadow-sm p-4 md:py-2 md:px-0 relative overflow-hidden">
+                        <div className="w-full bg-white/75 backdrop-blur-md border border-white/60 rounded-xl shadow-sm p-4 md:py-2 md:px-0 relative overflow-hidden">
                             <div className="relative w-full max-w-4xl mx-auto flex items-center">
                                 <button onClick={scrollLeft} className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 items-center justify-center bg-white border border-gray-200 shadow-md rounded-full hover:bg-gray-50 text-gray-600 cursor-pointer">&lt;</button>
 
@@ -1811,9 +1811,9 @@ QUY TẮC:
                                                                 return (
                                                                     <div
                                                                         key={product.id}
-                                                                        className={`group bg-white rounded-2xl border border-red-50 shadow-[0_0_30px_-10px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_-5px_rgba(220,38,38,0.35)] transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                        className={`group bg-white/75 backdrop-blur-md rounded-2xl border border-white/60 shadow-[0_0_30px_-10px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_-5px_rgba(220,38,38,0.35)] transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
                                                                     >
-                                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white p-4 flex items-center justify-center border-b border-gray-50 block cursor-pointer">
+                                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white/60 p-4 flex items-center justify-center border-b border-white/50 block cursor-pointer">
                                                                             <img
                                                                                 src={product.image_url || FallbackImage}
                                                                                 onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
@@ -1823,10 +1823,10 @@ QUY TẮC:
                                                                             />
                                                                             {isAdmin && (
                                                                                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Ch�0nh sửa">
+                                                                                    <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Chỉnh sửa">
                                                                                         <i className="fa-solid fa-pen text-sm"></i>
                                                                                     </button>
-                                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hi�!n sản phẩm' : 'Ẩn sản phẩm'}>
+                                                                                    <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
                                                                                         <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
                                                                                     </button>
                                                                                     <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="Xóa sản phẩm">
@@ -1837,7 +1837,7 @@ QUY TẮC:
                                                                             {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
                                                                         </CardLink>
 
-                                                                        <div className="p-5 flex flex-col flex-1 bg-white">
+                                                                        <div className="p-5 flex flex-col flex-1 bg-transparent">
                                                                             <CardLink {...cardLinkProps}>
                                                                                 <h3 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={product.name}>{product.name}</h3>
                                                                             </CardLink>
