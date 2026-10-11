@@ -149,7 +149,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                     </div>
                     
                     {isDropdownOpen && results.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white/88 backdrop-blur-xl border border-white/90 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden z-[100]">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white/[0.97] backdrop-blur-2xl border border-red-100 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.22)] overflow-hidden z-[100]">
                             {results.map(product => (
                                 <div 
                                     key={product.slug || product.name} 
@@ -160,7 +160,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     }}
                                     className="flex items-center gap-3 p-3 hover:bg-red-50/80 cursor-pointer border-b border-stone-100/80 last:border-0 transition-colors"
                                 >
-                                    <img src={product.image_url || FallbackImage} alt={product.name} className="w-[50px] h-[50px] object-cover rounded-lg flex-shrink-0 border border-white/80 shadow-sm" loading="lazy" decoding="async" onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} />
+                                    <img src={product.image_url || FallbackImage} alt={product.name} className="w-[50px] h-[50px] object-cover rounded-lg flex-shrink-0 border border-stone-200/70 shadow-sm" loading="lazy" decoding="async" onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} />
                                     <div className="flex-1 min-w-0">
                                         <span className="block text-sm font-semibold text-gray-800 line-clamp-1">{product.name}</span>
                                         {product.price !== undefined && product.price !== null && (
@@ -172,7 +172,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         </div>
                     )}
                     {isDropdownOpen && debouncedTerm.trim() && results.length === 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white/88 backdrop-blur-xl border border-white/90 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-4 text-center text-sm text-gray-600 z-[100]">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white/[0.97] backdrop-blur-2xl border border-red-100 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.22)] p-4 text-center text-sm text-gray-600 z-[100]">
                             Không tìm thấy sản phẩm nào.
                         </div>
                     )}
@@ -232,7 +232,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick }) => {
             return (
-                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-800/95 via-red-700/92 to-red-800/95 backdrop-blur-xl border-b border-red-400/30 shadow-[0_10px_30px_rgba(153,27,27,0.35)] transition-all">
+                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-950/95 via-red-800/92 to-red-500/90 backdrop-blur-xl border-b border-white/20 shadow-[0_10px_30px_rgba(127,29,29,0.3)] transition-all">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
@@ -361,10 +361,12 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white/75 backdrop-blur-lg border border-white/80 rounded-2xl shadow-lg max-w-md w-full animate-fade-in relative p-7 sm:p-8">
-                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full bg-white/80 border border-white/60 shadow-sm"><i className="fa-solid fa-xmark text-lg"></i></button>
-                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-5 uppercase tracking-wide border-b border-stone-200/70 pb-4">LIÊN HỆ VỚI CHÚNG TÔI</h3>
-                        <div className="mb-5 p-3.5 rounded-xl bg-white/65 border border-white/80 space-y-2.5 text-xs sm:text-sm text-stone-700">
+                    <div className="bg-white/85 backdrop-blur-xl border border-white/80 rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-6 sm:p-7">
+                        <div className="flex items-center justify-between gap-4 pr-12 border-b border-stone-200/70 pb-4 mb-5">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-800 uppercase tracking-wide leading-snug">LIÊN HỆ VỚI CHÚNG TÔI</h3>
+                            <button onClick={onClose} className="absolute top-5 right-5 text-gray-500 hover:text-red-600 transition-colors w-9 h-9 flex items-center justify-center rounded-full bg-white/90 border border-stone-200/70 shadow-sm flex-shrink-0"><i className="fa-solid fa-xmark text-lg"></i></button>
+                        </div>
+                        <div className="mb-5 p-3.5 rounded-xl bg-white/75 border border-white/80 space-y-2.5 text-xs sm:text-sm text-stone-700">
                             <div className="flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0 shadow-sm"><i className="fa-solid fa-phone text-xs"></i></span>
                                 <span className="font-semibold">0902 631 632</span>
@@ -420,9 +422,9 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 <div className={`fixed inset-0 z-[60] transition-opacity ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" onClick={onClose}></div>
                     <div className={`fixed inset-y-0 right-0 max-w-md w-full bg-white/85 backdrop-blur-2xl border-l border-white/80 shadow-2xl transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
-                        <div className="flex items-center justify-between p-5 border-b border-white/60 bg-red-50/70 backdrop-blur-md">
+                        <div className="flex items-center justify-between gap-4 pr-12 p-5 border-b border-white/60 bg-red-50/70 backdrop-blur-md relative">
                             <h2 className="text-xl font-bold text-primaryDark">Giỏ hàng ({cart.reduce((a, c) => a + c.qty, 0)})</h2>
-                            <button onClick={onClose} className="p-2 text-gray-500 hover:text-red-600 rounded-full bg-white/80 border border-white/60 shadow-sm transition-colors">
+                            <button onClick={onClose} className="absolute top-4 right-4 p-2 w-9 h-9 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-full bg-white/80 border border-white/60 shadow-sm transition-colors">
                                 <i className="fa-solid fa-xmark text-xl"></i>
                             </button>
                         </div>
@@ -1068,7 +1070,7 @@ QUY TẮC:
                 const el = sliderRef.current;
                 if (!el) return;
                 const handleNativeWheel = (e) => {
-                    if (e.deltaY !== 0 && window.innerWidth >= 768) {
+                    if (e.deltaY !== 0) {
                         e.preventDefault();
                         el.scrollLeft += e.deltaY;
                     }
@@ -1086,49 +1088,65 @@ QUY TẮC:
             return (
                 <div className="w-full">
                     <style>{`
-                        .hide-scrollbar::-webkit-scrollbar {
+                        .hide-scrollbar::-webkit-scrollbar,
+                        .no-scrollbar::-webkit-scrollbar {
                             display: none !important;
+                        }
+                        .no-scrollbar {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
                         }
                     `}</style>
                     <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-4 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="mb-6">
-                        <div className="w-full bg-white/65 backdrop-blur-md border border-white/80 shadow-[0_8px_25px_rgba(0,0,0,0.04)] rounded-3xl md:rounded-full p-4 md:py-2.5 md:px-2 relative overflow-hidden">
-                            <div className="relative w-full max-w-5xl mx-auto flex items-center">
-                                <button onClick={scrollLeft} className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 items-center justify-center bg-white/85 backdrop-blur-md border border-white/80 shadow-md rounded-full hover:bg-white text-stone-700 hover:text-red-600 transition-all cursor-pointer">&lt;</button>
+                    <div className="mb-3">
+                        <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md border border-red-100/80 p-1.5 rounded-full shadow-sm">
+                            <button
+                                type="button"
+                                onClick={scrollLeft}
+                                aria-label="Cuộn sang trái"
+                                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            >
+                                &lt;
+                            </button>
 
-                                <div
-                                    ref={sliderRef}
-                                    onWheel={handleWheel}
-                                    className="grid grid-cols-2 gap-3 md:flex md:flex-row md:flex-nowrap md:overflow-x-auto md:gap-3.5 md:px-11 w-full items-center hide-scrollbar"
-                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                                >
-                                    {isAdmin && (
-                                        <button
-                                            onClick={onManageTags}
-                                            className="flex items-center justify-center text-center font-medium border rounded-full transition-all w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm"
-                                        >
-                                            <i className="fa-solid fa-gear mr-1"></i> Quản lý
-                                        </button>
-                                    )}
+                            <div
+                                ref={sliderRef}
+                                onWheel={handleWheel}
+                                className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1"
+                            >
+                                {isAdmin && (
                                     <button
-                                        onClick={() => onTagToggle('')}
-                                        className={`flex items-center justify-center text-center font-semibold border rounded-full w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 ${selectedTag === '' ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                        onClick={onManageTags}
+                                        className="flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-4 py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm"
                                     >
-                                        Tất cả sản phẩm
+                                        <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                     </button>
-                                    {uniqueTags.map(tag => (
-                                        <button
-                                            key={tag}
-                                            onClick={() => onTagToggle(tag)}
-                                            className={`flex items-center justify-center text-center font-semibold border rounded-full w-full min-h-[44px] text-[14px] md:w-max md:min-h-[38px] md:text-sm md:px-4 md:py-1.5 md:flex-shrink-0 ${selectedTag === tag ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
-                                        >
-                                            {tag}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <button onClick={scrollRight} className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 items-center justify-center bg-white/85 backdrop-blur-md border border-white/80 shadow-md rounded-full hover:bg-white text-stone-700 hover:text-red-600 transition-all cursor-pointer">&gt;</button>
+                                )}
+                                <button
+                                    onClick={() => onTagToggle('')}
+                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                >
+                                    Tất cả sản phẩm
+                                </button>
+                                {uniqueTags.map(tag => (
+                                    <button
+                                        key={tag}
+                                        onClick={() => onTagToggle(tag)}
+                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
                             </div>
+
+                            <button
+                                type="button"
+                                onClick={scrollRight}
+                                aria-label="Cuộn sang phải"
+                                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            >
+                                &gt;
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1804,33 +1822,36 @@ QUY TẮC:
                                             <div className="flex-1 w-full max-w-7xl mx-auto pb-10 mb-8">
                                                 <TagsSlider uniqueTags={categories} selectedTag={selectedTag} onTagToggle={handleTagToggle} isAdmin={isAdmin} onManageTags={() => setIsTagsModalOpen(true)} />
 
-                                                <div className="hidden justify-center mt-4 mb-2">
-                                                    <select
-                                                        className="w-[90%] md:w-48 p-2 border border-red-300 rounded-md text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-                                                        onChange={(e) => {
-                                                            const val = e.target.value;
-                                                            if (val === 'all') {
-                                                                setPriceMin(''); setPriceMax(''); setSortOrder('');
-                                                            } else if (val === 'under-50') {
-                                                                setPriceMin(''); setPriceMax(50000); setSortOrder('');
-                                                            } else if (val === '50-100') {
-                                                                setPriceMin(50000); setPriceMax(100000); setSortOrder('');
-                                                            } else if (val === 'over-100') {
-                                                                setPriceMin(100000); setPriceMax(''); setSortOrder('');
-                                                            } else if (val === 'asc') {
-                                                                setPriceMin(''); setPriceMax(''); setSortOrder('asc');
-                                                            } else if (val === 'desc') {
-                                                                setPriceMin(''); setPriceMax(''); setSortOrder('desc');
-                                                            }
+                                                {/* Thanh đếm số sản phẩm (Trái) & Sắp xếp (Phải) */}
+                                                <div className="flex items-center justify-between px-2 py-2.5 mb-2 text-xs sm:text-sm text-stone-600">
+                                                    <span className="font-medium text-stone-500">
+                                                        Hiển thị <strong className="text-red-600 font-semibold">{isAdmin ? filteredProducts.length : totalCount}</strong> sản phẩm
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (sortOrder === '') setSortOrder('asc');
+                                                            else if (sortOrder === 'asc') setSortOrder('desc');
+                                                            else setSortOrder('');
                                                         }}
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/75 hover:bg-red-50/80 backdrop-blur-sm border border-red-100/80 text-stone-700 hover:text-red-600 font-medium shadow-sm transition-all cursor-pointer select-none"
                                                     >
-                                                        <option value="all">Lọc theo giá (Tất cả)</option>
-                                                        <option value="under-50">Dưới 50.000đ</option>
-                                                        <option value="50-100">50.000đ - 150.000đ</option>
-                                                        <option value="over-100">Trên 100.000 �</option>
-                                                        <option value="asc">Giá: Thấp �ến Cao</option>
-                                                        <option value="desc">Giá: Cao �ến Thấp</option>
-                                                    </select>
+                                                        <span>
+                                                            {sortOrder === 'asc' ? 'Sắp xếp: Giá tăng dần' : sortOrder === 'desc' ? 'Sắp xếp: Giá giảm dần' : 'Sắp xếp'}
+                                                        </span>
+                                                        {sortOrder === 'asc' ? (
+                                                            <span className="text-red-600 font-bold leading-none">↑</span>
+                                                        ) : sortOrder === 'desc' ? (
+                                                            <span className="text-red-600 font-bold leading-none">↓</span>
+                                                        ) : (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-red-500">
+                                                                <path d="m21 16-4 4-4-4" />
+                                                                <path d="M17 20V4" />
+                                                                <path d="m3 8 4-4 4 4" />
+                                                                <path d="M7 4v16" />
+                                                            </svg>
+                                                        )}
+                                                    </button>
                                                 </div>
 
                                                 {loading ? (
@@ -1852,9 +1873,9 @@ QUY TẮC:
                                                                 return (
                                                                     <div
                                                                         key={product.id}
-                                                                        className={`group bg-white/70 hover:bg-white/88 backdrop-blur-md border border-white/80 shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.10)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                        className={`group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-md border border-red-200/55 shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
                                                                     >
-                                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white/50 p-4 flex items-center justify-center border-b border-white/60 block cursor-pointer">
+                                                                        <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white/85 p-4 flex items-center justify-center border-b border-red-100/60 block cursor-pointer">
                                                                             <img
                                                                                 src={product.image_url || FallbackImage}
                                                                                 onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
@@ -1878,12 +1899,12 @@ QUY TẮC:
                                                                             {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
                                                                         </CardLink>
 
-                                                                        <div className="p-5 flex flex-col flex-1 bg-transparent">
+                                                                        <div className="p-4 sm:p-5 flex flex-col flex-1 bg-transparent">
                                                                             <CardLink {...cardLinkProps}>
                                                                                 <h3 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={product.name}>{product.name}</h3>
                                                                             </CardLink>
                                                                             <div className="mb-2">
-                                                                                <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
+                                                                                <span className={`px-2 py-1 rounded-md text-xs sm:text-sm font-medium ${colorClass}`}>
                                                                                     {product.stock_status || 'Hàng sẵn tại kho'}
                                                                                 </span>
                                                                             </div>
@@ -1893,10 +1914,10 @@ QUY TẮC:
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                                                                                     disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
-                                                                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-2"
+                                                                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-3 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-1.5 text-xs sm:text-sm whitespace-nowrap"
                                                                                 >
                                                                                     {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
-                                                                                        <>Thêm vào giỏ hàng</>
+                                                                                        <>Thêm vào giỏ</>
                                                                                     ) : (
                                                                                         <>Hết hàng</>
                                                                                     )}

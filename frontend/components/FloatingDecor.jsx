@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // HỆ THỐNG 30 ICONS - 3 LỚP CHIỀU SÂU + KÍNH MỜ (3-Layer Depth-of-Field Parallax & Ambient Glass)
 // Chỉ sử dụng đúng 9 ảnh đã tách nền (/decor-clean/decor-1.png -> decor-9.png)
@@ -55,31 +55,40 @@ const NEAR_LAYER_ITEMS = [
 ];
 
 const FloatingDecor = () => {
-    const [scrollY, setScrollY] = useState(0);
+    const containerRef = useRef(null);
 
     useEffect(() => {
         let ticking = false;
+        let rafId = null;
 
         const updateScroll = () => {
-            setScrollY(window.scrollY || window.pageYOffset || 0);
+            if (containerRef.current) {
+                const currentScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+                containerRef.current.style.setProperty('--scroll-y', `${currentScrollY}px`);
+            }
             ticking = false;
         };
 
         const onScroll = () => {
             if (!ticking) {
-                window.requestAnimationFrame(updateScroll);
+                rafId = window.requestAnimationFrame(updateScroll);
                 ticking = true;
             }
         };
 
         updateScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            if (rafId) window.cancelAnimationFrame(rafId);
+        };
     }, []);
 
     return (
         <div
-            className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
+            ref={containerRef}
+            className="fixed inset-0 h-[100lvh] z-0 pointer-events-none overflow-hidden select-none"
+            style={{ '--scroll-y': '0px' }}
             aria-hidden="true"
         >
             <style>{`
@@ -102,7 +111,7 @@ const FloatingDecor = () => {
                         top: item.top,
                         left: item.left,
                         filter: 'blur(1.5px)',
-                        transform: `translate3d(0, ${scrollY * item.speed}px, 0) rotate(${item.rotate}deg)`,
+                        transform: `translate3d(0, calc(var(--scroll-y, 0px) * ${item.speed}), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
                     <img
@@ -118,7 +127,7 @@ const FloatingDecor = () => {
             ))}
 
             {/* TẦNG NỀN KÍNH MỜ (Ambient Glass Backdrop - Đè lên Lớp Xa nhưng nằm dưới Lớp Trung & Lớp Gần) */}
-            <div className="fixed inset-0 pointer-events-none bg-white/25 backdrop-blur-[1.5px] bg-gradient-to-br from-red-50/30 via-white/20 to-orange-50/20" />
+            <div className="fixed inset-0 h-[100lvh] pointer-events-none bg-white/25 backdrop-blur-[1.5px] bg-gradient-to-br from-red-50/30 via-white/20 to-orange-50/20" />
 
             {/* LỚP 2: LỚP TRUNG (MID LAYER - 10 items rìa trong, speed -0.15, opacity 0.22, blur 0.5px) */}
             {MID_LAYER_ITEMS.map((item) => (
@@ -129,7 +138,7 @@ const FloatingDecor = () => {
                         top: item.top,
                         ...(item.left ? { left: item.left } : { right: item.right }),
                         filter: 'blur(0.5px) drop-shadow(0 4px 8px rgba(0,0,0,0.05))',
-                        transform: `translate3d(0, ${scrollY * item.speed}px, 0) rotate(${item.rotate}deg)`,
+                        transform: `translate3d(0, calc(var(--scroll-y, 0px) * ${item.speed}), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
                     <img
@@ -153,7 +162,7 @@ const FloatingDecor = () => {
                         top: item.top,
                         ...(item.left ? { left: item.left } : { right: item.right }),
                         filter: 'blur(0px) drop-shadow(0 10px 15px rgba(0,0,0,0.08))',
-                        transform: `translate3d(0, ${scrollY * item.speed}px, 0) rotate(${item.rotate}deg)`,
+                        transform: `translate3d(0, calc(var(--scroll-y, 0px) * ${item.speed}), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
                     <img
@@ -172,3 +181,4 @@ const FloatingDecor = () => {
 };
 
 export default FloatingDecor;
+
