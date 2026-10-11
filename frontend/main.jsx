@@ -95,19 +95,39 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                     try {
                         const trimmedTerm = debouncedTerm.trim();
                         const slugTerm = generateSlug(trimmedTerm);
-                        const searchFilter = slugTerm
-                            ? `name.ilike.%${trimmedTerm}%,slug.ilike.%${slugTerm}%`
-                            : `name.ilike.%${trimmedTerm}%`;
-                        const { data, error } = await supabase
-                            .from('products')
-                            .select('name, slug, image_url, price')
-                            .eq('is_hidden', false)
-                            .or(searchFilter)
-                            .limit(20);
-                        if (error) throw error;
-                        
-                        let rawData = data || [];
-                        const normalizedTerm = removeAccents(debouncedTerm.trim());
+                        const normalizedTerm = removeAccents(trimmedTerm);
+                        let rawData = null;
+
+                        try {
+                            const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
+                            if (cachedRaw) {
+                                const cached = JSON.parse(cachedRaw);
+                                if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
+                                    rawData = cached.data.filter(p => {
+                                        if (p.is_hidden) return false;
+                                        const pName = removeAccents(p.name || '');
+                                        const pSlug = String(p.slug || '').toLowerCase();
+                                        return pName.includes(normalizedTerm) || (slugTerm && pSlug.includes(slugTerm));
+                                    });
+                                }
+                            }
+                        } catch (e) {
+                            rawData = null;
+                        }
+
+                        if (!rawData) {
+                            const searchFilter = slugTerm
+                                ? `name.ilike.%${trimmedTerm}%,slug.ilike.%${slugTerm}%`
+                                : `name.ilike.%${trimmedTerm}%`;
+                            const { data, error } = await supabase
+                                .from('products')
+                                .select('name, slug, image_url, price')
+                                .eq('is_hidden', false)
+                                .or(searchFilter)
+                                .limit(20);
+                            if (error) throw error;
+                            rawData = data || [];
+                        }
 
                         rawData.sort((a, b) => {
                             const nameA = removeAccents(a.name);
@@ -304,8 +324,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const HeroBanner = ({ bannerMobileUrl, bannerDesktopUrl, isAdmin, onBannerMobileUpload, onBannerDesktopUpload }) => {
-            const finalMobileBanner = bannerMobileUrl || "./media__1783108509497.png";
-            const finalDesktopBanner = bannerDesktopUrl || "./media__1783108509497.png";
+            const finalMobileBanner = bannerMobileUrl || "/media__1783108509497.png";
+            const finalDesktopBanner = bannerDesktopUrl || "/media__1783108509497.png";
             return (
                 <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
                     {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
@@ -314,11 +334,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             src={finalMobileBanner}
                             className="w-full h-auto object-contain block md:hidden"
                             alt="Banner Mobile"
+                            decoding="async"
                         />
                         <img
                             src={finalDesktopBanner}
                             className="w-full h-auto object-contain hidden md:block"
                             alt="Banner PC"
+                            decoding="async"
                         />
                         
                         {/* Lớp 2: Nội dung Button đè lên trên */}
@@ -1179,7 +1201,8 @@ QUY TẮC:
                     setIsLoading(true);
                     await supabase.from('tags').insert([{ name: newTag.trim() }]);
                     setNewTag('');
-                    await fetchData();
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    await fetchData(true);
                     setIsLoading(false);
                 }
             };
@@ -1190,7 +1213,8 @@ QUY TẮC:
                 if (updated && updated.trim()) {
                     setIsLoading(true);
                     await supabase.from('tags').update({ name: updated.trim() }).eq('name', oldName);
-                    await fetchData();
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    await fetchData(true);
                     setIsLoading(false);
                 }
             };
@@ -1200,7 +1224,8 @@ QUY TẮC:
                     setIsLoading(true);
                     const oldName = categories[index];
                     await supabase.from('tags').delete().eq('name', oldName);
-                    await fetchData();
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    await fetchData(true);
                     setIsLoading(false);
                 }
             };
@@ -1232,7 +1257,7 @@ QUY TẮC:
             );
         };
 
-        const ProductDetail = ({ onAddToCart }) => {
+        const ProductDetail = ({ onAddToCart, products = [], parentLoading = false }) => {
             const { slug } = useParams();
             const [product, setProduct] = useState(null);
             const [relatedProducts, setRelatedProducts] = useState([]);
@@ -1268,43 +1293,99 @@ QUY TẮC:
             }, [slug]);
 
             useEffect(() => {
-                const fetchProductDetail = async () => {
-                    setLoading(true);
+                let isMounted = true;
+
+                const computeRelated = (targetProduct, allList) => {
+                    const visibleList = (allList || []).filter(p => !p.is_hidden && p.id !== targetProduct.id);
+                    const sameCategory = visibleList.filter(p => {
+                        if (targetProduct.category && p.category && p.category === targetProduct.category) return true;
+                        if (Array.isArray(targetProduct.tags) && targetProduct.tags.length > 0 && Array.isArray(p.tags)) {
+                            return p.tags.some(t => targetProduct.tags.includes(t));
+                        }
+                        return false;
+                    });
+                    return (sameCategory.length > 0 ? sameCategory : visibleList).slice(0, 5);
+                };
+
+                const findInList = (list) => {
+                    if (!Array.isArray(list) || list.length === 0) return null;
+                    return list.find(p => String(p.slug) === String(slug) || String(p.id) === String(slug)) || null;
+                };
+
+                const resolveProductDetail = async () => {
+                    // 1. Check in-memory products prop from App
+                    const fromProps = findInList(products);
+                    if (fromProps) {
+                        if (isMounted) {
+                            setProduct(fromProps);
+                            setRelatedProducts(computeRelated(fromProps, products));
+                            setLoading(false);
+                        }
+                        return;
+                    }
+
+                    // 2. Check sessionStorage SWR cache (5-minute TTL)
                     try {
-                        const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
-                        if (error) throw error;
-                        setProduct(data);
-
-                        if (data) {
-                            const { data: allProductsData } = await supabase
-                                .from('products')
-                                .select('*')
-                                .eq('is_hidden', false)
-                                .neq('id', data.id)
-                                .order('id', { ascending: false });
-
-                            const list = allProductsData || [];
-                            const sameCategory = list.filter(p => {
-                                if (p.id === data.id) return false;
-                                if (data.category && p.category && p.category === data.category) return true;
-                                if (Array.isArray(data.tags) && data.tags.length > 0 && Array.isArray(p.tags)) {
-                                    return p.tags.some(t => data.tags.includes(t));
+                        const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
+                        if (cachedRaw) {
+                            const cached = JSON.parse(cachedRaw);
+                            if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
+                                const fromCache = findInList(cached.data);
+                                if (fromCache) {
+                                    if (isMounted) {
+                                        setProduct(fromCache);
+                                        setRelatedProducts(computeRelated(fromCache, cached.data));
+                                        setLoading(false);
+                                    }
+                                    return;
                                 }
-                                return false;
-                            });
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Cache read error in ProductDetail:', e);
+                    }
 
-                            setRelatedProducts((sameCategory.length > 0 ? sameCategory : list).slice(0, 5));
+                    // 3. If App is currently fetching all products, wait for it first
+                    if (parentLoading) {
+                        if (isMounted) setLoading(true);
+                        return;
+                    }
+
+                    // 4. Fallback: fetch from Supabase safely
+                    if (isMounted) setLoading(true);
+                    try {
+                        let { data, error } = await supabase.from('products').select('*').eq('slug', slug).maybeSingle();
+                        if (!data && !error && !isNaN(Number(slug))) {
+                            const byId = await supabase.from('products').select('*').eq('id', Number(slug)).maybeSingle();
+                            data = byId.data;
+                            error = byId.error;
+                        }
+                        if (error) throw error;
+
+                        if (isMounted) {
+                            setProduct(data || null);
+                        }
+
+                        if (data && isMounted) {
+                            const sourceList = (Array.isArray(products) && products.length > 0)
+                                ? products
+                                : (await supabase.from('products').select('*').eq('is_hidden', false).order('id', { ascending: false })).data || [];
+                            if (isMounted) {
+                                setRelatedProducts(computeRelated(data, sourceList));
+                            }
                         }
                     } catch (error) {
                         console.error('Error fetching product:', error);
                     } finally {
-                        setLoading(false);
+                        if (isMounted) setLoading(false);
                     }
                 };
-                fetchProductDetail();
-            }, [slug]);
 
-            if (loading) {
+                resolveProductDetail();
+                return () => { isMounted = false; };
+            }, [slug, products, parentLoading]);
+
+            if (loading || (parentLoading && !product)) {
                 return (
                     <div className="flex justify-center py-32">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
@@ -1321,13 +1402,14 @@ QUY TẮC:
 
             return (
                 <div ref={detailTopRef} className="w-full pb-12 animate-fade-in">
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-red-100/80 overflow-hidden flex flex-col md:flex-row p-6 md:p-10 mb-10">
+                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-red-100/80 overflow-hidden flex flex-col md:flex-row p-6 md:p-10 mb-8">
                         <div className="w-full md:w-1/2 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50 rounded-xl">
                             <img
                                 src={product.image_url || FallbackImage}
                                 onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                 alt={product.name}
                                 loading="lazy"
+                                decoding="async"
                                 className="w-full max-h-[500px] object-cover drop-shadow-md"
                             />
                         </div>
@@ -1372,16 +1454,17 @@ QUY TẮC:
                         </div>
                     </div>
 
-                    {/* SẢN PHẨM CÙNG DANH MỤC */}
+                    {/* SẢN PHẨM CÙNG DANH MỤC (COMPACT SINGLE-ROW STRIP) */}
                     {relatedProducts.length > 0 && (
-                        <div className="mt-8">
-                            <h3 className="text-lg sm:text-xl font-bold text-red-700 uppercase tracking-wide mb-4 flex items-center gap-2">
-                                <span className="w-1.5 h-6 bg-red-700 rounded-full inline-block"></span>
+                        <div className="mt-6">
+                            <h4 className="text-xs sm:text-sm font-bold text-red-700 uppercase tracking-wider mb-2.5">
                                 Sản phẩm cùng danh mục
-                            </h3>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            </h4>
+                            <div
+                                onWheel={(e) => { if (e.deltaY !== 0) { e.currentTarget.scrollLeft += e.deltaY; } }}
+                                className="flex flex-nowrap items-stretch gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-2 scroll-smooth"
+                            >
                                 {relatedProducts.map(relProduct => {
-                                    const relColorClass = relProduct.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
                                     const relOutOfStock = relProduct.stock_status && relProduct.stock_status.toLowerCase() === 'hết hàng';
                                     const handleSelectRelated = () => {
                                         navigate(`/san-pham/${relProduct.slug || relProduct.id}`);
@@ -1391,46 +1474,36 @@ QUY TẮC:
                                         <div
                                             key={relProduct.id}
                                             onClick={handleSelectRelated}
-                                            className="group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-md border border-red-200/55 shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col cursor-pointer"
+                                            className="flex-shrink-0 w-32 sm:w-36 md:w-40 p-2 rounded-xl bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 backdrop-blur-md border border-red-200/55 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
                                         >
-                                            <div className="relative aspect-square overflow-hidden bg-white/85 p-4 flex items-center justify-center border-b border-red-100/60">
+                                            <div>
                                                 <img
                                                     src={relProduct.image_url || FallbackImage}
                                                     onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                                     alt={relProduct.name}
                                                     loading="lazy"
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    decoding="async"
+                                                    className="w-full h-20 sm:h-24 object-contain rounded-lg bg-white p-1 mb-1.5"
                                                 />
-                                            </div>
-                                            <div className="p-4 sm:p-5 flex flex-col flex-1 bg-transparent">
-                                                <h4 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={relProduct.name}>
+                                                <h5 className="text-[11px] sm:text-xs font-medium text-stone-800 line-clamp-2 leading-tight mb-1" title={relProduct.name}>
                                                     {relProduct.name}
-                                                </h4>
-                                                <div className="mb-2">
-                                                    <span className={`px-2 py-1 rounded-md text-xs sm:text-sm font-medium ${relColorClass}`}>
-                                                        {relProduct.stock_status || 'Hàng sẵn tại kho'}
-                                                    </span>
-                                                </div>
-                                                <div className="mt-auto pt-3">
-                                                    <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">
-                                                        Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span>
-                                                    </p>
-                                                    <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis">
-                                                        <span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span>
-                                                        <span className="text-sm md:text-base font-bold text-red-600">{formatVND(relProduct.price)}</span>
-                                                    </p>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            onAddToCart(relProduct);
-                                                        }}
-                                                        disabled={relOutOfStock}
-                                                        className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
-                                                        style={!relOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
-                                                    >
-                                                        {!relOutOfStock ? <>Thêm vào giỏ</> : <>Hết hàng</>}
-                                                    </button>
-                                                </div>
+                                                </h5>
+                                            </div>
+                                            <div className="mt-auto">
+                                                <p className="text-xs font-bold text-red-600 mb-1.5">
+                                                    {formatVND(relProduct.price)}
+                                                </p>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onAddToCart(relProduct);
+                                                    }}
+                                                    disabled={relOutOfStock}
+                                                    className="w-full py-1 px-2 rounded-lg text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                                    style={!relOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
+                                                >
+                                                    {!relOutOfStock ? 'Thêm vào giỏ' : 'Hết hàng'}
+                                                </button>
                                             </div>
                                         </div>
                                     );
@@ -1525,54 +1598,65 @@ QUY TẮC:
 
             const productsSectionRef = useRef(null);
 
-            const fetchData = async () => {
+            const fetchData = async (forceRefresh = false) => {
+                if (!forceRefresh) {
+                    try {
+                        const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
+                        if (cachedRaw) {
+                            const cached = JSON.parse(cachedRaw);
+                            if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
+                                setProducts(cached.data);
+                                setTotalCount(cached.data.filter(p => !p.is_hidden).length);
+                                if (cached.settings) setSettings(cached.settings);
+                                if (Array.isArray(cached.categories)) setCategories(cached.categories);
+                                setLoading(false);
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Cache read error:', e);
+                    }
+                }
+
                 setLoading(true);
                 try {
-                    let query = supabase.from('products').select('*', { count: 'exact' });
-
-                    if (!isAdmin) {
-                        query = query.eq('is_hidden', false);
-                        if (selectedTag) query = query.contains('tags', [selectedTag]);
-                        if (priceMin) query = query.gte('price', Number(priceMin));
-                        if (priceMax) query = query.lte('price', Number(priceMax));
-                        
-                        if (sortOrder === 'asc') query = query.order('price', { ascending: true });
-                        else if (sortOrder === 'desc') query = query.order('price', { ascending: false });
-                        else query = query.order('id', { ascending: false });
-
-                        const from = (currentPage - 1) * ITEMS_PER_PAGE;
-                        const to = from + ITEMS_PER_PAGE - 1;
-                        query = query.range(from, to);
-                    } else {
-                        query = query.order('id', { ascending: false });
-                    }
-
-                    const { data: pData, count, error: pError } = await query;
+                    const { data: pData, error: pError } = await supabase
+                        .from('products')
+                        .select('*')
+                        .order('id', { ascending: false });
                     if (pError) throw pError;
-                    
-                    if (pData) {
-                        setProducts(pData);
-                        if (!isAdmin) {
-                            setTotalCount(count || 0);
-                        } else {
-                            setTotalCount(pData.length);
-                        }
-                    }
 
+                    const productsList = pData || [];
+                    setProducts(productsList);
+                    setTotalCount(productsList.filter(p => !p.is_hidden).length);
+
+                    let settingsObj = {};
                     const { data: sData, error: sError } = await supabase.from('settings').select('*');
                     if (sError) throw sError;
                     if (sData) {
-                        const settingsObj = {};
                         sData.forEach(item => {
                             settingsObj[item.key] = item.value;
                         });
                         setSettings(settingsObj);
                     }
 
+                    let categoriesArr = [];
                     const { data: tData, error: tError } = await supabase.from('tags').select('*').order('created_at', { ascending: true });
                     if (tError) throw tError;
                     if (tData) {
-                        setCategories(tData.map(t => t.name));
+                        categoriesArr = tData.map(t => t.name);
+                        setCategories(categoriesArr);
+                    }
+
+                    try {
+                        sessionStorage.setItem('tokcay_products_cache', JSON.stringify({
+                            data: productsList,
+                            settings: settingsObj,
+                            categories: categoriesArr,
+                            timestamp: Date.now()
+                        }));
+                    } catch (cacheErr) {
+                        console.warn('Cache write error:', cacheErr);
                     }
                 } catch (error) {
                     console.error('Lỗi khi tải dữ liệu:', error);
@@ -1583,7 +1667,7 @@ QUY TẮC:
 
             useEffect(() => {
                 fetchData();
-            }, [currentPage, selectedTag, priceMin, priceMax, sortOrder, isAdmin]);
+            }, []);
 
             useEffect(() => {
                 if (currentPage !== 1) {
@@ -1609,18 +1693,18 @@ QUY TẮC:
 
                     const dbKey = type === 'mobile' ? 'banner_mobile_url' : 'banner_desktop_url';
                     await supabase.from('settings').upsert({ key: dbKey, value: data.publicUrl }, { onConflict: 'key' });
-                    await fetchData();
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    await fetchData(true);
                 } catch (error) {
-                    alert('L�i xử lý banner: ' + error.message);
+                    alert('Lỗi xử lý banner: ' + error.message);
                 } finally {
                     setLoading(false);
                 }
             };
 
             const filteredProducts = useMemo(() => {
-                if (!isAdmin) return products; // Server side already filtered
-                
                 let result = products.filter(p => {
+                    if (!isAdmin && p.is_hidden) return false;
                     if (selectedTag !== '' && (!p.tags || !p.tags.includes(selectedTag))) return false;
                     const price = p.price || 0;
                     if (priceMin && price < Number(priceMin)) return false;
@@ -1637,8 +1721,8 @@ QUY TẮC:
                 return result;
             }, [products, isAdmin, selectedTag, priceMin, priceMax, sortOrder]);
 
-            const totalPages = isAdmin ? Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) : Math.ceil(totalCount / ITEMS_PER_PAGE);
-            const currentProducts = isAdmin ? filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE) : products;
+            const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+            const currentProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
             // Handlers
             const handleAddToCart = (product) => {
@@ -1742,7 +1826,10 @@ QUY TẮC:
             const handleToggleVisibility = async (e, product) => {
                 e.stopPropagation();
                 const { error } = await supabase.from('products').update({ is_hidden: !product.is_hidden }).eq('id', product.id);
-                if (!error) fetchData();
+                if (!error) {
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    fetchData(true);
+                }
             };
 
             const handleEditClick = (e, product) => {
@@ -1758,6 +1845,7 @@ QUY TẮC:
                         const { error } = await supabase.from('products').delete().eq('id', product.id);
                         if (error) throw error;
 
+                        sessionStorage.removeItem('tokcay_products_cache');
                         setProducts(prev => prev.filter(p => p.id !== product.id));
 
                         if (product.image_url && product.image_url.includes('supabase.co')) {
@@ -1766,8 +1854,9 @@ QUY TẮC:
                                 await supabase.storage.from('images').remove([parts[1]]);
                             }
                         }
+                        await fetchData(true);
                     } catch (error) {
-                        alert('L�i xóa sản phẩm: ' + error.message);
+                        alert('Lỗi xóa sản phẩm: ' + error.message);
                     }
                 }
             };
@@ -1786,10 +1875,11 @@ QUY TẮC:
                 }
 
                 if (err) {
-                    alert('L�i lưu sản phẩm: ' + err.message);
+                    alert('Lỗi lưu sản phẩm: ' + err.message);
                 } else {
                     setIsProductModalOpen(false);
-                    fetchData(); // Cập nhật lại state products ngay lập tức
+                    sessionStorage.removeItem('tokcay_products_cache');
+                    fetchData(true); // Cập nhật lại state products ngay lập tức
                 }
             };
 
@@ -1800,7 +1890,8 @@ QUY TẮC:
                 }));
                 await supabase.from('settings').upsert(updates, { onConflict: 'key' });
                 setIsSettingsModalOpen(false);
-                fetchData();
+                sessionStorage.removeItem('tokcay_products_cache');
+                fetchData(true);
             };
 
             const handleTagToggle = (tag) => {
@@ -1919,7 +2010,7 @@ QUY TẮC:
                                             {/* HÀNG 2: Thanh đếm số sản phẩm (Trái) & Bộ lọc / Sắp xếp (Phải) */}
                                             <div className="w-full flex flex-wrap items-center justify-between gap-2 px-1 relative z-20 text-xs sm:text-sm text-stone-600">
                                                 <span className="font-medium text-stone-500">
-                                                    Hiển thị <strong className="text-red-600 font-semibold">{isAdmin ? filteredProducts.length : totalCount}</strong> sản phẩm
+                                                    Hiển thị <strong className="text-red-600 font-semibold">{filteredProducts.length}</strong> sản phẩm
                                                 </span>
 
                                                 <div className="flex items-center gap-2 relative">
@@ -2048,6 +2139,7 @@ QUY TẮC:
                                                                             onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                                                             alt={product.name}
                                                                             loading="lazy"
+                                                                            decoding="async"
                                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                                         />
                                                                         {isAdmin && (
@@ -2167,7 +2259,7 @@ QUY TẮC:
                                     )}
                                 </>
                             } />
-                            <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} />} />
+                            <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} products={products} parentLoading={loading} />} />
                             <Route path="/admin/*" element={
                                 <div className="p-20 text-center flex flex-col items-center justify-center min-h-[50vh]">
                                     <ScrollToTopAdmin />
