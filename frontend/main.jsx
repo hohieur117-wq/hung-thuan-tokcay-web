@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
+import FloatingDecor from './components/FloatingDecor.jsx';
 
 
         // Tích hợp Supabase
@@ -1654,7 +1655,8 @@ QUY TẮC:
             };
 
             return (
-                <div className="min-h-screen flex flex-col font-sans">
+                <div className="relative min-h-screen flex flex-col font-sans">
+                    <FloatingDecor />
 
                     <Header
                         cartCount={cart.reduce((a, c) => a + c.qty, 0)}
@@ -1663,7 +1665,7 @@ QUY TẮC:
                         onProductsClick={() => setShowFilters(!showFilters)}
                     />
 
-                    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                         <Routes>
                             <Route path="/" element={
                                 <>
@@ -1940,7 +1942,7 @@ QUY TẮC:
                         </Routes>
                     </div>
 
-                    <footer className="w-full bg-white border-t border-gray-200 py-10 mt-auto">
+                    <footer className="relative z-10 w-full bg-white border-t border-gray-200 py-10 mt-auto">
                         <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row justify-between items-start gap-8">
                             <div className="flex flex-col space-y-2">
                                 <h4 className="text-base font-bold text-gray-800">CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h4>
