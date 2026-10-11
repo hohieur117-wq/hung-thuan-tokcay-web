@@ -255,13 +255,11 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                             const y = el.getBoundingClientRect().top + window.scrollY - 100;
                                             window.scrollTo({ top: y, behavior: 'smooth' });
                                         }
-                                    }} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center lg:hidden">
-                                        <span className="hidden md:block font-semibold text-sm uppercase tracking-wide">Sản phẩm</span>
-                                        <i className="fa-solid fa-box-open text-xl md:hidden"></i>
+                                    }} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center md:hidden" aria-label="Sản phẩm">
+                                        <i className="fa-solid fa-box-open text-xl"></i>
                                     </button>
 
-                                    <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center lg:hidden">
-
+                                    <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center md:hidden" aria-label="Liên hệ">
                                         <i className="fa-solid fa-headset text-xl"></i>
                                     </button>
 
