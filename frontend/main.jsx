@@ -127,27 +127,29 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             }, [debouncedTerm]);
 
             return (
-                <div ref={wrapperRef} className="relative flex shadow-inner rounded-lg overflow-visible bg-white/10 p-1 w-full max-w-md">
-                    <input
-                        type="search"
-                        name="tokcay_search_query"
-                        className="block w-full pl-4 pr-12 py-2.5 rounded-l-md border-none leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="none"
-                        spellCheck="false"
-                        inputMode="search"
-                    />
-                    <button className="bg-white hover:bg-gray-100 text-primary px-5 py-2.5 rounded-r-md transition-colors flex items-center justify-center border-l border-gray-200">
-                        <i className="fa-solid fa-magnifying-glass"></i>
-                    </button>
+                <div ref={wrapperRef} className="relative w-full max-w-md">
+                    <div className="flex items-center w-full rounded-full bg-white/95 focus-within:bg-white focus-within:ring-2 focus-within:ring-yellow-300 shadow-inner overflow-hidden p-1 transition-all">
+                        <input
+                            type="search"
+                            name="tokcay_search_query"
+                            className="block w-full pl-4 pr-3 py-2 rounded-l-full border-none leading-5 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
+                            placeholder="Tìm kiếm sản phẩm..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
+                            autoComplete="off"
+                            autoCorrect="off"
+                            autoCapitalize="none"
+                            spellCheck="false"
+                            inputMode="search"
+                        />
+                        <button className="bg-red-50 hover:bg-primary text-primary hover:text-white w-9 h-9 rounded-full transition-all duration-200 flex items-center justify-center flex-shrink-0">
+                            <i className="fa-solid fa-magnifying-glass text-sm"></i>
+                        </button>
+                    </div>
                     
                     {isDropdownOpen && results.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-[100]">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[100]">
                             {results.map(product => (
                                 <div 
                                     key={product.slug || product.name} 
@@ -165,7 +167,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         </div>
                     )}
                     {isDropdownOpen && debouncedTerm.trim() && results.length === 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 p-4 text-center text-sm text-gray-500 z-[100]">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 text-center text-sm text-gray-500 z-[100]">
                             Không tìm thấy sản phẩm nào.
                         </div>
                     )}
@@ -193,10 +195,10 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         let cropHeight = srcHeight;
 
                         if (srcRatio > targetRatio) {
-                            // Ảnh g�c quá r�"ng ngang => Cắt b�:t chiều ngang
+                            // Ảnh gốc quá rộng ngang => Cắt bớt chiều ngang
                             cropWidth = srcHeight * targetRatio;
                         } else {
-                            // Ảnh g�c quá cao => Cắt b�:t chiều cao
+                            // Ảnh gốc quá cao => Cắt bớt chiều cao
                             cropHeight = srcWidth / targetRatio;
                         }
 
@@ -225,13 +227,21 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick }) => {
             return (
-                <header className="sticky top-0 z-40 bg-primary shadow-lg border-b border-primaryDark">
+                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-700/85 via-red-600/80 to-red-700/85 backdrop-blur-md shadow-[0_8px_30px_rgb(185,28,28,0.22)] border-b border-white/25 transition-all">
+                    {/* Topbar siêu mảnh */}
+                    <div className="hidden md:block bg-red-950/95 text-red-100 text-xs py-1.5 px-4 border-b border-white/10 backdrop-blur-sm">
+                        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-4 flex justify-between items-center tracking-wide">
+                            <span>🇰🇷 Nhà Phân Phối Nguyên Liệu Thực Phẩm Hàn Quốc Uy Tín - Chất Lượng</span>
+                            <span>📍 Cần Thơ & Toàn Quốc | 📞 Hotline Sỉ/Lẻ: 0902 631 632</span>
+                        </div>
+                    </div>
+
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
                             <div className="flex-1 flex justify-start items-center">
                                 <a href="#" className="flex items-center cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo(0, 0); }}>
-                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer" />
+                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer drop-shadow-sm" />
                                 </a>
                             </div>
 
@@ -241,32 +251,32 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             </div>
 
                             {/* Navigation & Cart */}
-                            <div className="flex-1 flex justify-end items-center gap-4 lg:gap-8">
-                                <nav className="hidden md:flex justify-between items-center gap-5 text-white font-semibold text-sm">
-                                    <button onClick={onProductsClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Sản phẩm</button>
-                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Khuyến mãi</button>
-                                    <button onClick={onContactClick} className="hover:text-yellow-300 transition-colors uppercase tracking-wide outline-none p-2 flex items-center justify-center">Liên hệ</button>
+                            <div className="flex-1 flex justify-end items-center gap-3 lg:gap-6">
+                                <nav className="hidden md:flex justify-between items-center gap-2 lg:gap-3 text-white font-semibold text-sm">
+                                    <button onClick={onProductsClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap">Sản phẩm</button>
+                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap">Khuyến mãi</button>
+                                    <button onClick={onContactClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap">Liên hệ</button>
                                 </nav>
 
-                                <div className="flex items-center gap-2 sm:gap-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
                                     <button onClick={() => {
                                         const el = document.getElementById('products-section');
                                         if (el) {
                                             const y = el.getBoundingClientRect().top + window.scrollY - 100;
                                             window.scrollTo({ top: y, behavior: 'smooth' });
                                         }
-                                    }} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center md:hidden" aria-label="Sản phẩm">
-                                        <i className="fa-solid fa-box-open text-xl"></i>
+                                    }} className="p-2 rounded-full bg-white/10 hover:bg-white/25 border border-white/20 transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden" aria-label="Sản phẩm">
+                                        <i className="fa-solid fa-box-open text-lg"></i>
                                     </button>
 
-                                    <button onClick={onContactClick} className="text-white hover:text-yellow-300 transition-colors outline-none p-2 flex items-center justify-center md:hidden" aria-label="Liên hệ">
-                                        <i className="fa-solid fa-headset text-xl"></i>
+                                    <button onClick={onContactClick} className="p-2 rounded-full bg-white/10 hover:bg-white/25 border border-white/20 transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden" aria-label="Liên hệ">
+                                        <i className="fa-solid fa-headset text-lg"></i>
                                     </button>
 
-                                    <button onClick={onOpenCart} className="relative p-2 text-white hover:text-yellow-300 transition-colors flex items-center justify-center">
-                                        <i className="fa-solid fa-cart-shopping text-2xl"></i>
+                                    <button onClick={onOpenCart} className="relative p-2 rounded-full bg-white/10 hover:bg-white/25 border border-white/20 transition-all text-white hover:text-yellow-300 flex items-center justify-center">
+                                        <i className="fa-solid fa-cart-shopping text-xl"></i>
                                         {cartCount > 0 && (
-                                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold leading-none text-primary transform translate-x-1/4 -translate-y-1/4 bg-yellow-400 rounded-full shadow-sm border border-yellow-300">
+                                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-primary bg-yellow-400 rounded-full shadow-sm border border-yellow-300">
                                                 {cartCount}
                                             </span>
                                         )}
@@ -1940,34 +1950,54 @@ QUY TẮC:
                         </Routes>
                     </div>
 
-                    <footer className="relative z-10 w-full bg-white border-t border-gray-200 py-10 mt-auto">
-                        <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row justify-between items-start gap-8">
-                            <div className="flex flex-col space-y-2">
-                                <h4 className="text-base font-bold text-gray-800">CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h4>
-                                <div className="text-sm text-gray-600 space-y-1">
-                                    <p>MST: 1801801902</p>
-                                    <p>Địa chỉ: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành phố Cần Thơ</p>
-                                    <p>Điện thoại: 0902 631 632</p>
-                                    <p>Email: hungthuanfood@gmail.com</p>
+                    {/* Decorative Top Wave */}
+                    <div className="relative z-10 w-full mt-auto overflow-hidden leading-none pointer-events-none select-none -mb-px">
+                        <svg className="relative block w-full h-10 sm:h-14 md:h-16" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                            <path
+                                d="M0,32 C320,112 640,-16 960,48 C1200,96 1340,24 1440,12 L1440,120 L0,120 Z"
+                                className="fill-red-600/10"
+                            />
+                            <path
+                                d="M0,68 C360,12 720,116 1080,56 C1260,26 1380,64 1440,80 L1440,120 L0,120 Z"
+                                className="fill-red-700/85"
+                            />
+                        </svg>
+                    </div>
+
+                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-700/85 via-red-800/90 to-red-950/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(185,28,28,0.15)] overflow-hidden py-10 sm:py-12">
+                        {/* Ambient Light Orbs */}
+                        <div className="pointer-events-none absolute -top-24 left-1/4 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl"></div>
+                        <div className="pointer-events-none absolute -bottom-24 right-1/4 w-72 h-72 bg-red-500/20 rounded-full blur-3xl"></div>
+
+                        <div className="container relative z-10 mx-auto px-4 max-w-7xl">
+                            <div className="bg-white/[0.06] backdrop-blur-md border border-white/15 rounded-2xl p-6 sm:p-8 shadow-inner flex flex-col md:flex-row justify-between items-start gap-8">
+                                <div className="flex flex-col space-y-2.5 tracking-wide drop-shadow-sm">
+                                    <h4 className="text-base sm:text-lg font-bold text-white tracking-wider">CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h4>
+                                    <div className="text-sm text-red-50/90 space-y-1.5 leading-relaxed">
+                                        <p>MST: 1801801902</p>
+                                        <p>Địa chỉ: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành phố Cần Thơ</p>
+                                        <p>Điện thoại: 0902 631 632</p>
+                                        <p>Email: hungthuanfood@gmail.com</p>
+                                    </div>
+                                    <div className="text-red-200/80 text-sm font-medium pt-4 border-t border-white/10">
+                                        &copy; 2026 Hùng Thuận Tokcay. All rights reserved.
+                                    </div>
                                 </div>
-                                <div className="text-gray-500 text-sm font-medium pt-4">
-                                    &copy; 2026 Hùng Thuận Tokcay. All rights reserved.
+                                <div className="flex flex-col md:items-end gap-4 text-sm tracking-wide drop-shadow-sm">
+                                    <div className="flex flex-wrap gap-6">
+                                        <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Chính sách bảo mật</a>
+                                        <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Điều khoản dịch vụ</a>
+                                    </div>
+                                    {isAdmin ? (
+                                        <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-red-200/75 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                            Đăng xuất admin
+                                        </button>
+                                    ) : (
+                                        <button onClick={(e) => handleAdminClick(e)} className="text-red-200/75 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                            Admin
+                                        </button>
+                                    )}
                                 </div>
-                            </div>
-                            <div className="flex flex-col md:items-end gap-4 text-sm">
-                                <div className="flex flex-wrap gap-6">
-                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Chính sách bảo mật</a>
-                                    <a href="#" className="text-gray-500 hover:text-primary transition-colors font-medium">Điều khoản dịch vụ</a>
-                                </div>
-                                {isAdmin ? (
-                                    <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                        Đăng xuất admin
-                                    </button>
-                                ) : (
-                                    <button onClick={(e) => handleAdminClick(e)} className="text-gray-400 hover:text-primary transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                        Admin
-                                    </button>
-                                )}
                             </div>
                         </div>
                     </footer>
