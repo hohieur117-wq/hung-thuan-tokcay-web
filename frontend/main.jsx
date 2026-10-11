@@ -232,7 +232,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick }) => {
             return (
-                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-950/95 via-red-800/92 to-red-500/90 backdrop-blur-xl border-b border-white/20 shadow-[0_10px_30px_rgba(127,29,29,0.3)] transition-all">
+                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-600/90 via-red-500/88 to-red-600/90 backdrop-blur-xl border-b border-white/30 shadow-[0_8px_25px_rgba(220,38,38,0.28)] transition-all">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
@@ -1124,7 +1124,7 @@ QUY TẮC:
                                 )}
                                 <button
                                     onClick={() => onTagToggle('')}
-                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
                                 >
                                     Tất cả sản phẩm
                                 </button>
@@ -1132,7 +1132,7 @@ QUY TẮC:
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-transparent shadow-md shadow-red-600/25 transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
                                     >
                                         {tag}
                                     </button>
@@ -1364,6 +1364,7 @@ QUY TẮC:
         // --- Main App ---
         const App = () => {
             const navigate = useNavigate();
+            const adminPassword = "admin@1993";
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -1739,12 +1740,15 @@ QUY TẮC:
 
                                         {isAdmin && (
                                             <div className="mb-8 p-5 bg-primaryLight border border-red-200 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
-                                                <div className="flex items-center gap-3 text-primaryDark font-bold text-lg">
+                                                <div className="flex items-center flex-wrap gap-3 text-primaryDark font-bold text-lg">
                                                     <span className="relative flex h-4 w-4">
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                                                     </span>
-                                        Chế độ Quản Trị (Admin)
+                                                    <span>Chế độ Quản Trị (Admin)</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-600/85 backdrop-blur-md border border-white/30 text-white select-all shadow-sm" title="Mật khẩu Admin hiện tại">
+                                                        Pass: {adminPassword}
+                                                    </span>
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
@@ -1914,7 +1918,7 @@ QUY TẮC:
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                                                                                     disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
-                                                                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-2.5 px-3 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 flex justify-center items-center gap-1.5 text-xs sm:text-sm whitespace-nowrap"
+                                                                                    className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(220,38,38,0.38)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-xs sm:text-sm whitespace-nowrap"
                                                                                 >
                                                                                     {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
                                                                                         <>Thêm vào giỏ</>
@@ -2035,12 +2039,12 @@ QUY TẮC:
                             />
                             <path
                                 d="M0,68 C360,12 720,116 1080,56 C1260,26 1380,64 1440,80 L1440,120 L0,120 Z"
-                                className="fill-red-700/85"
+                                className="fill-red-600/90"
                             />
                         </svg>
                     </div>
 
-                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-700/85 via-red-800/90 to-red-950/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(185,28,28,0.15)] overflow-hidden py-10 sm:py-12">
+                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-600/90 via-red-600/92 to-red-700/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(220,38,38,0.18)] overflow-hidden py-10 sm:py-12">
                         {/* Ambient Light Orbs */}
                         <div className="pointer-events-none absolute -top-24 left-1/4 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl"></div>
                         <div className="pointer-events-none absolute -bottom-24 right-1/4 w-72 h-72 bg-red-500/20 rounded-full blur-3xl"></div>
@@ -2055,7 +2059,7 @@ QUY TẮC:
                                         <p>Điện thoại: 0902 631 632</p>
                                         <p>Email: hungthuanfood@gmail.com</p>
                                     </div>
-                                    <div className="text-red-200/80 text-sm font-medium pt-4 border-t border-white/10">
+                                    <div className="text-red-100/85 text-sm font-medium pt-4 border-t border-white/10">
                                         &copy; 2026 Hùng Thuận Tokcay. All rights reserved.
                                     </div>
                                 </div>
@@ -2064,15 +2068,22 @@ QUY TẮC:
                                         <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Chính sách bảo mật</a>
                                         <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Điều khoản dịch vụ</a>
                                     </div>
-                                    {isAdmin ? (
-                                        <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-red-200/75 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                            Đăng xuất admin
-                                        </button>
-                                    ) : (
-                                        <button onClick={(e) => handleAdminClick(e)} className="text-red-200/75 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
-                                            Admin
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-2.5 flex-wrap">
+                                        {isAdmin ? (
+                                            <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-red-100/90 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                                Đăng xuất admin
+                                            </button>
+                                        ) : (
+                                            <button onClick={(e) => handleAdminClick(e)} className="text-red-100/85 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                                Admin
+                                            </button>
+                                        )}
+                                        {isAdmin && (
+                                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-md border border-white/30 text-white select-all" title="Mật khẩu Admin hiện tại">
+                                                Pass: {adminPassword}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
