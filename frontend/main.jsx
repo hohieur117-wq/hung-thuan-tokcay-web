@@ -37,6 +37,56 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         const FallbackImage = "/media__1783016111445.png";
         const LogoImage = "./logo.png";
 
+        // --- SWR Cache Helpers (localStorage + sessionStorage) ---
+        const CACHE_KEY = 'tokcay_products_cache';
+        const CACHE_FRESH_TTL = 600000;  // 10 phút: hoàn toàn tươi mới (0 gọi API kể cả mở tab mới)
+        const CACHE_STALE_TTL = 86400000; // 24 giờ: hiển thị tức thì từ cache, đồng thời làm mới ngầm dưới nền
+
+        const readProductsCache = () => {
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY) || localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.data) || !parsed.timestamp) return null;
+                const age = Date.now() - parsed.timestamp;
+                if (age > CACHE_STALE_TTL) return null;
+                return {
+                    cached: parsed,
+                    isFresh: age < CACHE_FRESH_TTL,
+                };
+            } catch (_) {
+                return null;
+            }
+        };
+
+        const writeProductsCache = (payload) => {
+            const serialized = JSON.stringify({
+                ...payload,
+                timestamp: Date.now(),
+            });
+            try { sessionStorage.setItem(CACHE_KEY, serialized); } catch (_) {}
+            try { localStorage.setItem(CACHE_KEY, serialized); } catch (_) {}
+        };
+
+        const clearProductsCache = () => {
+            try { sessionStorage.removeItem(CACHE_KEY); } catch (_) {}
+            try { localStorage.removeItem(CACHE_KEY); } catch (_) {}
+        };
+
+        // --- Helper: Dọn file ảnh cũ trên Supabase Storage khi thay ảnh mới ---
+        const removeOldSupabaseImage = async (oldUrl, newUrl = '') => {
+            try {
+                if (!oldUrl || oldUrl === newUrl || !oldUrl.includes('supabase.co')) return;
+                const parts = oldUrl.split('/public/images/');
+                if (parts.length === 2 && parts[1]) {
+                    const cleanPath = decodeURIComponent(parts[1].split('?')[0]);
+                    await supabase.storage.from('images').remove([cleanPath]);
+                }
+            } catch (e) {
+                console.warn('Không thể xóa ảnh cũ:', e);
+            }
+        };
+
         const useDebounce = (value, delay) => {
             const [debouncedValue, setDebouncedValue] = useState(value);
             useEffect(() => {
@@ -55,7 +105,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
         const LiveSearchBar = ({ resetKey }) => {
             const [searchTerm, setSearchTerm] = useState('');
-            const debouncedTerm = useDebounce(searchTerm, 400);
+            const debouncedTerm = useDebounce(searchTerm, 350);
             const [results, setResults] = useState([]);
             const [isDropdownOpen, setIsDropdownOpen] = useState(false);
             const searchCache = useRef({});
@@ -98,21 +148,14 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         const normalizedTerm = removeAccents(trimmedTerm);
                         let rawData = null;
 
-                        try {
-                            const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
-                            if (cachedRaw) {
-                                const cached = JSON.parse(cachedRaw);
-                                if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
-                                    rawData = cached.data.filter(p => {
-                                        if (p.is_hidden) return false;
-                                        const pName = removeAccents(p.name || '');
-                                        const pSlug = String(p.slug || '').toLowerCase();
-                                        return pName.includes(normalizedTerm) || (slugTerm && pSlug.includes(slugTerm));
-                                    });
-                                }
-                            }
-                        } catch (e) {
-                            rawData = null;
+                        const cacheEntry = readProductsCache();
+                        if (cacheEntry && cacheEntry.cached) {
+                            rawData = cacheEntry.cached.data.filter(p => {
+                                if (p.is_hidden) return false;
+                                const pName = removeAccents(p.name || '');
+                                const pSlug = String(p.slug || '').toLowerCase();
+                                return pName.includes(normalizedTerm) || (slugTerm && pSlug.includes(slugTerm));
+                            });
                         }
 
                         if (!rawData) {
@@ -208,8 +251,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             );
         };
 
-        // --- Helper: Crop Image using Canvas ---
-        const cropImage = (file, targetRatio) => {
+        // --- Helper: Crop + Resize + WebP Compression using Canvas ---
+        const cropImage = (file, targetRatio, maxDimension = 800) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -228,20 +271,27 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         let cropHeight = srcHeight;
 
                         if (srcRatio > targetRatio) {
-                            // Ảnh gốc quá rộng ngang => Cắt bớt chiều ngang
                             cropWidth = srcHeight * targetRatio;
                         } else {
-                            // Ảnh gốc quá cao => Cắt bớt chiều cao
                             cropHeight = srcWidth / targetRatio;
                         }
 
                         const startX = (srcWidth - cropWidth) / 2;
                         const startY = (srcHeight - cropHeight) / 2;
 
-                        canvas.width = cropWidth;
-                        canvas.height = cropHeight;
+                        // Thu nhỏ về tối đa maxDimension (800x800px) để giảm 85% dung lượng Egress
+                        let outWidth = cropWidth;
+                        let outHeight = cropHeight;
+                        if (outWidth > maxDimension || outHeight > maxDimension) {
+                            const scale = Math.min(maxDimension / outWidth, maxDimension / outHeight);
+                            outWidth = Math.round(outWidth * scale);
+                            outHeight = Math.round(outHeight * scale);
+                        }
 
-                        ctx.drawImage(img, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                        canvas.width = outWidth;
+                        canvas.height = outHeight;
+
+                        ctx.drawImage(img, startX, startY, cropWidth, cropHeight, 0, 0, outWidth, outHeight);
 
                         canvas.toBlob((blob) => {
                             if (!blob) {
@@ -249,11 +299,45 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                 return;
                             }
                             resolve(blob);
-                        }, file.type || 'image/jpeg', 0.9);
+                        }, 'image/webp', 0.85);
                     };
                     img.onerror = (error) => reject(error);
                 };
                 reader.onerror = (error) => reject(error);
+            });
+        };
+
+        const compressBannerImage = (file, maxWidth = 1920) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let outWidth = img.width;
+                        let outHeight = img.height;
+                        if (outWidth > maxWidth) {
+                            const scale = maxWidth / outWidth;
+                            outWidth = Math.round(outWidth * scale);
+                            outHeight = Math.round(outHeight * scale);
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = outWidth;
+                        canvas.height = outHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, outWidth, outHeight);
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                resolve(file);
+                                return;
+                            }
+                            resolve(blob);
+                        }, 'image/webp', 0.88);
+                    };
+                    img.onerror = () => resolve(file);
+                };
+                reader.onerror = () => resolve(file);
             });
         };
 
@@ -430,7 +514,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             );
         };
 
-        const CartSlideOver = ({ isOpen, onClose, cart, setCart }) => {
+        const CartSlideOver = ({ isOpen, onClose, cart, setCart, zaloNumber }) => {
             const updateQuantity = (id, newQty) => {
                 if (newQty < 1) {
                     setCart(cart.filter(item => item.id !== id));
@@ -449,7 +533,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 message += `Tổng tạm tính: ${formatVND(total)}`;
 
                 const encodedMessage = encodeURIComponent(message);
-                window.open(`https://zalo.me/0902631632?text=${encodedMessage}`, '_blank');
+                const cleanZalo = String(zaloNumber || '0902631632').replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').trim() || '0902631632';
+                window.open(`https://zalo.me/${cleanZalo}?text=${encodedMessage}`, '_blank');
             };
 
             return (
@@ -471,7 +556,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             ) : (
                                 cart.map(item => (
                                     <div key={item.id} className="flex gap-4 bg-white/70 backdrop-blur-sm p-3 rounded-xl border border-stone-200/60 shadow-sm relative pr-10">
-                                        <img src={item.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={item.name} loading="lazy" className="w-20 h-20 object-cover rounded-lg border border-white/80 shadow-sm" />
+                                        <img src={item.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={item.name} loading="lazy" decoding="async" className="w-20 h-20 object-cover rounded-lg border border-white/80 shadow-sm" />
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug" title={item.name}>{item.name}</h4>
                                             <div className="flex justify-between items-end mt-2">
@@ -520,7 +605,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                         {/* Image Section */}
                         <div className="w-full sm:w-1/2 bg-gray-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100">
-                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" className="w-full max-h-[40vh] sm:max-h-full object-cover drop-shadow-md" />
+                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" decoding="async" className="w-full max-h-[40vh] sm:max-h-full object-cover drop-shadow-md" />
                         </div>
 
                         {/* Content Section */}
@@ -864,15 +949,18 @@ QUY TẮC:
                 e.preventDefault();
                 setUploading(true);
                 let finalImageUrl = formData.image_url;
+                const previousImageUrl = product?.image_url;
                 try {
                     let fileToUpload = selectedFile;
                     if (fileToUpload) {
                         const croppedBlob = await cropImage(fileToUpload, 1);
-                        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+                        const ext = croppedBlob.type === 'image/webp' ? 'webp' : 'jpg';
+                        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
                         const filePath = `products/${fileName}`;
 
                         const { error: uploadError } = await supabase.storage.from('images').upload(filePath, croppedBlob, {
-                            contentType: fileToUpload.type === 'image/webp' ? 'image/webp' : 'image/jpeg'
+                            contentType: croppedBlob.type || 'image/webp',
+                            cacheControl: '31536000'
                         });
 
                         if (uploadError) throw uploadError;
@@ -882,6 +970,10 @@ QUY TẮC:
 
                     const processedTags = tagsInput.split(',').map(t => t.trim()).filter(t => t !== '');
                     await onSave({ ...(product || {}), ...formData, image_url: finalImageUrl, price: formData.price === '' ? 0 : Number(formData.price), tags: processedTags });
+
+                    if (previousImageUrl && previousImageUrl !== finalImageUrl) {
+                        await removeOldSupabaseImage(previousImageUrl, finalImageUrl);
+                    }
                 } catch (err) {
                     alert('Lỗi khi lưu sản phẩm: ' + err.message);
                 } finally {
@@ -992,6 +1084,7 @@ QUY TẮC:
         const AdminSettingsModal = ({ isOpen, onClose, settings, onSave, session }) => {
             const [formData, setFormData] = useState({});
             const [uploading, setUploading] = useState(false);
+            const [loginData, setLoginData] = useState({ email: '', password: '' });
 
             useEffect(() => {
                 if (settings) setFormData(settings);
@@ -1005,23 +1098,30 @@ QUY TẮC:
                 setUploading(true);
 
                 try {
-                    const fileName = `${Date.now()}_banner_${type}.jpg`;
+                    const compressedBlob = await compressBannerImage(file, type === 'mobile' ? 1080 : 1920);
+                    const ext = compressedBlob.type === 'image/webp' ? 'webp' : 'jpg';
+                    const fileName = `${Date.now()}_banner_${type}.${ext}`;
                     const filePath = `banners/${fileName}`;
 
-                    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file, {
-                        contentType: file.type || 'image/jpeg'
+                    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, compressedBlob, {
+                        contentType: compressedBlob.type || 'image/webp',
+                        cacheControl: '31536000'
                     });
 
                     if (uploadError) throw uploadError;
 
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+                    const oldUrl = type === 'mobile' ? formData.banner_mobile_url : formData.banner_desktop_url;
                     if (type === 'mobile') {
                         setFormData({ ...formData, banner_mobile_url: data.publicUrl });
                     } else {
                         setFormData({ ...formData, banner_desktop_url: data.publicUrl });
                     }
+                    if (oldUrl && oldUrl !== data.publicUrl) {
+                        await removeOldSupabaseImage(oldUrl, data.publicUrl);
+                    }
                 } catch (error) {
-                    alert('L�i xử lý ảnh: ' + error.message);
+                    alert('Lỗi xử lý ảnh: ' + error.message);
                 } finally {
                     setUploading(false);
                 }
@@ -1190,7 +1290,7 @@ QUY TẮC:
             );
         };
 
-        const AdminTagsModal = ({ isOpen, onClose, categories, fetchData }) => {
+        const AdminTagsModal = ({ isOpen, onClose, categories, products = [], fetchData }) => {
             const [newTag, setNewTag] = useState('');
             const [isLoading, setIsLoading] = useState(false);
 
@@ -1201,7 +1301,7 @@ QUY TẮC:
                     setIsLoading(true);
                     await supabase.from('tags').insert([{ name: newTag.trim() }]);
                     setNewTag('');
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    clearProductsCache();
                     await fetchData(true);
                     setIsLoading(false);
                 }
@@ -1209,22 +1309,37 @@ QUY TẮC:
 
             const handleEdit = async (index) => {
                 const oldName = categories[index];
-            const updated = prompt('Nhập tên danh mục mới:', oldName);
-                if (updated && updated.trim()) {
+                const updated = prompt('Nhập tên danh mục mới:', oldName);
+                const newName = updated ? updated.trim() : '';
+                if (newName && newName !== oldName) {
                     setIsLoading(true);
-                    await supabase.from('tags').update({ name: updated.trim() }).eq('name', oldName);
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    await supabase.from('tags').update({ name: newName }).eq('name', oldName);
+                    const affectedProducts = (products || []).filter(p => Array.isArray(p.tags) && p.tags.includes(oldName));
+                    if (affectedProducts.length > 0) {
+                        await Promise.all(affectedProducts.map(p => {
+                            const updatedTags = Array.from(new Set(p.tags.map(t => t === oldName ? newName : t)));
+                            return supabase.from('products').update({ tags: updatedTags }).eq('id', p.id);
+                        }));
+                    }
+                    clearProductsCache();
                     await fetchData(true);
                     setIsLoading(false);
                 }
             };
 
             const handleDelete = async (index) => {
-            if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này không?')) {
+                if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này không?')) {
                     setIsLoading(true);
                     const oldName = categories[index];
                     await supabase.from('tags').delete().eq('name', oldName);
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    const affectedProducts = (products || []).filter(p => Array.isArray(p.tags) && p.tags.includes(oldName));
+                    if (affectedProducts.length > 0) {
+                        await Promise.all(affectedProducts.map(p => {
+                            const updatedTags = p.tags.filter(t => t !== oldName);
+                            return supabase.from('products').update({ tags: updatedTags }).eq('id', p.id);
+                        }));
+                    }
+                    clearProductsCache();
                     await fetchData(true);
                     setIsLoading(false);
                 }
@@ -1238,16 +1353,16 @@ QUY TẮC:
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
                         </div>
                         <div className="p-5 flex gap-2">
-                                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="Tên danh mục mới..." />
-                            <button onClick={handleAdd} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primaryDark transition-colors">Thêm</button>
+                            <input type="text" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary" value={newTag} onChange={e => setNewTag(e.target.value)} placeholder="Tên danh mục mới..." />
+                            <button onClick={handleAdd} disabled={isLoading} className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primaryDark transition-colors disabled:opacity-50">Thêm</button>
                         </div>
                         <div className="p-5 overflow-y-auto space-y-3">
                             {categories.map((cat, index) => (
                                 <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
                                     <span className="font-semibold text-gray-700">{cat}</span>
                                     <div className="flex gap-2">
-                                        <button onClick={() => handleEdit(index)} className="text-blue-500 hover:text-blue-700 w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center transition-colors"><i className="fa-solid fa-pen"></i></button>
-                                        <button onClick={() => handleDelete(index)} className="text-red-500 hover:text-red-700 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center transition-colors"><i className="fa-solid fa-trash"></i></button>
+                                        <button onClick={() => handleEdit(index)} disabled={isLoading} className="text-blue-500 hover:text-blue-700 w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center transition-colors disabled:opacity-50"><i className="fa-solid fa-pen"></i></button>
+                                        <button onClick={() => handleDelete(index)} disabled={isLoading} className="text-red-500 hover:text-red-700 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center transition-colors disabled:opacity-50"><i className="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
                             ))}
@@ -1324,25 +1439,18 @@ QUY TẮC:
                         return;
                     }
 
-                    // 2. Check sessionStorage SWR cache (5-minute TTL)
-                    try {
-                        const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
-                        if (cachedRaw) {
-                            const cached = JSON.parse(cachedRaw);
-                            if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
-                                const fromCache = findInList(cached.data);
-                                if (fromCache) {
-                                    if (isMounted) {
-                                        setProduct(fromCache);
-                                        setRelatedProducts(computeRelated(fromCache, cached.data));
-                                        setLoading(false);
-                                    }
-                                    return;
-                                }
+                    // 2. Check SWR cache (localStorage + sessionStorage)
+                    const cached = readProductsCache();
+                    if (cached && Array.isArray(cached.data)) {
+                        const fromCache = findInList(cached.data);
+                        if (fromCache) {
+                            if (isMounted) {
+                                setProduct(fromCache);
+                                setRelatedProducts(computeRelated(fromCache, cached.data));
+                                setLoading(false);
                             }
+                            return;
                         }
-                    } catch (e) {
-                        console.warn('Cache read error in ProductDetail:', e);
                     }
 
                     // 3. If App is currently fetching all products, wait for it first
@@ -1523,11 +1631,16 @@ QUY TẮC:
                         window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
                     }, 0);
                 }
+                let scrollTimer = null;
                 const handleScroll = () => {
-                    sessionStorage.setItem('homeScrollY', window.scrollY);
+                    if (scrollTimer) clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => {
+                        sessionStorage.setItem('homeScrollY', String(window.scrollY));
+                    }, 150);
                 };
                 window.addEventListener('scroll', handleScroll, { passive: true });
                 return () => {
+                    if (scrollTimer) clearTimeout(scrollTimer);
                     window.removeEventListener('scroll', handleScroll);
                 };
             }, []);
@@ -1550,8 +1663,23 @@ QUY TẮC:
             const [loading, setLoading] = useState(true);
             const [totalCount, setTotalCount] = useState(0);
 
-            // UI State
-            const [cart, setCart] = useState([]);
+            // UI State - Persist Cart in localStorage
+            const [cart, setCart] = useState(() => {
+                try {
+                    const savedCart = localStorage.getItem('tokcay_cart');
+                    return savedCart ? JSON.parse(savedCart) : [];
+                } catch (e) {
+                    return [];
+                }
+            });
+            useEffect(() => {
+                try {
+                    localStorage.setItem('tokcay_cart', JSON.stringify(cart));
+                } catch (e) {
+                    console.warn('Cart save error:', e);
+                }
+            }, [cart]);
+
             const [isCartOpen, setIsCartOpen] = useState(false);
             const [searchParams, setSearchParams] = useSearchParams();
             const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -1599,65 +1727,56 @@ QUY TẮC:
             const productsSectionRef = useRef(null);
 
             const fetchData = async (forceRefresh = false) => {
+                let isSilentRevalidate = false;
                 if (!forceRefresh) {
-                    try {
-                        const cachedRaw = sessionStorage.getItem('tokcay_products_cache');
-                        if (cachedRaw) {
-                            const cached = JSON.parse(cachedRaw);
-                            if (cached && Array.isArray(cached.data) && (Date.now() - cached.timestamp < 300000)) {
-                                setProducts(cached.data);
-                                setTotalCount(cached.data.filter(p => !p.is_hidden).length);
-                                if (cached.settings) setSettings(cached.settings);
-                                if (Array.isArray(cached.categories)) setCategories(cached.categories);
-                                setLoading(false);
-                                return;
-                            }
+                    const cached = readProductsCache();
+                    if (cached && Array.isArray(cached.data)) {
+                        setProducts(cached.data);
+                        setTotalCount(cached.data.filter(p => !p.is_hidden).length);
+                        if (cached.settings) setSettings(cached.settings);
+                        if (Array.isArray(cached.categories)) setCategories(cached.categories);
+                        setLoading(false);
+                        if (cached.isFresh) {
+                            return;
                         }
-                    } catch (e) {
-                        console.warn('Cache read error:', e);
+                        isSilentRevalidate = true;
                     }
                 }
 
-                setLoading(true);
-                try {
-                    const { data: pData, error: pError } = await supabase
-                        .from('products')
-                        .select('*')
-                        .order('id', { ascending: false });
-                    if (pError) throw pError;
+                if (!isSilentRevalidate) {
+                    setLoading(true);
+                }
 
-                    const productsList = pData || [];
+                try {
+                    const [productsRes, settingsRes, tagsRes] = await Promise.all([
+                        supabase.from('products').select('*').order('id', { ascending: false }),
+                        supabase.from('settings').select('*'),
+                        supabase.from('tags').select('*').order('created_at', { ascending: true })
+                    ]);
+
+                    if (productsRes.error) throw productsRes.error;
+                    if (settingsRes.error) throw settingsRes.error;
+                    if (tagsRes.error) throw tagsRes.error;
+
+                    const productsList = productsRes.data || [];
                     setProducts(productsList);
                     setTotalCount(productsList.filter(p => !p.is_hidden).length);
 
                     let settingsObj = {};
-                    const { data: sData, error: sError } = await supabase.from('settings').select('*');
-                    if (sError) throw sError;
-                    if (sData) {
-                        sData.forEach(item => {
+                    if (settingsRes.data) {
+                        settingsRes.data.forEach(item => {
                             settingsObj[item.key] = item.value;
                         });
                         setSettings(settingsObj);
                     }
 
                     let categoriesArr = [];
-                    const { data: tData, error: tError } = await supabase.from('tags').select('*').order('created_at', { ascending: true });
-                    if (tError) throw tError;
-                    if (tData) {
-                        categoriesArr = tData.map(t => t.name);
+                    if (tagsRes.data) {
+                        categoriesArr = tagsRes.data.map(t => t.name);
                         setCategories(categoriesArr);
                     }
 
-                    try {
-                        sessionStorage.setItem('tokcay_products_cache', JSON.stringify({
-                            data: productsList,
-                            settings: settingsObj,
-                            categories: categoriesArr,
-                            timestamp: Date.now()
-                        }));
-                    } catch (cacheErr) {
-                        console.warn('Cache write error:', cacheErr);
-                    }
+                    writeProductsCache(productsList, settingsObj, categoriesArr);
                 } catch (error) {
                     console.error('Lỗi khi tải dữ liệu:', error);
                 } finally {
@@ -1681,19 +1800,26 @@ QUY TẮC:
                 setLoading(true);
 
                 try {
-                    const fileName = `${Date.now()}_banner_${type}.jpg`;
+                    const compressedBlob = await compressBannerImage(file, type === 'mobile' ? 1080 : 1920);
+                    const ext = compressedBlob.type === 'image/webp' ? 'webp' : 'jpg';
+                    const fileName = `${Date.now()}_banner_${type}.${ext}`;
                     const filePath = `banners/${fileName}`;
 
-                    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file, {
-                        contentType: file.type || 'image/jpeg'
+                    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, compressedBlob, {
+                        contentType: compressedBlob.type || 'image/webp',
+                        cacheControl: '31536000'
                     });
                     if (uploadError) throw uploadError;
 
                     const { data } = supabase.storage.from('images').getPublicUrl(filePath);
 
                     const dbKey = type === 'mobile' ? 'banner_mobile_url' : 'banner_desktop_url';
+                    const oldUrl = settings?.[dbKey];
                     await supabase.from('settings').upsert({ key: dbKey, value: data.publicUrl }, { onConflict: 'key' });
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    if (oldUrl && oldUrl !== data.publicUrl) {
+                        await removeOldSupabaseImage(oldUrl, data.publicUrl);
+                    }
+                    clearProductsCache();
                     await fetchData(true);
                 } catch (error) {
                     alert('Lỗi xử lý banner: ' + error.message);
@@ -1827,7 +1953,7 @@ QUY TẮC:
                 e.stopPropagation();
                 const { error } = await supabase.from('products').update({ is_hidden: !product.is_hidden }).eq('id', product.id);
                 if (!error) {
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    clearProductsCache();
                     fetchData(true);
                 }
             };
@@ -1845,14 +1971,11 @@ QUY TẮC:
                         const { error } = await supabase.from('products').delete().eq('id', product.id);
                         if (error) throw error;
 
-                        sessionStorage.removeItem('tokcay_products_cache');
+                        clearProductsCache();
                         setProducts(prev => prev.filter(p => p.id !== product.id));
 
-                        if (product.image_url && product.image_url.includes('supabase.co')) {
-                            const parts = product.image_url.split('/public/images/');
-                            if (parts.length === 2) {
-                                await supabase.storage.from('images').remove([parts[1]]);
-                            }
+                        if (product.image_url) {
+                            await removeOldSupabaseImage(product.image_url, null);
                         }
                         await fetchData(true);
                     } catch (error) {
@@ -1878,7 +2001,7 @@ QUY TẮC:
                     alert('Lỗi lưu sản phẩm: ' + err.message);
                 } else {
                     setIsProductModalOpen(false);
-                    sessionStorage.removeItem('tokcay_products_cache');
+                    clearProductsCache();
                     fetchData(true); // Cập nhật lại state products ngay lập tức
                 }
             };
@@ -1890,7 +2013,7 @@ QUY TẮC:
                 }));
                 await supabase.from('settings').upsert(updates, { onConflict: 'key' });
                 setIsSettingsModalOpen(false);
-                sessionStorage.removeItem('tokcay_products_cache');
+                clearProductsCache();
                 fetchData(true);
             };
 
@@ -2355,7 +2478,7 @@ QUY TẮC:
                         </div>
                     </footer>
 
-                    <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} />
+                    <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ZaloWidget zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} settings={settings} />
 
@@ -2370,7 +2493,7 @@ QUY TẮC:
                         <>
                             <AdminProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} uniqueTags={categories} />
                             <AdminSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} settings={settings} onSave={handleSaveSettings} session={session} />
-                            <AdminTagsModal isOpen={isTagsModalOpen} onClose={() => setIsTagsModalOpen(false)} categories={categories} fetchData={fetchData} />
+                            <AdminTagsModal isOpen={isTagsModalOpen} onClose={() => setIsTagsModalOpen(false)} categories={categories} products={products} fetchData={fetchData} />
                         </>
                     )}
                 </div>

@@ -1,6 +1,20 @@
 {
   "rewrites": [
-    { "source": "/((?!assets/|decor-clean/|favicon.ico|robots.txt).*)", "destination": "/index.html" }
+    {
+      "source": "/san-pham/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(zalo|facebookexternalhit|facebot|telegrambot|twitterbot|slackbot|whatsapp|discordbot).*"
+        }
+      ],
+      "destination": "/api/product-preview.js?slug=:slug"
+    },
+    {
+      "source": "/((?!api/|assets/|decor-clean/|favicon.ico|robots.txt).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
