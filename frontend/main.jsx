@@ -232,7 +232,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick }) => {
             return (
-                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-600/90 via-red-500/88 to-red-600/90 backdrop-blur-xl border-b border-white/30 shadow-[0_8px_25px_rgba(220,38,38,0.28)] transition-all">
+                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-800/95 via-red-700/92 to-red-800/95 backdrop-blur-xl border-b border-white/25 shadow-[0_8px_25px_rgba(153,27,27,0.35)] transition-all">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
@@ -1124,7 +1124,7 @@ QUY TẮC:
                                 )}
                                 <button
                                     onClick={() => onTagToggle('')}
-                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
                                 >
                                     Tất cả sản phẩm
                                 </button>
@@ -1132,7 +1132,7 @@ QUY TẮC:
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
                                     >
                                         {tag}
                                     </button>
@@ -1918,7 +1918,7 @@ QUY TẮC:
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                                                                                     disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
-                                                                                    className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-600/85 to-red-500/85 hover:from-red-600/95 hover:to-red-500/95 backdrop-blur-md border border-white/30 shadow-[0_6px_16px_rgba(220,38,38,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(220,38,38,0.38)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-xs sm:text-sm whitespace-nowrap"
+                                                                                    className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] hover:shadow-[0_8px_22px_rgba(153,27,27,0.45)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-xs sm:text-sm whitespace-nowrap"
                                                                                 >
                                                                                     {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
                                                                                         <>Thêm vào giỏ</>
@@ -2035,16 +2035,16 @@ QUY TẮC:
                         <svg className="relative block w-full h-10 sm:h-14 md:h-16" viewBox="0 0 1440 120" preserveAspectRatio="none">
                             <path
                                 d="M0,32 C320,112 640,-16 960,48 C1200,96 1340,24 1440,12 L1440,120 L0,120 Z"
-                                className="fill-red-600/10"
+                                className="fill-red-700/15"
                             />
                             <path
                                 d="M0,68 C360,12 720,116 1080,56 C1260,26 1380,64 1440,80 L1440,120 L0,120 Z"
-                                className="fill-red-600/90"
+                                className="fill-red-800/92"
                             />
                         </svg>
                     </div>
 
-                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-600/90 via-red-600/92 to-red-700/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(220,38,38,0.18)] overflow-hidden py-10 sm:py-12">
+                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-800/92 via-red-800/95 to-red-900/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(153,27,27,0.25)] overflow-hidden py-10 sm:py-12">
                         {/* Ambient Light Orbs */}
                         <div className="pointer-events-none absolute -top-24 left-1/4 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl"></div>
                         <div className="pointer-events-none absolute -bottom-24 right-1/4 w-72 h-72 bg-red-500/20 rounded-full blur-3xl"></div>
