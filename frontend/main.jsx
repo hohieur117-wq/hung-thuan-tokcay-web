@@ -240,7 +240,10 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick, onLogoClick, searchResetKey }) => {
             return (
-                <header className="sticky top-0 z-50 bg-gradient-to-r from-red-800/95 via-red-700/92 to-red-800/95 backdrop-blur-xl border-b border-white/25 shadow-[0_8px_25px_rgba(153,27,27,0.35)] transition-all">
+                <header
+                    className="sticky top-0 z-50 bg-red-800 text-white backdrop-blur-xl border-b border-white/25 shadow-[0_8px_25px_rgba(153,27,27,0.35)] transition-all"
+                    style={{ background: 'linear-gradient(90deg, rgba(153, 27, 27, 0.96) 0%, rgba(185, 28, 28, 0.94) 50%, rgba(153, 27, 27, 0.96) 100%)' }}
+                >
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
@@ -1132,19 +1135,24 @@ QUY TẮC:
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
-                                className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === '' ? 'text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
+                                className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-4 py-2 rounded-full font-semibold text-xs sm:text-sm cursor-pointer transition-all ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
                             </button>
-                            {uniqueTags.map(tag => (
-                                <button
-                                    key={tag}
-                                    onClick={() => onTagToggle(tag)}
-                                    className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold rounded-full px-4 py-2 text-xs sm:text-sm ${selectedTag === tag ? 'text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] transition-all' : 'bg-white/50 hover:bg-white/90 text-stone-700 border border-stone-200/60 backdrop-blur-sm transition-all'}`}
-                                >
-                                    {tag}
-                                </button>
-                            ))}
+                            {uniqueTags.map(tag => {
+                                const isActive = selectedTag === tag;
+                                return (
+                                    <button
+                                        key={tag}
+                                        onClick={() => onTagToggle(tag)}
+                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-4 py-2 rounded-full font-semibold text-xs sm:text-sm cursor-pointer transition-all ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
+                                    >
+                                        {tag}
+                                    </button>
+                                );
+                            })}
                         </div>
 
                         <button
@@ -1354,7 +1362,8 @@ QUY TẮC:
                                 <button
                                     onClick={() => onAddToCart(product)}
                                     disabled={isOutOfStock}
-                                    className="w-full py-4 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] hover:shadow-[0_8px_22px_rgba(153,27,27,0.45)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-lg"
+                                    className="w-full py-4 px-6 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg cursor-pointer"
+                                    style={!isOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
                                 >
                                     <i className="fa-solid fa-cart-plus"></i>
                                     {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ hàng'}
@@ -1416,7 +1425,8 @@ QUY TẮC:
                                                             onAddToCart(relProduct);
                                                         }}
                                                         disabled={relOutOfStock}
-                                                        className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] hover:shadow-[0_8px_22px_rgba(153,27,27,0.45)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-xs sm:text-sm whitespace-nowrap"
+                                                        className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
+                                                        style={!relOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
                                                     >
                                                         {!relOutOfStock ? <>Thêm vào giỏ</> : <>Hết hàng</>}
                                                     </button>
@@ -1876,7 +1886,11 @@ QUY TẮC:
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                                                     </span>
                                                     <span>Chế độ Quản Trị (Admin)</span>
-                                                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-600/85 backdrop-blur-md border border-white/30 text-white select-all shadow-sm" title="Mật khẩu Admin hiện tại">
+                                                    <span
+                                                        className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-600 backdrop-blur-md border border-red-400/40 text-white select-all shadow-sm"
+                                                        style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }}
+                                                        title="Mật khẩu Admin hiện tại"
+                                                    >
                                                         Pass: {adminPassword}
                                                     </span>
                                                 </div>
@@ -1912,7 +1926,8 @@ QUY TẮC:
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowFilters(!showFilters)}
-                                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-sm border font-medium shadow-sm transition-all cursor-pointer select-none ${showFilters || priceMin || priceMax ? 'bg-red-700/90 text-white border-white/25' : 'bg-white/75 hover:bg-red-50/80 border-red-100/80 text-stone-700 hover:text-red-600'}`}
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-sm border font-medium shadow-sm transition-all cursor-pointer select-none ${showFilters || priceMin || priceMax ? 'bg-red-600 text-white border-red-400/40' : 'bg-white/80 hover:bg-red-50 border-red-100 text-stone-700 hover:text-red-600'}`}
+                                                        style={showFilters || priceMin || priceMax ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                                     >
                                                         <i className="fa-solid fa-sliders text-xs"></i>
                                                         <span>Bộ lọc</span>
@@ -2066,7 +2081,8 @@ QUY TẮC:
                                                                             <button
                                                                                 onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                                                                                 disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
-                                                                                className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-700/92 to-red-800/92 hover:from-red-800/95 hover:to-red-900/95 backdrop-blur-md border border-white/25 shadow-[0_6px_16px_rgba(153,27,27,0.32),inset_0_1px_1px_rgba(255,255,255,0.3)] hover:shadow-[0_8px_22px_rgba(153,27,27,0.45)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 text-xs sm:text-sm whitespace-nowrap"
+                                                                                className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
+                                                                                style={!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
                                                                             >
                                                                                 {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
                                                                                     <>Thêm vào giỏ</>
@@ -2116,7 +2132,8 @@ QUY TẮC:
                                                         <button
                                                             key={page}
                                                             onClick={() => handlePageChange(page)}
-                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-600' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
+                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-400/40' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
+                                                            style={currentPage === page ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                                         >
                                                             {page}
                                                         </button>
@@ -2182,51 +2199,61 @@ QUY TẮC:
                         <svg className="relative block w-full h-10 sm:h-14 md:h-16" viewBox="0 0 1440 120" preserveAspectRatio="none">
                             <path
                                 d="M0,32 C320,112 640,-16 960,48 C1200,96 1340,24 1440,12 L1440,120 L0,120 Z"
-                                className="fill-red-700/15"
+                                fill="rgba(185, 28, 28, 0.15)"
                             />
                             <path
                                 d="M0,68 C360,12 720,116 1080,56 C1260,26 1380,64 1440,80 L1440,120 L0,120 Z"
-                                className="fill-red-800/92"
+                                fill="rgba(185, 28, 28, 0.95)"
                             />
                         </svg>
                     </div>
 
-                    <footer className="relative z-10 w-full bg-gradient-to-b from-red-800/92 via-red-800/95 to-red-900/95 backdrop-blur-lg border-t border-white/25 shadow-[0_-10px_35px_rgba(153,27,27,0.25)] overflow-hidden py-10 sm:py-12">
+                    <footer
+                        className="relative z-10 w-full text-white bg-red-800 backdrop-blur-xl border-t border-red-400/30 shadow-[0_-10px_35px_rgba(153,27,27,0.25)] overflow-hidden py-10 sm:py-12"
+                        style={{ background: 'linear-gradient(180deg, rgba(185, 28, 28, 0.95) 0%, rgba(153, 27, 27, 0.98) 50%, rgba(127, 29, 29, 1) 100%)' }}
+                    >
                         {/* Ambient Light Orbs */}
                         <div className="pointer-events-none absolute -top-24 left-1/4 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl"></div>
                         <div className="pointer-events-none absolute -bottom-24 right-1/4 w-72 h-72 bg-red-500/20 rounded-full blur-3xl"></div>
 
                         <div className="container relative z-10 mx-auto px-4 max-w-7xl">
-                            <div className="bg-white/[0.06] backdrop-blur-md border border-white/15 rounded-2xl p-6 sm:p-8 shadow-inner flex flex-col md:flex-row justify-between items-start gap-8">
+                            <div
+                                className="backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-8 shadow-inner flex flex-col md:flex-row justify-between items-start gap-8"
+                                style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                            >
                                 <div className="flex flex-col space-y-2.5 tracking-wide drop-shadow-sm">
                                     <h4 className="text-base sm:text-lg font-bold text-white tracking-wider">CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h4>
-                                    <div className="text-sm text-red-50/90 space-y-1.5 leading-relaxed">
+                                    <div className="text-sm text-red-100 space-y-1.5 leading-relaxed">
                                         <p>MST: 1801801902</p>
                                         <p>Địa chỉ: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, Thành phố Cần Thơ</p>
                                         <p>Điện thoại: 0902 631 632</p>
                                         <p>Email: hungthuanfood@gmail.com</p>
                                     </div>
-                                    <div className="text-red-100/85 text-sm font-medium pt-4 border-t border-white/10">
+                                    <div className="text-red-100 text-sm font-medium pt-4 border-t border-white/15">
                                         &copy; 2026 Hùng Thuận Tokcay. All rights reserved.
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:items-end gap-4 text-sm tracking-wide drop-shadow-sm">
                                     <div className="flex flex-wrap gap-6">
-                                        <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Chính sách bảo mật</a>
-                                        <a href="#" className="text-red-100/90 hover:text-yellow-300 transition-colors font-medium">Điều khoản dịch vụ</a>
+                                        <a href="#" className="text-white hover:text-yellow-300 transition-colors font-medium">Chính sách bảo mật</a>
+                                        <a href="#" className="text-white hover:text-yellow-300 transition-colors font-medium">Điều khoản dịch vụ</a>
                                     </div>
                                     <div className="flex items-center gap-2.5 flex-wrap">
                                         {isAdmin ? (
-                                            <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-red-100/90 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                            <button onClick={(e) => { window.scrollTo(0, 0); handleAdminLogin(e); }} className="text-red-100 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                                 Đăng xuất admin
                                             </button>
                                         ) : (
-                                            <button onClick={(e) => handleAdminClick(e)} className="text-red-100/85 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
+                                            <button onClick={(e) => handleAdminClick(e)} className="text-red-100 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                                 Admin
                                             </button>
                                         )}
                                         {isAdmin && (
-                                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-md border border-white/30 text-white select-all" title="Mật khẩu Admin hiện tại">
+                                            <span
+                                                className="px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-md border border-white/30 text-white select-all"
+                                                style={{ backgroundColor: 'rgba(255, 255, 255, 0.22)' }}
+                                                title="Mật khẩu Admin hiện tại"
+                                            >
                                                 Pass: {adminPassword}
                                             </span>
                                         )}
