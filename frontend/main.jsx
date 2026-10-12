@@ -1245,19 +1245,19 @@ QUY TẮC:
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="flex flex-wrap items-center justify-center gap-2 w-full md:flex-1 md:min-w-0 md:flex-nowrap md:justify-start md:overflow-x-auto no-scrollbar scroll-smooth px-1"
+                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto no-scrollbar scroll-smooth md:px-1"
                         >
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
+                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
-                                className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                className={`w-full md:w-auto md:flex-shrink-0 whitespace-nowrap truncate flex items-center justify-center text-center px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                 style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
@@ -1268,7 +1268,7 @@ QUY TẮC:
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        className={`w-full md:w-auto md:flex-shrink-0 whitespace-nowrap truncate flex items-center justify-center text-center px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                         style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
