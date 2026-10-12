@@ -1204,7 +1204,7 @@ QUY TẮC:
                 const el = sliderRef.current;
                 if (!el) return;
                 const handleNativeWheel = (e) => {
-                    if (e.deltaY !== 0) {
+                    if (window.innerWidth >= 768 && e.deltaY !== 0) {
                         e.preventDefault();
                         el.scrollLeft += e.deltaY;
                     }
@@ -1214,7 +1214,7 @@ QUY TẮC:
             }, []);
 
             const handleWheel = (e) => {
-                if (e.deltaY !== 0 && sliderRef.current && !e.defaultPrevented) {
+                if (window.innerWidth >= 768 && e.deltaY !== 0 && sliderRef.current && !e.defaultPrevented) {
                     sliderRef.current.scrollLeft += e.deltaY;
                 }
             };
@@ -1232,12 +1232,12 @@ QUY TẮC:
                         }
                     `}</style>
                     <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="w-full max-w-full overflow-hidden flex items-center gap-2 box-border bg-white/70 backdrop-blur-md border border-red-100/80 p-1.5 rounded-full shadow-sm">
+                    <div className="rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden flex items-center gap-2 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
                             aria-label="Cuộn sang trái"
-                            className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
                         >
                             &lt;
                         </button>
@@ -1245,19 +1245,19 @@ QUY TẮC:
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1"
+                            className="flex flex-wrap items-center justify-center gap-2 w-full md:flex-1 md:min-w-0 md:flex-nowrap md:justify-start md:overflow-x-auto no-scrollbar scroll-smooth px-1"
                         >
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-4 py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm"
+                                    className="flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
-                                className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-4 py-2 rounded-full font-semibold text-xs sm:text-sm cursor-pointer transition-all ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                 style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
@@ -1268,7 +1268,7 @@ QUY TẮC:
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-4 py-2 rounded-full font-semibold text-xs sm:text-sm cursor-pointer transition-all ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        className={`flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/80 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                         style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
@@ -1281,7 +1281,7 @@ QUY TẮC:
                             type="button"
                             onClick={scrollRight}
                             aria-label="Cuộn sang phải"
-                            className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
                         >
                             &gt;
                         </button>
@@ -1828,6 +1828,21 @@ QUY TẮC:
                 }
             };
 
+            const [editingPriceId, setEditingPriceId] = useState(null);
+            const [editingPriceValue, setEditingPriceValue] = useState('');
+
+            const pinnedProductIds = useMemo(() => {
+                if (!settings?.pinned_product_ids) return [];
+                try {
+                    const parsed = typeof settings.pinned_product_ids === 'string'
+                        ? JSON.parse(settings.pinned_product_ids)
+                        : settings.pinned_product_ids;
+                    return Array.isArray(parsed) ? parsed.map(Number) : [];
+                } catch (e) {
+                    return [];
+                }
+            }, [settings]);
+
             const filteredProducts = useMemo(() => {
                 let result = products.filter(p => {
                     if (!isAdmin && p.is_hidden) return false;
@@ -1842,10 +1857,21 @@ QUY TẮC:
                     result.sort((a, b) => (a.price || 0) - (b.price || 0));
                 } else if (sortOrder === 'desc') {
                     result.sort((a, b) => (b.price || 0) - (a.price || 0));
+                } else if (pinnedProductIds.length > 0) {
+                    result.sort((a, b) => {
+                        const aPinIdx = pinnedProductIds.indexOf(Number(a.id));
+                        const bPinIdx = pinnedProductIds.indexOf(Number(b.id));
+                        const aPinned = aPinIdx !== -1;
+                        const bPinned = bPinIdx !== -1;
+                        if (aPinned && !bPinned) return -1;
+                        if (!aPinned && bPinned) return 1;
+                        if (aPinned && bPinned) return aPinIdx - bPinIdx;
+                        return (b.id || 0) - (a.id || 0);
+                    });
                 }
 
                 return result;
-            }, [products, isAdmin, selectedTag, priceMin, priceMax, sortOrder]);
+            }, [products, isAdmin, selectedTag, priceMin, priceMax, sortOrder, pinnedProductIds]);
 
             const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
             const currentProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -1956,6 +1982,192 @@ QUY TẮC:
                     clearProductsCache();
                     fetchData(true);
                 }
+            };
+
+            // 1. Admin Quick Toggle Pin Product to Top
+            const handleTogglePinProduct = async (e, product) => {
+                e.stopPropagation();
+                const pid = Number(product.id);
+                const isCurrentlyPinned = pinnedProductIds.includes(pid);
+                const nextPinned = isCurrentlyPinned
+                    ? pinnedProductIds.filter(id => id !== pid)
+                    : [pid, ...pinnedProductIds];
+
+                setSettings(prev => ({ ...(prev || {}), pinned_product_ids: JSON.stringify(nextPinned) }));
+                const { error } = await supabase.from('settings').upsert(
+                    { key: 'pinned_product_ids', value: JSON.stringify(nextPinned) },
+                    { onConflict: 'key' }
+                );
+                if (!error) {
+                    clearProductsCache();
+                    fetchData(true);
+                }
+            };
+
+            // 2. Admin 1-Click Quick Toggle Stock Status
+            const handleQuickToggleStock = async (e, product) => {
+                e.stopPropagation();
+                if (!isAdmin) return;
+                const isCurrentlyOut = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
+                const nextStatus = isCurrentlyOut ? 'Hàng sẵn tại kho' : 'Hết hàng';
+                const nextColor = isCurrentlyOut ? 'green' : 'red';
+
+                setProducts(prev => prev.map(p => p.id === product.id ? { ...p, stock_status: nextStatus, statusColor: nextColor } : p));
+                const { error } = await supabase.from('products').update({ stock_status: nextStatus, statusColor: nextColor }).eq('id', product.id);
+                if (!error) {
+                    clearProductsCache();
+                    fetchData(true);
+                }
+            };
+
+            // 3. Admin Quick Inline Price Save
+            const handleQuickPriceSave = async (e, product) => {
+                if (e && e.stopPropagation) e.stopPropagation();
+                const numericPrice = editingPriceValue === '' ? 0 : Number(editingPriceValue);
+                if (isNaN(numericPrice) || numericPrice < 0) {
+                    setEditingPriceId(null);
+                    return;
+                }
+                setEditingPriceId(null);
+                if (numericPrice === Number(product.price)) return;
+
+                setProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: numericPrice } : p));
+                const { error } = await supabase.from('products').update({ price: numericPrice }).eq('id', product.id);
+                if (!error) {
+                    clearProductsCache();
+                    fetchData(true);
+                }
+            };
+
+            // 4. Admin Export Price List to Excel (CSV UTF-8 BOM)
+            const handleExportPriceListCSV = () => {
+                const exportList = filteredProducts.length > 0 ? filteredProducts : products;
+                const headers = ['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'Giá bán lẻ (VNĐ)', 'Tình trạng kho', 'Nổi bật', 'Link sản phẩm'];
+                const rows = exportList.map((p, idx) => {
+                    const tagsStr = Array.isArray(p.tags) ? p.tags.join('; ') : '';
+                    const isPinned = pinnedProductIds.includes(Number(p.id)) ? 'Đã ghim' : '';
+                    const link = `${window.location.origin}/san-pham/${p.slug || p.id}`;
+                    const escapeCsv = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+                    return [
+                        idx + 1,
+                        escapeCsv(p.sku || `SP-${p.id}`),
+                        escapeCsv(p.name || ''),
+                        escapeCsv(tagsStr),
+                        p.price || 0,
+                        escapeCsv(p.stock_status || 'Hàng sẵn tại kho'),
+                        escapeCsv(isPinned),
+                        escapeCsv(link)
+                    ].join(',');
+                });
+                const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const today = new Date().toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `Bang-Gia-Hung-Thuan-Tokcay-${today}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            // 5. Admin Print / Save PDF Price List
+            const handlePrintPriceListPDF = () => {
+                const exportList = (filteredProducts.length > 0 ? filteredProducts : products).filter(p => !p.is_hidden);
+                const todayStr = new Date().toLocaleDateString('vi-VN');
+                const printWin = window.open('', '_blank', 'width=1000,height=800');
+                if (!printWin) {
+                    alert('Vui lòng cho phép mở cửa sổ bật lên (Pop-up) để in bảng giá.');
+                    return;
+                }
+                const rowsHtml = exportList.map((p, idx) => {
+                    const tagsStr = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+                    const priceStr = formatVND(p.price);
+                    const stockStr = p.stock_status || 'Hàng sẵn tại kho';
+                    const isOut = stockStr.toLowerCase() === 'hết hàng';
+                    return `
+                        <tr>
+                            <td style="text-align:center;font-weight:600;">${idx + 1}</td>
+                            <td style="text-align:center;">
+                                <img src="${p.image_url || FallbackImage}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #eee;" />
+                            </td>
+                            <td style="font-weight:700;color:#1c1917;">${p.name || ''}</td>
+                            <td style="color:#57534e;font-size:12px;">${tagsStr}</td>
+                            <td style="text-align:right;font-weight:800;color:#b91c1c;">${priceStr}</td>
+                            <td style="text-align:center;color:#0068FF;font-weight:600;font-size:12px;">Liên hệ Zalo</td>
+                            <td style="text-align:center;">
+                                <span style="padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;background:${isOut ? '#fee2e2' : '#dcfce7'};color:${isOut ? '#b91c1c' : '#15803d'};">
+                                    ${stockStr}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                printWin.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="vi">
+                    <head>
+                        <meta charset="UTF-8" />
+                        <title>Bảng Báo Giá - Hùng Thuận Tokcay Korea Foods (${todayStr})</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 24px; color: #1c1917; }
+                            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #b91c1c; padding-bottom: 14px; margin-bottom: 18px; }
+                            .company h1 { margin: 0 0 6px 0; font-size: 18px; color: #b91c1c; text-transform: uppercase; }
+                            .company p { margin: 2px 0; font-size: 12.5px; color: #44403c; }
+                            .meta { text-align: right; font-size: 12.5px; }
+                            .meta h2 { margin: 0 0 6px 0; font-size: 16px; color: #1c1917; }
+                            table { width: 100%; border-collapse: collapse; font-size: 13px; }
+                            th { background: #b91c1c; color: #fff; padding: 9px 8px; text-align: left; font-size: 12px; text-transform: uppercase; }
+                            td { padding: 7px 8px; border-bottom: 1px solid #e7e5e4; vertical-align: middle; }
+                            tr:nth-child(even) { background: #fafaf9; }
+                            @media print {
+                                .no-print { display: none !important; }
+                                body { margin: 10mm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="no-print" style="margin-bottom:16px;display:flex;justify-content:flex-end;gap:10px;">
+                            <button onclick="window.print()" style="background:#b91c1c;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;">🖨️ In / Lưu thành PDF</button>
+                            <button onclick="window.close()" style="background:#e7e5e4;color:#1c1917;border:none;padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;">Đóng</button>
+                        </div>
+                        <div class="header">
+                            <div class="company">
+                                <h1>CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS</h1>
+                                <p>📍 Địa chỉ: 92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú, TP. Cần Thơ</p>
+                                <p>📞 Hotline Sỉ/Lẻ (Zalo): <strong>0902 631 632</strong> | ✉️ Email: hungthuanfood@gmail.com</p>
+                            </div>
+                            <div class="meta">
+                                <h2>BẢNG BÁO GIÁ SẢN PHẨM</h2>
+                                <p>Ngày xuất: <strong>${todayStr}</strong></p>
+                                <p>Tổng số mặt hàng: <strong>${exportList.length}</strong></p>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;text-align:center;">STT</th>
+                                    <th style="width:60px;text-align:center;">Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th style="width:140px;">Danh mục</th>
+                                    <th style="width:110px;text-align:right;">Giá bán lẻ</th>
+                                    <th style="width:100px;text-align:center;">Giá sỉ/thùng</th>
+                                    <th style="width:120px;text-align:center;">Tình trạng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                        <script>
+                            window.onload = function() { setTimeout(function() { window.print(); }, 400); };
+                        </script>
+                    </body>
+                    </html>
+                `);
+                printWin.document.close();
             };
 
             const handleEditClick = (e, product) => {
@@ -2093,7 +2305,7 @@ QUY TẮC:
                                     <main id="products-section" className="flex-1 py-6 w-full" ref={productsSectionRef}>
 
                                         {isAdmin && (
-                                            <div className="mb-8 p-5 bg-primaryLight border border-red-200 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
+                                            <div className="mb-8 p-5 bg-primaryLight border border-red-200 rounded-xl shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4 animate-fade-in">
                                                 <div className="flex items-center flex-wrap gap-3 text-primaryDark font-bold text-lg">
                                                     <span className="relative flex h-4 w-4">
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -2108,12 +2320,18 @@ QUY TẮC:
                                                         Pass: {adminPassword}
                                                     </span>
                                                 </div>
-                                                <div className="flex gap-3">
-                                                    <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
-                                                        <i className="fa-solid fa-plus"></i> Thêm sản phẩm
+                                                <div className="flex flex-wrap items-center justify-center gap-2.5">
+                                                    <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-3.5 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
+                                                        <i className="fa-solid fa-plus text-primary"></i> Thêm sản phẩm
                                                     </button>
-                                                    <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-900 shadow-sm transition-colors">
-                                        <i className="fa-solid fa-gear"></i> Cài đặt chung
+                                                    <button onClick={handleExportPriceListCSV} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" title="Tải xuống Bảng Giá file Excel (.CSV)">
+                                                        <i className="fa-solid fa-file-excel"></i> Xuất Excel
+                                                    </button>
+                                                    <button onClick={handlePrintPriceListPDF} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }} title="In Bảng Báo Giá hoặc Lưu thành PDF">
+                                                        <i className="fa-solid fa-print"></i> In Bảng Giá / PDF
+                                                    </button>
+                                                    <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-900 shadow-sm transition-colors cursor-pointer">
+                                                        <i className="fa-solid fa-gear"></i> Cài đặt chung
                                                     </button>
                                                 </div>
                                             </div>
@@ -2249,12 +2467,13 @@ QUY TẮC:
                                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full justify-center">
                                                         {currentProducts.map(product => {
                                                             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
+                                                            const isPinned = pinnedProductIds.includes(Number(product.id));
                                                             const CardLink = isAdmin ? 'div' : Link;
                                                             const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.slug || product.id}` };
                                                             return (
                                                                 <div
                                                                     key={product.id}
-                                                                    className={`group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-md border border-red-200/55 shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                    className={`group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-md border ${isPinned ? 'border-red-400/80 ring-1 ring-red-300/50' : 'border-red-200/55'} shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
                                                                 >
                                                                     <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white/85 p-4 flex items-center justify-center border-b border-red-100/60 block cursor-pointer">
                                                                         <img
@@ -2266,19 +2485,40 @@ QUY TẮC:
                                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                                         />
                                                                         {isAdmin && (
-                                                                            <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                                                                                <button onClick={(e) => handleEditClick(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors" title="Chỉnh sửa">
-                                                                                    <i className="fa-solid fa-pen text-sm"></i>
+                                                                            <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+                                                                                <button
+                                                                                    onClick={(e) => handleTogglePinProduct(e, product)}
+                                                                                    className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${isPinned ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white/90 text-gray-700 hover:bg-amber-500 hover:text-white'}`}
+                                                                                    title={isPinned ? 'Bỏ ghim khỏi đầu trang' : 'Ghim sản phẩm lên đầu trang'}
+                                                                                >
+                                                                                    <i className="fa-solid fa-thumbtack text-xs sm:text-sm"></i>
                                                                                 </button>
-                                                                                <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
-                                                                                    <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
+                                                                                <button onClick={(e) => handleEditClick(e, product)} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors cursor-pointer" title="Chỉnh sửa chi tiết">
+                                                                                    <i className="fa-solid fa-pen text-xs sm:text-sm"></i>
                                                                                 </button>
-                                                                                <button onClick={(e) => handleDeleteProduct(e, product)} className="w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors" title="Xóa sản phẩm">
-                                                                                    <i className="fa-solid fa-trash-can text-sm"></i>
+                                                                                <button onClick={(e) => handleToggleVisibility(e, product)} className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
+                                                                                    <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-xs sm:text-sm`}></i>
+                                                                                </button>
+                                                                                <button onClick={(e) => handleDeleteProduct(e, product)} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors cursor-pointer" title="Xóa sản phẩm">
+                                                                                    <i className="fa-solid fa-trash-can text-xs sm:text-sm"></i>
                                                                                 </button>
                                                                             </div>
                                                                         )}
-                                                                        {product.is_hidden && <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded shadow-md z-10">Đang ẩn</div>}
+                                                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                                                                            {isPinned && (
+                                                                                <div
+                                                                                    className="text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 w-max"
+                                                                                    style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }}
+                                                                                >
+                                                                                    <i className="fa-solid fa-thumbtack text-[9px]"></i> Nổi bật
+                                                                                </div>
+                                                                            )}
+                                                                            {product.is_hidden && (
+                                                                                <div className="bg-gray-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-md w-max">
+                                                                                    Đang ẩn
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
                                                                     </CardLink>
 
                                                                     <div className="p-4 sm:p-5 flex flex-col flex-1 bg-transparent">
@@ -2286,13 +2526,51 @@ QUY TẮC:
                                                                             <h3 className="text-[15px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug group-hover:text-primary transition-colors" title={product.name}>{product.name}</h3>
                                                                         </CardLink>
                                                                         <div className="mb-2">
-                                                                            <span className={`px-2 py-1 rounded-md text-xs sm:text-sm font-medium ${colorClass}`}>
+                                                                            <span
+                                                                                onClick={isAdmin ? (e) => handleQuickToggleStock(e, product) : undefined}
+                                                                                title={isAdmin ? 'Admin: Nhấn 1 chạm để đổi nhanh Còn hàng / Hết hàng' : undefined}
+                                                                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs sm:text-sm font-medium ${colorClass} ${isAdmin ? 'cursor-pointer hover:ring-2 hover:ring-red-300 active:scale-95 transition-all select-none' : ''}`}
+                                                                            >
                                                                                 {product.stock_status || 'Hàng sẵn tại kho'}
+                                                                                {isAdmin && <i className="fa-solid fa-rotate text-[10px] opacity-75"></i>}
                                                                             </span>
                                                                         </div>
                                                                         <div className="mt-auto pt-3">
-                                                        <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span></p>
-                                                                            <p className="mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis"><span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span><span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span></p>
+                                                                            <p className="whitespace-nowrap overflow-hidden text-ellipsis w-full text-[11px] sm:text-xs md:text-sm text-blue-600 mb-1">Giá sỉ/thùng: <span className="font-bold cursor-pointer no-underline text-blue-600">liên hệ Zalo</span></p>
+                                                                            {isAdmin && editingPriceId === product.id ? (
+                                                                                <div className="mb-3 flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        autoFocus
+                                                                                        className="w-full border border-red-400 rounded-md px-2 py-1 text-xs sm:text-sm font-bold text-red-600 outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                                                                                        value={editingPriceValue}
+                                                                                        onChange={e => setEditingPriceValue(e.target.value)}
+                                                                                        onKeyDown={e => {
+                                                                                            if (e.key === 'Enter') handleQuickPriceSave(e, product);
+                                                                                            if (e.key === 'Escape') setEditingPriceId(null);
+                                                                                        }}
+                                                                                        onBlur={e => handleQuickPriceSave(e, product)}
+                                                                                    />
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onMouseDown={e => { e.preventDefault(); handleQuickPriceSave(e, product); }}
+                                                                                        className="px-2 py-1 bg-red-600 text-white rounded-md text-xs font-bold cursor-pointer"
+                                                                                        style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }}
+                                                                                    >
+                                                                                        Lưu
+                                                                                    </button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <p
+                                                                                    onClick={isAdmin ? (e) => { e.stopPropagation(); setEditingPriceId(product.id); setEditingPriceValue(String(product.price || 0)); } : undefined}
+                                                                                    title={isAdmin ? 'Admin: Nhấn để sửa nhanh giá bán lẻ' : undefined}
+                                                                                    className={`mb-3 tracking-tight w-full flex items-center flex-wrap md:flex-nowrap whitespace-nowrap overflow-hidden text-ellipsis ${isAdmin ? 'cursor-pointer hover:bg-red-50/80 rounded px-1 -mx-1 transition-colors' : ''}`}
+                                                                                >
+                                                                                    <span className="text-gray-500 text-xs md:text-sm font-medium mr-1">Giá bán lẻ: </span>
+                                                                                    <span className="text-sm md:text-base font-bold text-red-600">{formatVND(product.price)}</span>
+                                                                                    {isAdmin && <i className="fa-solid fa-pen-to-square text-[11px] text-red-400 ml-1.5"></i>}
+                                                                                </p>
+                                                                            )}
                                                                             <button
                                                                                 onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                                                                                 disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
