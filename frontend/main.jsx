@@ -229,7 +229,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             ref={inputRef}
                             type="search"
                             name="tokcay_search_query"
-                            className="block w-full pl-4 pr-3 py-2 rounded-l-full border-none leading-5 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
+                            className="block w-full min-w-0 pl-4 pr-3 py-2 rounded-l-full border-none leading-5 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
                             placeholder={placeholder || "Tìm kiếm sản phẩm..."}
                             value={searchTerm}
                             onChange={handleInputChange}
@@ -420,10 +420,10 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             isCompactMobile ? 'h-14 sm:h-16' : 'h-16 sm:h-18'
                         }`}>
                             {/* Cột 1: Logo (Trên PC chiếm 1/3 bên trái, kích thước lớn chuẩn) */}
-                            <div className="flex-1 flex justify-start items-center min-w-0">
+                            <div className={`${isCompactMobile ? 'flex-shrink-0' : 'flex-1'} md:flex-1 flex justify-start items-center min-w-0`}>
                                 <a
                                     href="/"
-                                    className="flex items-center cursor-pointer"
+                                    className="flex items-center cursor-pointer flex-shrink-0"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         if (onLogoClick) onLogoClick(e);
@@ -432,8 +432,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     <img
                                         src="/logo_new.png"
                                         alt="Logo Hùng Thuận Tokcay"
-                                        className={`w-auto object-contain cursor-pointer drop-shadow-md transition-all duration-300 md:h-12 lg:h-14 ${
-                                            isCompactMobile ? 'h-8 sm:h-9' : 'h-10 sm:h-11'
+                                        className={`w-auto object-contain cursor-pointer drop-shadow-md transition-all duration-300 md:h-12 lg:h-14 flex-shrink-0 ${
+                                            isCompactMobile ? 'h-7 sm:h-8' : 'h-9 sm:h-10'
                                         }`}
                                     />
                                 </a>
@@ -450,33 +450,35 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                             }
                                         }, 60);
                                     }}
-                                    className="md:hidden flex-1 mx-2 sm:mx-3 cursor-pointer animate-fade-in"
+                                    className="md:hidden flex-1 min-w-0 mx-2 cursor-pointer animate-fade-in"
                                 >
-                                    <div className="flex items-center w-full rounded-full bg-white/95 hover:bg-white text-gray-700 shadow-inner px-3 py-1.5 border border-white/70 transition-all">
-                                        <i className="fa-solid fa-magnifying-glass text-xs text-primary mr-2 flex-shrink-0"></i>
-                                        <span className="text-xs text-gray-500 font-medium truncate">Tìm kiếm sản phẩm...</span>
+                                    <div className="flex items-center w-full rounded-full bg-white/95 hover:bg-white text-gray-700 shadow-inner px-2.5 sm:px-3 py-1.5 border border-white/70 transition-all">
+                                        <i className="fa-solid fa-magnifying-glass text-xs text-primary mr-1.5 sm:mr-2 flex-shrink-0"></i>
+                                        <span className="text-[11px] sm:text-xs text-gray-500 font-medium truncate">Tìm kiếm sản phẩm...</span>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Cột 2: Desktop Search (Nằm chính giữa Header 100%, giữ nguyên kích thước chuẩn, không bị co nhỏ) */}
-                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50 px-2 lg:px-4">
-                                <LiveSearchBar resetKey={searchResetKey} />
+                            {/* Cột 2: Desktop Search (Nằm chính giữa Header 100%, không bị đè hay co nhỏ) */}
+                            <div className="flex-1 hidden md:flex justify-center items-center relative z-40 px-2 lg:px-4 min-w-0">
+                                <div className="w-full max-w-xs lg:max-w-md">
+                                    <LiveSearchBar resetKey={searchResetKey} />
+                                </div>
                             </div>
 
-                            {/* Cột 3: Navigation & Cart (Trên PC chiếm 1/3 bên phải) */}
-                            <div className="flex-1 flex justify-end items-center gap-1.5 sm:gap-3 lg:gap-6 min-w-0">
-                                <nav className="hidden md:flex justify-between items-center gap-2 lg:gap-3 text-white font-semibold text-sm">
-                                    <button onClick={onProductsClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Sản phẩm</button>
-                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Khuyến mãi</button>
-                                    <button onClick={onContactClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Liên hệ</button>
+                            {/* Cột 3: Navigation & Cart (Trên PC chiếm 1/3 bên phải, các nút có flex-shrink-0 chống đè tuyệt đối) */}
+                            <div className={`${isCompactMobile ? 'flex-shrink-0' : 'flex-1'} md:flex-1 flex justify-end items-center gap-1.5 sm:gap-2.5 lg:gap-4 min-w-0`}>
+                                <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-white font-semibold flex-shrink-0">
+                                    <button onClick={onProductsClick} className="px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">Sản phẩm</button>
+                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">Khuyến mãi</button>
+                                    <button onClick={onContactClick} className="px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">Liên hệ</button>
                                 </nav>
 
-                                <div className="flex items-center gap-1.5 sm:gap-2.5">
+                                <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                                     <button
                                         onClick={onProductsClick}
-                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer ${
-                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'p-2.5 text-lg'
+                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer flex-shrink-0 ${
+                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10 text-base'
                                         }`}
                                         aria-label="Sản phẩm"
                                     >
@@ -485,8 +487,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                                     <button
                                         onClick={onContactClick}
-                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer ${
-                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'p-2.5 text-lg'
+                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer flex-shrink-0 ${
+                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10 text-base'
                                         }`}
                                         aria-label="Liên hệ"
                                     >
@@ -495,13 +497,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                                     <button
                                         onClick={onOpenCart}
-                                        className={`relative rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer ${
-                                            isCompactMobile ? 'w-8 h-8 text-base md:w-auto md:h-auto md:p-2.5' : 'p-2.5 text-xl'
+                                        className={`relative rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer flex-shrink-0 ${
+                                            isCompactMobile ? 'w-8 h-8 text-sm md:w-11 md:h-11 md:text-xl' : 'w-10 h-10 text-base md:w-11 md:h-11 md:text-xl'
                                         }`}
                                     >
-                                        <i className="fa-solid fa-cart-shopping md:text-xl"></i>
+                                        <i className="fa-solid fa-cart-shopping"></i>
                                         {cartCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white">
+                                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white pointer-events-none z-10">
                                                 {cartCount}
                                             </span>
                                         )}
