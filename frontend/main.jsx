@@ -410,10 +410,70 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         const HeroBanner = ({ bannerMobileUrl, bannerDesktopUrl, isAdmin, onBannerMobileUpload, onBannerDesktopUpload }) => {
             const finalMobileBanner = bannerMobileUrl || "/media__1783108509497.png";
             const finalDesktopBanner = bannerDesktopUrl || "/media__1783108509497.png";
+            const bannerRef = useRef(null);
+
+            useEffect(() => {
+                let ticking = false;
+                let rafId = null;
+
+                const updateScrollSheen = () => {
+                    if (bannerRef.current) {
+                        const rect = bannerRef.current.getBoundingClientRect();
+                        const windowHeight = window.innerHeight || 800;
+                        const totalTravel = windowHeight + rect.height;
+                        const currentPos = windowHeight - rect.top;
+                        const progress = Math.max(0, Math.min(1, currentPos / totalTravel));
+                        const sheenVal = -25 + progress * 150;
+                        bannerRef.current.style.setProperty('--scroll-sheen', `${sheenVal.toFixed(1)}%`);
+                    }
+                    ticking = false;
+                };
+
+                const onScroll = () => {
+                    if (!ticking) {
+                        rafId = window.requestAnimationFrame(updateScrollSheen);
+                        ticking = true;
+                    }
+                };
+
+                updateScrollSheen();
+                window.addEventListener('scroll', onScroll, { passive: true });
+                return () => {
+                    window.removeEventListener('scroll', onScroll);
+                    if (rafId) window.cancelAnimationFrame(rafId);
+                };
+            }, []);
+
+            const handleMouseMove = (e) => {
+                if (!bannerRef.current) return;
+                const rect = bannerRef.current.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                bannerRef.current.style.setProperty('--mouse-x', `${x}px`);
+                bannerRef.current.style.setProperty('--mouse-y', `${y}px`);
+                bannerRef.current.style.setProperty('--spotlight-opacity', '1');
+            };
+
+            const handleMouseLeave = () => {
+                if (!bannerRef.current) return;
+                bannerRef.current.style.setProperty('--spotlight-opacity', '0');
+            };
+
             return (
                 <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
                     {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
-                    <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_80px_-15px_rgba(220,38,38,0.4)] border border-red-200 overflow-hidden bg-white">
+                    <div
+                        ref={bannerRef}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        className="relative w-full h-auto rounded-[2rem] shadow-[0_0_80px_-15px_rgba(220,38,38,0.4)] border border-red-200 overflow-hidden bg-white"
+                        style={{
+                            '--mouse-x': '50%',
+                            '--mouse-y': '50%',
+                            '--spotlight-opacity': '0',
+                            '--scroll-sheen': '-25%',
+                        }}
+                    >
                         <img
                             src={finalMobileBanner}
                             className="w-full h-auto object-contain block md:hidden"
@@ -426,9 +486,30 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             alt="Banner PC"
                             decoding="async"
                         />
+
+                        {/* Interactive Glass & Light Overlays */}
+                        {/* 1. Lớp viền kính 3D (Clear Glass Rim) */}
+                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border border-white/65 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),inset_0_-1px_2px_rgba(185,28,28,0.15)] bg-gradient-to-tr from-white/5 via-transparent to-white/15" />
+
+                        {/* 2. Lớp ánh sáng đi theo chuột (Cursor Spotlight) */}
+                        <div
+                            className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] transition-opacity duration-300"
+                            style={{
+                                opacity: 'var(--spotlight-opacity, 0)',
+                                background: 'radial-gradient(360px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.32), rgba(255,245,235,0.1) 45%, transparent 75%)',
+                            }}
+                        />
+
+                        {/* 3. Lớp vệt sáng lướt qua mặt kính khi cuộn trang (Scroll Glare) */}
+                        <div
+                            className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
+                            style={{
+                                background: 'linear-gradient(115deg, transparent calc(var(--scroll-sheen, -20%) - 16%), rgba(255,255,255,0.38) var(--scroll-sheen, -20%), transparent calc(var(--scroll-sheen, -20%) + 16%))',
+                            }}
+                        />
                         
-                        {/* Lớp 2: Nội dung Button đè lên trên */}
-                        <div className="absolute inset-0 z-10 w-full h-full p-4 pointer-events-none">
+                        {/* Lớp Button Quản trị đè lên trên */}
+                        <div className="absolute inset-0 z-20 w-full h-full p-4 pointer-events-none">
                             {isAdmin && (
                                 <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto">
                                     <div>
@@ -2277,7 +2358,7 @@ QUY TẮC:
             };
 
             return (
-                <div className="relative min-h-screen flex flex-col font-sans">
+                <div className="relative min-h-screen flex flex-col font-sans" style={{ backgroundColor: '#FAF0E6' }}>
                     <FloatingDecor />
 
                     <Header
