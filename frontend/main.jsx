@@ -12,7 +12,19 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         const isWebAuthnSupported = typeof window !== 'undefined' && window.PublicKeyCredential !== undefined;
 
         const formatVND = (price) => {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price).replace(' ', ' ');
+            const num = Number(price);
+            const safePrice = (!isNaN(num) && num >= 0) ? num : 0;
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safePrice).replace(' ', ' ');
+        };
+
+        const getCleanZaloLink = (raw) => {
+            if (!raw) return 'https://zalo.me/0902631632';
+            const str = String(raw).trim();
+            if (str.startsWith('http://') || str.startsWith('https://')) {
+                return str;
+            }
+            const cleanNumber = str.replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').replace(/[^\d]/g, '');
+            return `https://zalo.me/${cleanNumber || '0902631632'}`;
         };
 
         const generateSlug = (text) => {
@@ -227,7 +239,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     onClick={() => {
                                         setIsDropdownOpen(false);
                                         setSearchTerm('');
-                                        navigate(`/san-pham/${product.slug}`);
+                                        navigate(`/san-pham/${product.slug || product.id}`);
                                     }}
                                     className="flex items-center gap-3 p-3 hover:bg-red-50/80 cursor-pointer border-b border-stone-100/80 last:border-0 transition-colors"
                                 >
@@ -456,10 +468,9 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const ZaloWidget = ({ zaloNumber }) => {
-            const finalZaloNumber = zaloNumber || '0902631632';
             return (
                 <a
-                    href={`https://zalo.me/${finalZaloNumber}`}
+                    href={getCleanZaloLink(zaloNumber)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="fixed bottom-6 right-6 w-14 h-14 bg-[#0068FF] rounded-full ring-4 ring-white/60 backdrop-blur-sm shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 group border border-white/80"
@@ -479,7 +490,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             const fbLink = settings?.facebook_url || defaultFb;
             const mapsLink = settings?.maps_url || defaultMaps;
-            const zaloLink = `https://zalo.me/${settings?.link_zalo || settings?.zalo_number || defaultZalo}`;
+            const zaloLink = getCleanZaloLink(settings?.link_zalo || settings?.zalo_number || defaultZalo);
 
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
@@ -537,7 +548,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 message += `Tổng tạm tính: ${formatVND(total)}`;
 
                 const encodedMessage = encodeURIComponent(message);
-                const cleanZalo = String(zaloNumber || '0902631632').replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').trim() || '0902631632';
+                const rawZalo = String(zaloNumber || '0902631632').replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').replace(/[^\d]/g, '').trim();
+                const cleanZalo = rawZalo || '0902631632';
                 window.open(`https://zalo.me/${cleanZalo}?text=${encodedMessage}`, '_blank');
             };
 
@@ -1724,6 +1736,18 @@ QUY TẮC:
             const [isProductModalOpen, setIsProductModalOpen] = useState(false);
             const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
             const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+
+            useEffect(() => {
+                const hasOpenModal = isCartOpen || isContactModalOpen || isProductModalOpen || isSettingsModalOpen || isTagsModalOpen || isDetailsModalOpen || !!selectedProduct;
+                if (hasOpenModal) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+                return () => {
+                    document.body.style.overflow = '';
+                };
+            }, [isCartOpen, isContactModalOpen, isProductModalOpen, isSettingsModalOpen, isTagsModalOpen, isDetailsModalOpen, selectedProduct]);
 
             const [categories, setCategories] = useState([]);
             const [localBanner, setLocalBanner] = useState(null);
