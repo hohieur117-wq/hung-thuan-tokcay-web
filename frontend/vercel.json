@@ -12,11 +12,18 @@
       "destination": "/api/product-preview.js?slug=:slug"
     },
     {
-      "source": "/((?!api/|assets/|decor-clean/|favicon.ico|robots.txt).*)",
+      "source": "/((?!api/|assets/|decor-clean/|favicon.ico|robots.txt|og-banner.jpg|og-banner.png|logo_new.png|.*\\.(?:ico|png|jpg|jpeg|webp|svg|css|js|json|txt|xml|wasm)).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/(.*\\.(?:ico|png|jpg|jpeg|webp|svg))",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
     {
       "source": "/decor-clean/(.*)",
       "headers": [

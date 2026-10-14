@@ -9,7 +9,16 @@ const FALLBACK_HTML = `<!DOCTYPE html>
     <title>Hùng Thuận Tokcay</title>
     <meta property="og:title" content="Cửa hàng Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc" />
     <meta property="og:description" content="Chuyên cung cấp sỉ và lẻ nguyên liệu nấu ăn Hàn Quốc: Bánh gạo, chả cá, tương ớt, mì cay... Uy tín, chất lượng tại Cần Thơ." />
-    <meta property="og:image" content="https://ufffqeaurlulzfsmznmq.supabase.co/storage/v1/object/public/images/banners/1783271534502_banner_desktop.jpg" />
+    <meta property="og:url" content="https://tokcayfood.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://tokcayfood.com/og-banner.jpg" />
+    <meta property="og:image:secure_url" content="https://tokcayfood.com/og-banner.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cửa hàng Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc" />
+    <meta name="twitter:description" content="Chuyên cung cấp sỉ và lẻ nguyên liệu nấu ăn Hàn Quốc: Bánh gạo, chả cá, tương ớt, mì cay... Uy tín, chất lượng tại Cần Thơ." />
+    <meta name="twitter:image" content="https://tokcayfood.com/og-banner.jpg" />
 </head>
 <body>
     <div id="root"></div>
@@ -88,8 +97,8 @@ export default async function handler(req, res) {
             ? product.description.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim().slice(0, 160)
             : 'Sản phẩm Hàn Quốc chất lượng cao tại Hùng Thuận Tokcay.';
         const ogDesc = escapeHtml(rawDesc);
-        const ogImage = escapeHtml(product.image_url || 'https://ufffqeaurlulzfsmznmq.supabase.co/storage/v1/object/public/images/banners/1783271534502_banner_desktop.jpg');
-        const ogUrl = escapeHtml(`https://www.tokcayfood.com/san-pham/${product.slug}`);
+        const ogImage = escapeHtml(product.image_url || 'https://tokcayfood.com/og-banner.jpg');
+        const ogUrl = escapeHtml(`https://tokcayfood.com/san-pham/${product.slug || product.id}`);
 
         let html = baseHtml
             .replace(/<title>.*?<\/title>/i, `<title>${ogTitle}</title>`)
@@ -97,7 +106,10 @@ export default async function handler(req, res) {
             .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${ogDesc}" />`)
             .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${ogUrl}" />`)
             .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${ogImage}" />`)
-            .replace(/<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:secure_url" content="${ogImage}" />`);
+            .replace(/<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:secure_url" content="${ogImage}" />`)
+            .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${ogTitle}" />`)
+            .replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${ogDesc}" />`)
+            .replace(/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:image" content="${ogImage}" />`);
 
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
