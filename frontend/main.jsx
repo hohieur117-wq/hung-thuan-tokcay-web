@@ -2477,7 +2477,7 @@ QUY TẮC:
                                                             return (
                                                                 <div
                                                                     key={product.id}
-                                                                    className={`group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-md border ${isPinned ? 'border-red-400/80 ring-1 ring-red-300/50' : 'border-red-200/55'} shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
+                                                                    className={`group bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-sm border ${isPinned ? 'border-red-400/80 ring-1 ring-red-300/50' : 'border-red-200/55'} shadow-[0_8px_24px_rgba(185,28,28,0.05)] hover:shadow-[0_14px_32px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col ${product.is_hidden ? 'opacity-60 grayscale-[0.2]' : ''}`}
                                                                 >
                                                                     <CardLink {...cardLinkProps} className="relative aspect-square overflow-hidden bg-white/85 p-4 flex items-center justify-center border-b border-red-100/60 block cursor-pointer">
                                                                         <img
