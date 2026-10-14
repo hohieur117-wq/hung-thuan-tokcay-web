@@ -1,16 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 
 // =========================================================================================
-// HỆ THỐNG FLOATING ICONS 3 LỚP CHIỀU SÂU (3-LAYER DEPTH OF FIELD PARALLAX - TỐI ƯU SIÊU MƯỢT)
-// 1. LỚP XA (Far Layer): Nhỏ nhất, mờ xa (opacity 0.18-0.20), cuộn chậm (-0.07), ở giữa trang
-// 2. LỚP TRUNG (Mid Layer): Kích thước vừa (opacity 0.25-0.27), cuộn vừa (-0.15), ở rìa trong 2 bên
-// 3. LỚP GẦN (Near Layer): To nhất (opacity 0.32-0.38), cuộn nhanh (-0.25), ở sát 2 lề ngoài cùng
+// HỆ THỐNG FLOATING ICONS 3 LỚP CHIỀU SÂU (3-LAYER DEPTH OF FIELD PARALLAX - TỐI ƯU MOBILE & PC)
+// 1. LỚP XA (Far Layer): Nhỏ nhất (16px Mobile / 36px PC), mờ xa (opacity 0.16-0.18), cuộn chậm (-0.07)
+// 2. LỚP TRUNG (Mid Layer): Kích thước vừa (20px Mobile / 48px PC), rõ vừa (opacity 0.24-0.27), cuộn vừa (-0.15)
+// 3. LỚP GẦN (Near Layer): Cận cảnh gọn gàng (24px Mobile / 58px PC), rõ nét (opacity 0.30-0.36), cuộn nhanh (-0.25)
 //
-// QUY TẮC CHỐNG ĐÈ 100% (ZERO COLLISION GUARANTEE):
-// - Toàn bộ màn hình được chia thành 7 rãnh dọc độc lập (X-channels), không có 2 rãnh nào trùng tọa độ X.
-// - Tất cả icon trong cùng 1 rãnh dùng CHUNG một tốc độ cuộn cố định (speed).
-// - Do đó, khoảng cách theo chiều dọc giữa các icon trong cùng rãnh là BẤT BIẾN khi cuộn (không bao giờ đè nhau).
-// - KHÔNG SỬ DỤNG animation tự di chuyển (loại bỏ hoàn toàn lag giật do keyframe loops).
+// ĐẶC BIỆT:
+// - Đã fix triệt để lỗi "icon to chà bá" trên điện thoại bằng clamp() CSS + Tailwind arbitrary pixel widths.
+// - Trên Mobile: icon chỉ nhỏ từ 16px đến 24px, tinh tế và không chiếm diện tích màn hình điện thoại.
+// - Chống đè icon 100%: 7 rãnh tọa độ X độc lập, cùng rãnh cùng tốc độ cuộn.
 // =========================================================================================
 
 // LỚP 1: LỚP XA (FAR LAYER - 11 items ở giữa trang | Speed cố định: -0.07)
@@ -103,18 +102,18 @@ const FloatingDecor = () => {
             className="fixed inset-0 h-[100lvh] z-0 pointer-events-none overflow-hidden select-none"
             style={{
                 '--scroll-y': '0px',
-                contain: 'strict',
             }}
             aria-hidden="true"
         >
-            {/* LỚP 1: LỚP XA (FAR LAYER - Nhỏ, cuộn chậm -0.07, mờ xa) */}
+            {/* LỚP 1: LỚP XA (FAR LAYER - Nhỏ gọn, cuộn chậm -0.07, mờ nhẹ) */}
             {FAR_LAYER_ITEMS.map((item) => (
                 <div
                     key={item.id}
-                    className="block absolute w-8 sm:w-10 md:w-12 lg:w-14 opacity-[0.18] sm:opacity-[0.20] will-change-transform"
+                    className="block absolute w-[16px] sm:w-[22px] md:w-[28px] lg:w-[36px] opacity-[0.16] sm:opacity-[0.19] will-change-transform"
                     style={{
                         top: item.top,
                         left: item.left,
+                        width: 'clamp(16px, 2.5vw, 36px)',
                         transform: `translate3d(0, calc(var(--scroll-y, 0px) * -0.07), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
@@ -122,10 +121,12 @@ const FloatingDecor = () => {
                         src={item.src}
                         alt=""
                         draggable={false}
-                        className="w-full h-auto block select-none pointer-events-none"
+                        className="w-full h-auto max-w-full block select-none pointer-events-none"
                         style={{
+                            maxWidth: '100%',
+                            height: 'auto',
                             transform: 'perspective(500px) rotateX(6deg) rotateY(-6deg) scale(0.96)',
-                            filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08))',
+                            filter: 'drop-shadow(0 3px 5px rgba(0, 0, 0, 0.08))',
                         }}
                     />
                 </div>
@@ -135,10 +136,11 @@ const FloatingDecor = () => {
             {MID_LAYER_ITEMS.map((item) => (
                 <div
                     key={item.id}
-                    className="block absolute w-11 sm:w-14 md:w-16 lg:w-18 opacity-[0.24] md:opacity-[0.27] will-change-transform"
+                    className="block absolute w-[20px] sm:w-[28px] md:w-[38px] lg:w-[48px] opacity-[0.24] md:opacity-[0.27] will-change-transform"
                     style={{
                         top: item.top,
                         ...(item.left ? { left: item.left } : { right: item.right }),
+                        width: 'clamp(20px, 3.4vw, 48px)',
                         transform: `translate3d(0, calc(var(--scroll-y, 0px) * -0.15), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
@@ -146,23 +148,26 @@ const FloatingDecor = () => {
                         src={item.src}
                         alt=""
                         draggable={false}
-                        className="w-full h-auto block select-none pointer-events-none"
+                        className="w-full h-auto max-w-full block select-none pointer-events-none"
                         style={{
+                            maxWidth: '100%',
+                            height: 'auto',
                             transform: 'perspective(600px) rotateX(8deg) rotateY(-8deg) scale(1.02)',
-                            filter: 'drop-shadow(0 8px 12px rgba(110, 30, 20, 0.14))',
+                            filter: 'drop-shadow(0 6px 10px rgba(110, 30, 20, 0.14))',
                         }}
                     />
                 </div>
             ))}
 
-            {/* LỚP 3: LỚP GẦN (NEAR LAYER - To nhất, rõ nét nhất, cuộn nhanh -0.25, sát mép ngoài) */}
+            {/* LỚP 3: LỚP GẦN (NEAR LAYER - Nổi bật cận cảnh, cuộn nhanh -0.25, sát mép ngoài) */}
             {NEAR_LAYER_ITEMS.map((item) => (
                 <div
                     key={item.id}
-                    className="block absolute w-13 sm:w-16 md:w-20 lg:w-24 opacity-[0.32] md:opacity-[0.38] will-change-transform"
+                    className="block absolute w-[24px] sm:w-[34px] md:w-[46px] lg:w-[58px] opacity-[0.30] md:opacity-[0.36] will-change-transform"
                     style={{
                         top: item.top,
                         ...(item.left ? { left: item.left } : { right: item.right }),
+                        width: 'clamp(24px, 4.2vw, 58px)',
                         transform: `translate3d(0, calc(var(--scroll-y, 0px) * -0.25), 0) rotate(${item.rotate}deg)`,
                     }}
                 >
@@ -170,10 +175,12 @@ const FloatingDecor = () => {
                         src={item.src}
                         alt=""
                         draggable={false}
-                        className="w-full h-auto block select-none pointer-events-none"
+                        className="w-full h-auto max-w-full block select-none pointer-events-none"
                         style={{
+                            maxWidth: '100%',
+                            height: 'auto',
                             transform: 'perspective(600px) rotateX(10deg) rotateY(-10deg) scale(1.06)',
-                            filter: 'drop-shadow(0 12px 16px rgba(90, 25, 15, 0.18))',
+                            filter: 'drop-shadow(0 8px 14px rgba(90, 25, 15, 0.18))',
                         }}
                     />
                 </div>
