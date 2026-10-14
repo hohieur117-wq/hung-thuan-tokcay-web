@@ -115,7 +115,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                       .toLowerCase();
         };
 
-        const LiveSearchBar = ({ resetKey }) => {
+        const LiveSearchBar = ({ resetKey, onFocusChange, onTextChange, inputRef, placeholder }) => {
             const [searchTerm, setSearchTerm] = useState('');
             const debouncedTerm = useDebounce(searchTerm, 350);
             const [results, setResults] = useState([]);
@@ -129,6 +129,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                     setSearchTerm('');
                     setResults([]);
                     setIsDropdownOpen(false);
+                    if (onTextChange) onTextChange(false);
+                    if (onFocusChange) onFocusChange(false);
                 }
             }, [resetKey]);
 
@@ -136,11 +138,16 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 const handleClickOutside = (event) => {
                     if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
                         setIsDropdownOpen(false);
+                        if (onFocusChange) onFocusChange(false);
                     }
                 };
                 document.addEventListener("mousedown", handleClickOutside);
-                return () => document.removeEventListener("mousedown", handleClickOutside);
-            }, []);
+                document.addEventListener("touchstart", handleClickOutside);
+                return () => {
+                    document.removeEventListener("mousedown", handleClickOutside);
+                    document.removeEventListener("touchstart", handleClickOutside);
+                };
+            }, [onFocusChange]);
 
             useEffect(() => {
                 const fetchResults = async () => {
@@ -209,17 +216,34 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 fetchResults();
             }, [debouncedTerm]);
 
+            const handleInputChange = (e) => {
+                const val = e.target.value;
+                setSearchTerm(val);
+                if (onTextChange) onTextChange(val.trim().length > 0);
+            };
+
             return (
                 <div ref={wrapperRef} className="relative w-full max-w-md">
                     <div className="flex items-center w-full rounded-full bg-white/95 focus-within:bg-white focus-within:ring-2 focus-within:ring-yellow-300 shadow-inner overflow-hidden p-1 transition-all">
                         <input
+                            ref={inputRef}
                             type="search"
                             name="tokcay_search_query"
                             className="block w-full pl-4 pr-3 py-2 rounded-l-full border-none leading-5 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none sm:text-sm"
-                            placeholder="Tìm kiếm sản phẩm..."
+                            placeholder={placeholder || "Tìm kiếm sản phẩm..."}
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onFocus={() => { if (searchTerm.trim()) setIsDropdownOpen(true); }}
+                            onChange={handleInputChange}
+                            onFocus={() => {
+                                if (onFocusChange) onFocusChange(true);
+                                if (searchTerm.trim()) setIsDropdownOpen(true);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                    setIsDropdownOpen(false);
+                                    if (onFocusChange) onFocusChange(false);
+                                    e.target.blur();
+                                }
+                            }}
                             autoComplete="off"
                             autoCorrect="off"
                             autoCapitalize="none"
@@ -238,6 +262,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     key={product.slug || product.name} 
                                     onClick={() => {
                                         setIsDropdownOpen(false);
+                                        if (onFocusChange) onFocusChange(false);
+                                        if (onTextChange) onTextChange(false);
                                         setSearchTerm('');
                                         navigate(`/san-pham/${product.slug || product.id}`);
                                     }}
@@ -355,15 +381,49 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
         // --- Components ---
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick, onLogoClick, searchResetKey }) => {
+            const [isScrolled, setIsScrolled] = useState(false);
+            const [isSearchFocused, setIsSearchFocused] = useState(false);
+            const [hasSearchText, setHasSearchText] = useState(false);
+            const mobileInputRef = useRef(null);
+
+            useEffect(() => {
+                let ticking = false;
+                const handleScroll = () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            const y = window.scrollY;
+                            setIsScrolled((prev) => {
+                                if (y > 75) return true;   // Cuộn xuống qua 75px -> Thu gọn
+                                if (y < 20) return false;  // Cuộn lên sát đỉnh < 20px -> Bung rộng lại
+                                return prev;               // Giữ nguyên ở vùng đệm 20px - 75px để chống giật
+                            });
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                };
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            // Nếu đang cuộn xuống NHƯNG người dùng bấm vào tìm kiếm hoặc có chữ gõ thì vẫn bung rộng để dễ gõ
+            const isCompactMobile = isScrolled && !isSearchFocused && !hasSearchText;
+
             return (
                 <header
-                    className="sticky top-0 z-50 bg-red-800 text-white backdrop-blur-xl border-b border-white/25 shadow-[0_8px_25px_rgba(153,27,27,0.35)] transition-all"
+                    className={`sticky top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-red-800 text-white backdrop-blur-xl border-b border-white/25 ${
+                        isScrolled
+                            ? 'shadow-[0_10px_30px_rgba(153,27,27,0.45)]'
+                            : 'shadow-[0_8px_25px_rgba(153,27,27,0.35)]'
+                    }`}
                     style={{ background: 'linear-gradient(90deg, rgba(153, 27, 27, 0.96) 0%, rgba(185, 28, 28, 0.94) 50%, rgba(153, 27, 27, 0.96) 100%)' }}
                 >
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-20">
+                    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+                        <div className={`flex justify-between items-center transition-all duration-300 ${
+                            isCompactMobile ? 'h-14 sm:h-16' : isScrolled ? 'h-16 md:h-16' : 'h-16 sm:h-20'
+                        }`}>
                             {/* Logo */}
-                            <div className="flex-1 flex justify-start items-center">
+                            <div className="flex items-center flex-shrink-0">
                                 <a
                                     href="/"
                                     className="flex items-center cursor-pointer"
@@ -372,34 +432,81 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                         if (onLogoClick) onLogoClick(e);
                                     }}
                                 >
-                                    <img src="/logo_new.png" alt="Logo Hùng Thuận Tokcay" className="h-10 md:h-12 lg:h-14 w-auto object-contain cursor-pointer drop-shadow-md" />
+                                    <img
+                                        src="/logo_new.png"
+                                        alt="Logo Hùng Thuận Tokcay"
+                                        className={`w-auto object-contain cursor-pointer drop-shadow-md transition-all duration-300 ${
+                                            isCompactMobile
+                                                ? 'h-8 sm:h-9'
+                                                : isScrolled
+                                                    ? 'h-9 md:h-11 lg:h-12'
+                                                    : 'h-10 md:h-12 lg:h-14'
+                                        }`}
+                                    />
                                 </a>
                             </div>
 
-                            {/* Search */}
-                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50">
+                            {/* Mobile Compact Search Trigger (Chỉ hiển thị khi đang thu gọn trên Mobile) */}
+                            {isCompactMobile && (
+                                <div
+                                    onClick={() => {
+                                        setIsSearchFocused(true);
+                                        setTimeout(() => {
+                                            if (mobileInputRef.current) {
+                                                mobileInputRef.current.focus();
+                                            }
+                                        }, 60);
+                                    }}
+                                    className="md:hidden flex-1 mx-2 sm:mx-3 cursor-pointer animate-fade-in"
+                                >
+                                    <div className="flex items-center w-full rounded-full bg-white/95 hover:bg-white text-gray-700 shadow-inner px-3 py-1.5 border border-white/70 transition-all">
+                                        <i className="fa-solid fa-magnifying-glass text-xs text-primary mr-2 flex-shrink-0"></i>
+                                        <span className="text-xs text-gray-500 font-medium truncate">Tìm kiếm sản phẩm...</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Desktop Search */}
+                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50 px-4">
                                 <LiveSearchBar resetKey={searchResetKey} />
                             </div>
 
                             {/* Navigation & Cart */}
-                            <div className="flex-1 flex justify-end items-center gap-3 lg:gap-6">
+                            <div className="flex items-center justify-end gap-1.5 sm:gap-3 lg:gap-6 flex-shrink-0">
                                 <nav className="hidden md:flex justify-between items-center gap-2 lg:gap-3 text-white font-semibold text-sm">
                                     <button onClick={onProductsClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Sản phẩm</button>
                                     <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Khuyến mãi</button>
                                     <button onClick={onContactClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Liên hệ</button>
                                 </nav>
 
-                                <div className="flex items-center gap-2 sm:gap-3">
-                                    <button onClick={onProductsClick} className="p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer" aria-label="Sản phẩm">
-                                        <i className="fa-solid fa-box-open text-lg"></i>
+                                <div className="flex items-center gap-1.5 sm:gap-2.5">
+                                    <button
+                                        onClick={onProductsClick}
+                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer ${
+                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'p-2.5 text-lg'
+                                        }`}
+                                        aria-label="Sản phẩm"
+                                    >
+                                        <i className="fa-solid fa-box-open"></i>
                                     </button>
 
-                                    <button onClick={onContactClick} className="p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer" aria-label="Liên hệ">
-                                        <i className="fa-solid fa-headset text-lg"></i>
+                                    <button
+                                        onClick={onContactClick}
+                                        className={`rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 outline-none flex items-center justify-center md:hidden cursor-pointer ${
+                                            isCompactMobile ? 'w-8 h-8 text-sm' : 'p-2.5 text-lg'
+                                        }`}
+                                        aria-label="Liên hệ"
+                                    >
+                                        <i className="fa-solid fa-headset"></i>
                                     </button>
 
-                                    <button onClick={onOpenCart} className="relative p-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer">
-                                        <i className="fa-solid fa-cart-shopping text-xl"></i>
+                                    <button
+                                        onClick={onOpenCart}
+                                        className={`relative rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer ${
+                                            isCompactMobile ? 'w-8 h-8 text-base' : 'p-2.5 text-xl'
+                                        }`}
+                                    >
+                                        <i className="fa-solid fa-cart-shopping"></i>
                                         {cartCount > 0 && (
                                             <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white">
                                                 {cartCount}
@@ -410,9 +517,20 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             </div>
                         </div>
 
-                        {/* Mobile Search */}
-                        <div className="md:hidden pb-4 relative z-50">
-                            <LiveSearchBar resetKey={searchResetKey} />
+                        {/* Mobile Search (Row 2 - Tự động thu gọn khi cuộn xuống, bung rộng khi ở đỉnh hoặc khi focus) */}
+                        <div
+                            className={`md:hidden relative z-50 transition-all duration-300 ease-in-out ${
+                                isCompactMobile
+                                    ? 'max-h-0 opacity-0 pb-0 -translate-y-2 pointer-events-none overflow-hidden'
+                                    : 'max-h-24 opacity-100 pb-3 translate-y-0 overflow-visible'
+                            }`}
+                        >
+                            <LiveSearchBar
+                                resetKey={searchResetKey}
+                                onFocusChange={setIsSearchFocused}
+                                onTextChange={setHasSearchText}
+                                inputRef={mobileInputRef}
+                            />
                         </div>
                     </div>
                 </header>
