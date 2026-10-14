@@ -393,7 +393,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         window.requestAnimationFrame(() => {
                             const y = window.scrollY;
                             setIsScrolled((prev) => {
-                                if (y > 75) return true;   // Cuộn xuống qua 75px -> Thu gọn
+                                if (y > 75) return true;   // Cuộn xuống qua 75px -> Thu gọn (chỉ trên Mobile)
                                 if (y < 20) return false;  // Cuộn lên sát đỉnh < 20px -> Bung rộng lại
                                 return prev;               // Giữ nguyên ở vùng đệm 20px - 75px để chống giật
                             });
@@ -406,24 +406,21 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
-            // Nếu đang cuộn xuống NHƯNG người dùng bấm vào tìm kiếm hoặc có chữ gõ thì vẫn bung rộng để dễ gõ
+            // Chỉ thu gọn trên điện thoại khi cuộn xuống và không bấm vào ô tìm kiếm
             const isCompactMobile = isScrolled && !isSearchFocused && !hasSearchText;
 
             return (
                 <header
-                    className={`sticky top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-red-800 text-white backdrop-blur-xl border-b border-white/25 ${
-                        isScrolled
-                            ? 'shadow-[0_10px_30px_rgba(153,27,27,0.45)]'
-                            : 'shadow-[0_8px_25px_rgba(153,27,27,0.35)]'
-                    }`}
+                    className="sticky top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-red-800 text-white backdrop-blur-xl border-b border-white/25 shadow-[0_8px_25px_rgba(153,27,27,0.35)]"
                     style={{ background: 'linear-gradient(90deg, rgba(153, 27, 27, 0.96) 0%, rgba(185, 28, 28, 0.94) 50%, rgba(153, 27, 27, 0.96) 100%)' }}
                 >
                     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-                        <div className={`flex justify-between items-center transition-all duration-300 ${
-                            isCompactMobile ? 'h-14 sm:h-16' : isScrolled ? 'h-16 md:h-16' : 'h-16 sm:h-20'
+                        {/* Hàng 1: Trên PC luôn giữ nguyên độ cao chuẩn h-20 không đổi. Trên mobile thu gọn linh hoạt h-14 / h-16 */}
+                        <div className={`flex justify-between items-center transition-all duration-300 md:h-20 ${
+                            isCompactMobile ? 'h-14 sm:h-16' : 'h-16 sm:h-18'
                         }`}>
-                            {/* Logo */}
-                            <div className="flex items-center flex-shrink-0">
+                            {/* Cột 1: Logo (Trên PC chiếm 1/3 bên trái, kích thước lớn chuẩn) */}
+                            <div className="flex-1 flex justify-start items-center min-w-0">
                                 <a
                                     href="/"
                                     className="flex items-center cursor-pointer"
@@ -435,18 +432,14 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     <img
                                         src="/logo_new.png"
                                         alt="Logo Hùng Thuận Tokcay"
-                                        className={`w-auto object-contain cursor-pointer drop-shadow-md transition-all duration-300 ${
-                                            isCompactMobile
-                                                ? 'h-8 sm:h-9'
-                                                : isScrolled
-                                                    ? 'h-9 md:h-11 lg:h-12'
-                                                    : 'h-10 md:h-12 lg:h-14'
+                                        className={`w-auto object-contain cursor-pointer drop-shadow-md transition-all duration-300 md:h-12 lg:h-14 ${
+                                            isCompactMobile ? 'h-8 sm:h-9' : 'h-10 sm:h-11'
                                         }`}
                                     />
                                 </a>
                             </div>
 
-                            {/* Mobile Compact Search Trigger (Chỉ hiển thị khi đang thu gọn trên Mobile) */}
+                            {/* Mobile Compact Search Trigger (Chỉ hiển thị trên Điện thoại khi cuộn xuống) */}
                             {isCompactMobile && (
                                 <div
                                     onClick={() => {
@@ -466,13 +459,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                 </div>
                             )}
 
-                            {/* Desktop Search */}
-                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50 px-4">
+                            {/* Cột 2: Desktop Search (Nằm chính giữa Header 100%, giữ nguyên kích thước chuẩn, không bị co nhỏ) */}
+                            <div className="flex-1 hidden md:flex justify-center items-center relative z-50 px-2 lg:px-4">
                                 <LiveSearchBar resetKey={searchResetKey} />
                             </div>
 
-                            {/* Navigation & Cart */}
-                            <div className="flex items-center justify-end gap-1.5 sm:gap-3 lg:gap-6 flex-shrink-0">
+                            {/* Cột 3: Navigation & Cart (Trên PC chiếm 1/3 bên phải) */}
+                            <div className="flex-1 flex justify-end items-center gap-1.5 sm:gap-3 lg:gap-6 min-w-0">
                                 <nav className="hidden md:flex justify-between items-center gap-2 lg:gap-3 text-white font-semibold text-sm">
                                     <button onClick={onProductsClick} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Sản phẩm</button>
                                     <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-3.5 py-1.5 rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer">Khuyến mãi</button>
@@ -503,10 +496,10 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     <button
                                         onClick={onOpenCart}
                                         className={`relative rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer ${
-                                            isCompactMobile ? 'w-8 h-8 text-base' : 'p-2.5 text-xl'
+                                            isCompactMobile ? 'w-8 h-8 text-base md:w-auto md:h-auto md:p-2.5' : 'p-2.5 text-xl'
                                         }`}
                                     >
-                                        <i className="fa-solid fa-cart-shopping"></i>
+                                        <i className="fa-solid fa-cart-shopping md:text-xl"></i>
                                         {cartCount > 0 && (
                                             <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white">
                                                 {cartCount}
@@ -517,12 +510,12 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             </div>
                         </div>
 
-                        {/* Mobile Search (Row 2 - Tự động thu gọn khi cuộn xuống, bung rộng khi ở đỉnh hoặc khi focus) */}
+                        {/* Hàng 2: Mobile Search (Tự động thu gọn khi cuộn xuống trên Mobile, bung rộng khi ở đỉnh hoặc khi focus) */}
                         <div
                             className={`md:hidden relative z-50 transition-all duration-300 ease-in-out ${
                                 isCompactMobile
                                     ? 'max-h-0 opacity-0 pb-0 -translate-y-2 pointer-events-none overflow-hidden'
-                                    : 'max-h-24 opacity-100 pb-3 translate-y-0 overflow-visible'
+                                    : 'max-h-24 opacity-100 pb-3.5 translate-y-0 overflow-visible'
                             }`}
                         >
                             <LiveSearchBar
