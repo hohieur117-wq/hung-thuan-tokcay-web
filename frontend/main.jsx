@@ -731,6 +731,12 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const ProductDetailsModal = ({ isOpen, onClose, product, onAddToCart }) => {
+            const [showFullDetails, setShowFullDetails] = useState(false);
+
+            useEffect(() => {
+                setShowFullDetails(false);
+            }, [product?.id, isOpen]);
+
             if (!isOpen || !product) return null;
             const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
@@ -752,12 +758,24 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h2>
                             <p className="text-3xl font-black text-primary mb-6">{formatVND(product.price)}</p>
 
-                            <div className="prose prose-sm text-gray-600 mb-8 flex-1">
-                                <h4 className="font-semibold text-gray-900 mb-2 text-base">Thông tin chi tiết</h4>
-                                {product.description ? (
-                                    <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
-                                ) : (
-                                    <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                            <div className="mb-6 flex-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowFullDetails(prev => !prev)}
+                                    className="w-full py-2.5 px-4 rounded-xl bg-white/75 hover:bg-red-50/80 backdrop-blur-md border border-red-200/70 text-red-700 font-semibold text-sm flex items-center justify-between shadow-sm transition-all duration-200 cursor-pointer select-none"
+                                >
+                                    <span>{showFullDetails ? 'Thu gọn thông tin chi tiết' : 'Nhấn để xem thêm thông tin chi tiết'}</span>
+                                    <i className={`fa-solid fa-chevron-down text-xs transition-transform duration-300 ${showFullDetails ? 'rotate-180' : ''}`}></i>
+                                </button>
+
+                                {showFullDetails && (
+                                    <div className="mt-2.5 p-4 rounded-xl bg-white/80 backdrop-blur-md border border-red-100/80 text-stone-700 text-sm leading-relaxed shadow-inner transition-all duration-300 animate-fadeIn">
+                                        {product.description ? (
+                                            <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
+                                        ) : (
+                                            <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
@@ -1601,8 +1619,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             const [product, setProduct] = useState(null);
             const [relatedProducts, setRelatedProducts] = useState([]);
             const [loading, setLoading] = useState(true);
+            const [showFullDetails, setShowFullDetails] = useState(false);
             const navigate = useNavigate();
             const detailTopRef = useRef(null);
+
+            useEffect(() => {
+                setShowFullDetails(false);
+            }, [product?.id, slug]);
 
             const handleBack = () => {
                 if (window.history.length > 2) {
@@ -1757,12 +1780,24 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
                             <p className="text-4xl font-black text-primary mb-6">{formatVND(product.price)}</p>
 
-                            <div className="prose prose-sm text-gray-600 mb-8 flex-1">
-                                <h4 className="font-semibold text-gray-900 mb-2 text-lg">Thông tin chi tiết</h4>
-                                {product.description ? (
-                                    <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
-                                ) : (
-                                    <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                            <div className="mb-8 flex-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowFullDetails(prev => !prev)}
+                                    className="w-full py-2.5 px-4 rounded-xl bg-white/75 hover:bg-red-50/80 backdrop-blur-md border border-red-200/70 text-red-700 font-semibold text-sm flex items-center justify-between shadow-sm transition-all duration-200 cursor-pointer select-none"
+                                >
+                                    <span>{showFullDetails ? 'Thu gọn thông tin chi tiết' : 'Nhấn để xem thêm thông tin chi tiết'}</span>
+                                    <i className={`fa-solid fa-chevron-down text-xs transition-transform duration-300 ${showFullDetails ? 'rotate-180' : ''}`}></i>
+                                </button>
+
+                                {showFullDetails && (
+                                    <div className="mt-2.5 p-4 rounded-xl bg-white/80 backdrop-blur-md border border-red-100/80 text-stone-700 text-sm leading-relaxed shadow-inner transition-all duration-300 animate-fadeIn">
+                                        {product.description ? (
+                                            <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
+                                        ) : (
+                                            <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
