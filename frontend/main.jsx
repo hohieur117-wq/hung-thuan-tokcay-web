@@ -1137,103 +1137,30 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 setIsGenerating(true);
                 try {
                     const imagePart = await getImageInlineData(imageSource);
-                    let text = '';
 
-                    const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.
-QUY TẮC: 
-1. Trích xuất chính xác 100% thông tin (khối lượng, thành phần, thương hiệu...).
-2. Tuyệt đối không bịa đặt số liệu. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng đó để suy luận hợp lý.
-3. KHÔNG chào hỏi, KHÔNG dùng markdown code block. CHỈ TRẢ VỀ kết quả tuân thủ đúng biểu mẫu sau:
+                    // Toàn bộ logic gọi AI được đóng gói hoàn toàn trên Serverless Backend (/api/generate-description)
+                    // Tuyệt đối không để lộ Gemini API Key ra trình duyệt web hay mã nguồn client
+                    const apiRes = await fetch('/api/generate-description', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            imageBase64: imagePart.inlineData.data,
+                            mimeType: imagePart.inlineData.mimeType
+                        })
+                    });
 
-* Tên sản phẩm: [Điền tên chuẩn]
-* Thương hiệu: [Điền tên thương hiệu]
-* Khối lượng tịnh: [Điền khối lượng/thể tích]
-* Thành phần: [Liệt kê thành phần chính]
-* Dạng sản phẩm: [Bột mịn, xốt đặc, sợi khô...]
-* Hương vị: [Mô tả ngắn gọn]
-* Công dụng: [Cách chế biến]
-* Đối tượng sử dụng: [Gia đình, nhà hàng...]
-* Bảo quản: [Hướng dẫn bảo quản]
-* Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
-
-                    // 1. First try secure serverless endpoint
-                    try {
-                        const apiRes = await fetch('/api/generate-description', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                imageBase64: imagePart.inlineData.data,
-                                mimeType: imagePart.inlineData.mimeType
-                            })
-                        });
-                        const contentType = apiRes.headers.get('content-type') || '';
-                        if (apiRes.ok && contentType.includes('application/json')) {
-                            const apiData = await apiRes.json();
-                            if (apiData.text) text = apiData.text;
-                        }
-                    } catch (netErr) {
-                        console.warn("Serverless AI endpoint fallback:", netErr);
+                    const contentType = apiRes.headers.get('content-type') || '';
+                    if (!apiRes.ok || !contentType.includes('application/json')) {
+                        const errData = await apiRes.json().catch(() => null);
+                        throw new Error(errData?.error || `Lỗi kết nối máy chủ (${apiRes.status})`);
                     }
 
-                    // 2. Client fallback using Gemini API REST with model fallback chain
-                    if (!text) {
-                        const apiKey = (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_GEMINI_API_KEY || import.meta.env?.GEMINI_API_KEY)) || '';
-                        if (!apiKey) {
-                            throw new Error("Chưa cấu hình Gemini API Key. Vui lòng kiểm tra file .env hoặc cấu hình Vercel.");
-                        }
-
-                        const candidateModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
-                        let lastErr = null;
-
-                        for (const model of candidateModels) {
-                            try {
-                                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                                const clientRes = await fetch(url, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        contents: [
-                                            {
-                                                parts: [
-                                                    { text: promptText },
-                                                    {
-                                                        inline_data: {
-                                                            mime_type: imagePart.inlineData.mimeType,
-                                                            data: imagePart.inlineData.data
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    })
-                                });
-
-                                if (clientRes.ok) {
-                                    const clientData = await clientRes.json();
-                                    const genText = clientData?.candidates?.[0]?.content?.parts?.[0]?.text;
-                                    if (genText) {
-                                        text = genText;
-                                        break;
-                                    }
-                                } else {
-                                    const errJson = await clientRes.json().catch(() => null);
-                                    lastErr = errJson?.error?.message || `HTTP ${clientRes.status}`;
-                                }
-                            } catch (mErr) {
-                                lastErr = mErr.message;
-                            }
-                        }
-
-                        if (!text && lastErr) {
-                            throw new Error(`Không thể kết nối Gemini API: ${lastErr}`);
-                        }
+                    const apiData = await apiRes.json();
+                    if (!apiData.text) {
+                        throw new Error(apiData.error || "Không nhận được phản hồi từ AI.");
                     }
 
-                    if (!text) {
-                        throw new Error("Không thể phân tích ảnh qua AI vào lúc này. Vui lòng thử lại sau.");
-                    }
-
-                    setFormData(prev => ({ ...prev, description: text }));
+                    setFormData(prev => ({ ...prev, description: apiData.text }));
                 } catch (error) {
                     console.error("AI Error:", error);
                     alert("Lỗi AI: " + error.message);

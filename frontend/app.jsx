@@ -203,47 +203,27 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
         }
         setIsGenerating(true);
         try {
-            const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
-            
-            let apiKey = '';
-            try {
-                apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-            } catch (e) {
-                apiKey = prompt("Môi trường không dùng Vite. Vui lòng nhập tạm Gemini API Key để dùng thử (Hoặc cấu hình Vite để đọc từ .env):");
-            }
-
-            if (!apiKey) {
-                alert("Không tìm thấy API Key!");
-                setIsGenerating(false);
-                return;
-            }
-
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const visionModel = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
-
             const imagePart = await imageToBase64InlineData(formData.image_url);
-            const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.
-QUY TẮC: 
-1. Trích xuất chính xác 100% thông tin (khối lượng, thành phần, thương hiệu...).
-2. Tuyệt đối không bịa đặt số liệu. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng đó để suy luận hợp lý.
-3. KHÔNG chào hỏi, KHÔNG dùng markdown code block. CHỈ TRẢ VỀ kết quả tuân thủ đúng biểu mẫu sau:
+            const apiRes = await fetch('/api/generate-description', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    imageBase64: imagePart.inlineData.data,
+                    mimeType: imagePart.inlineData.mimeType
+                })
+            });
 
-* Tên sản phẩm: [Điền tên chuẩn]
-* Thương hiệu: [Điền tên thương hiệu]
-* Khối lượng tịnh: [Điền khối lượng/thể tích]
-* Thành phần: [Liệt kê thành phần chính]
-* Dạng sản phẩm: [Bột mịn, xốt đặc, sợi khô...]
-* Hương vị: [Mô tả ngắn gọn]
-* Công dụng: [Cách chế biến]
-* Đối tượng sử dụng: [Gia đình, nhà hàng...]
-* Bảo quản: [Hướng dẫn bảo quản]
-* Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
+            if (!apiRes.ok) {
+                const errData = await apiRes.json().catch(() => ({}));
+                throw new Error(errData.error || `Lỗi máy chủ (${apiRes.status})`);
+            }
 
-            const result = await visionModel.generateContent([promptText, imagePart]);
-            const response = await result.response;
-            const text = response.text();
+            const data = await apiRes.json();
+            if (!data.text) {
+                throw new Error(data.error || "Không nhận được phản hồi từ AI.");
+            }
 
-            setFormData(prev => ({ ...prev, description: text }));
+            setFormData(prev => ({ ...prev, description: data.text }));
         } catch (error) {
             console.error("AI Error:", error);
             alert("Lỗi AI: " + error.message);

@@ -3,9 +3,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    // Chỉ đọc API Key từ biến môi trường máy chủ (Server-side Only, tuyệt đối không lộ lên client)
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return res.status(500).json({ error: 'Gemini API key is not configured on server' });
+        return res.status(500).json({ error: 'GEMINI_API_KEY chưa được cấu hình trên máy chủ (Vercel Environment Variables).' });
     }
 
     try {
@@ -31,10 +32,11 @@ QUY TẮC:
 * Bảo quản: [Hướng dẫn bảo quản]
 * Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
 
-        const CANDIDATE_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
+        // Chỉ chạy các model Flash-Lite thấp nhất (miễn phí 100% trên Free Tier, chi phí 0đ, không phát sinh chi phí)
+        const LITE_MODELS = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
         let lastErr = null;
 
-        for (const model of CANDIDATE_MODELS) {
+        for (const model of LITE_MODELS) {
             try {
                 const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 const geminiRes = await fetch(geminiEndpoint, {
@@ -72,7 +74,7 @@ QUY TẮC:
             }
         }
 
-        throw new Error(`Tất cả mô hình Gemini đều bận hoặc không phản hồi: ${lastErr}`);
+        throw new Error(`Mô hình AI Flash-Lite đang bận hoặc quá tải: ${lastErr}`);
     } catch (err) {
         console.error('generate-description error:', err);
         return res.status(500).json({ error: err.message });
