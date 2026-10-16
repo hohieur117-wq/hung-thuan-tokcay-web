@@ -17,12 +17,22 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safePrice).replace(' ', ' ');
         };
 
+        const sanitizeHttpUrl = (url, fallback = '#') => {
+            if (!url) return fallback;
+            try {
+                const parsed = new URL(String(url).trim());
+                if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+                    return parsed.href;
+                }
+            } catch (e) {
+                // Invalid URL
+            }
+            return fallback;
+        };
+
         const getCleanZaloLink = (raw) => {
             if (!raw) return 'https://zalo.me/0902631632';
             const str = String(raw).trim();
-            if (str.startsWith('http://') || str.startsWith('https://')) {
-                return str;
-            }
             const cleanNumber = str.replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').replace(/[^\d]/g, '');
             return `https://zalo.me/${cleanNumber || '0902631632'}`;
         };
@@ -178,17 +188,23 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         }
 
                         if (!rawData) {
-                            const searchFilter = slugTerm
-                                ? `name.ilike.%${trimmedTerm}%,slug.ilike.%${slugTerm}%`
-                                : `name.ilike.%${trimmedTerm}%`;
-                            const { data, error } = await supabase
-                                .from('products')
-                                .select('name, slug, image_url, price')
-                                .eq('is_hidden', false)
-                                .or(searchFilter)
-                                .limit(20);
-                            if (error) throw error;
-                            rawData = data || [];
+                            const cleanSearch = trimmedTerm.replace(/[,().%]/g, '').trim();
+                            const cleanSlug = slugTerm ? slugTerm.replace(/[,().%]/g, '').trim() : '';
+                            if (cleanSearch) {
+                                const searchFilter = cleanSlug
+                                    ? `name.ilike.%${cleanSearch}%,slug.ilike.%${cleanSlug}%`
+                                    : `name.ilike.%${cleanSearch}%`;
+                                const { data, error } = await supabase
+                                    .from('products')
+                                    .select('name, slug, image_url, price')
+                                    .eq('is_hidden', false)
+                                    .or(searchFilter)
+                                    .limit(20);
+                                if (error) throw error;
+                                rawData = data || [];
+                            } else {
+                                rawData = [];
+                            }
                         }
 
                         rawData.sort((a, b) => {
@@ -595,8 +611,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             const defaultMaps = "https://maps.app.goo.gl/7XXZpNfJ3nQ6UUia6";
             const defaultZalo = "0902631632";
 
-            const fbLink = settings?.facebook_url || defaultFb;
-            const mapsLink = settings?.maps_url || defaultMaps;
+            const fbLink = sanitizeHttpUrl(settings?.facebook_url, defaultFb);
+            const mapsLink = sanitizeHttpUrl(settings?.maps_url, defaultMaps);
             const zaloLink = getCleanZaloLink(settings?.link_zalo || settings?.zalo_number || defaultZalo);
 
             return (
@@ -624,10 +640,10 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             <a href={zaloLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg bg-[#0068FF] hover:bg-blue-700 transition-transform hover:scale-[1.02] shadow-md">
                                 <i className="fa-solid fa-comment-dots text-2xl"></i> Chat Zalo
                             </a>
-                            <a href={fbLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg bg-[#1877F2] hover:bg-[#166FE5] transition-transform hover:scale-[1.02] shadow-md">
+                            <a href={fbLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg bg-[#1877F2] hover:bg-[#166FE5] transition-transform hover:scale-[1.02] shadow-md">
                                 <i className="fa-brands fa-facebook text-2xl"></i> Trang Facebook
                             </a>
-                            <a href={mapsLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-gray-700 font-bold text-lg bg-white/85 backdrop-blur-sm border border-white/80 hover:bg-white transition-transform hover:scale-[1.02] shadow-md">
+                            <a href={mapsLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-gray-700 font-bold text-lg bg-white/85 backdrop-blur-sm border border-white/80 hover:bg-white transition-transform hover:scale-[1.02] shadow-md">
                                 <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Bản đồ Google Maps
                             </a>
                         </div>
@@ -739,7 +755,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             <div className="prose prose-sm text-gray-600 mb-8 flex-1">
                                 <h4 className="font-semibold text-gray-900 mb-2 text-base">Thông tin chi tiết</h4>
                                 {product.description ? (
-                                    <div dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }} />
+                                    <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
                                 ) : (
                                     <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                                 )}
@@ -1010,59 +1026,69 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             const generateDescriptionFromImage = async () => {
                 if (!formData.image_url) {
-                    alert("Chưa có ảnh! Vui lòng chọn ảnh trư�:c khi dùng AI phân tích.");
+                    alert("Chưa có ảnh! Vui lòng chọn ảnh trước khi dùng AI phân tích.");
                     return;
                 }
                 setIsGenerating(true);
                 try {
-                    // Kh�xi tạo model từ esm.sh do chạy trực tiếp trên trình duy�!t bằng Babel
-                    // Hoặc lấy từ file config nếu có dùng Vite (bundle)
-                    const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
-
-                    // Thử lấy key từ import.meta.env (nếu dùng Vite) hoặc yêu cầu nhập tạm nếu chạy thuần
-                    let apiKey = '';
-                    try {
-                        apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-                    } catch (e) {
-                        // Trình duy�!t không h� trợ import.meta.env
-                        apiKey = prompt("Môi trường không dùng Vite. Vui lòng nhập tạm Gemini API Key �Ồ dùng thử (Hoặc cấu hình Vite �Ồ �ọc từ .env):");
-                    }
-
-                    if (!apiKey) {
-                        alert("Không tìm thấy API Key!");
-                        setIsGenerating(false);
-                        return;
-                    }
-
-                    const genAI = new GoogleGenerativeAI(apiKey);
-                    const visionModel = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
-
                     const imagePart = await imageToBase64InlineData(formData.image_url);
-                    const promptText = `Bạn là m�"t chuyên gia kiỒm ��9nh nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Qu�c. Nhi�!m vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm �ược cung cấp.
+                    let text = '';
+
+                    // 1. First try secure serverless endpoint
+                    try {
+                        const apiRes = await fetch('/api/generate-description', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                imageBase64: imagePart.inlineData.data,
+                                mimeType: imagePart.inlineData.mimeType
+                            })
+                        });
+                        if (apiRes.ok) {
+                            const apiData = await apiRes.json();
+                            if (apiData.text) text = apiData.text;
+                        }
+                    } catch (netErr) {
+                        console.warn("Serverless AI endpoint fallback:", netErr);
+                    }
+
+                    // 2. Client fallback if serverless endpoint is offline
+                    if (!text) {
+                        const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || '';
+                        if (apiKey) {
+                            const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
+                            const genAI = new GoogleGenerativeAI(apiKey);
+                            const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                            const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.
 QUY TẮC: 
-1. Trích xuất chính xác 100% thông tin (kh�i lượng, thành phần, thương hi�!u...).
-2. Tuy�!t ��i không b�9a �ặt s� li�!u. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng �ó �Ồ suy luận hợp lý.
-3. KH�NG chào hỏi, KH�NG dùng markdown code block. CH�� TRẢ VỬ kết quả tuân thủ �úng biỒu mẫu sau:
+1. Trích xuất chính xác 100% thông tin (khối lượng, thành phần, thương hiệu...).
+2. Tuyệt đối không bịa đặt số liệu. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng đó để suy luận hợp lý.
+3. KHÔNG chào hỏi, KHÔNG dùng markdown code block. CHỈ TRẢ VỀ kết quả tuân thủ đúng biểu mẫu sau:
 
 * Tên sản phẩm: [Điền tên chuẩn]
-* Thương hi�!u: [Điền tên thương hi�!u]
-* Kh�i lượng t�9nh: [Điền kh�i lượng/thỒ tích]
-* Thành phần: [Li�!t kê thành phần chính]
-* Dạng sản phẩm: [B�"t m�9n, x�t �ặc, sợi khô...]
-* Hương v�9: [Mô tả ngắn gọn]
+* Thương hiệu: [Điền tên thương hiệu]
+* Khối lượng tịnh: [Điền khối lượng/thể tích]
+* Thành phần: [Liệt kê thành phần chính]
+* Dạng sản phẩm: [Bột mịn, xốt đặc, sợi khô...]
+* Hương vị: [Mô tả ngắn gọn]
 * Công dụng: [Cách chế biến]
-* Đ�i tượng sử dụng: [Gia �ình, nhà hàng...]
-* Bảo quản: [Hư�:ng dẫn bảo quản]
-* Quy cách �óng gói: [Túi zip, chai thủy tinh...]`;
+* Đối tượng sử dụng: [Gia đình, nhà hàng...]
+* Bảo quản: [Hướng dẫn bảo quản]
+* Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
+                            const result = await visionModel.generateContent([promptText, imagePart]);
+                            const response = await result.response;
+                            text = response.text();
+                        }
+                    }
 
-                    const result = await visionModel.generateContent([promptText, imagePart]);
-                    const response = await result.response;
-                    const text = response.text();
+                    if (!text) {
+                        throw new Error("Không thể phân tích ảnh qua AI vào lúc này. Vui lòng thử lại sau.");
+                    }
 
                     setFormData(prev => ({ ...prev, description: text }));
                 } catch (error) {
                     console.error("AI Error:", error);
-                    alert("L�i AI: " + error.message);
+                    alert("Lỗi AI: " + error.message);
                 } finally {
                     setIsGenerating(false);
                 }
@@ -1659,7 +1685,7 @@ QUY TẮC:
                             <div className="prose prose-sm text-gray-600 mb-8 flex-1">
                                 <h4 className="font-semibold text-gray-900 mb-2 text-lg">Thông tin chi tiết</h4>
                                 {product.description ? (
-                                    <div dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }} />
+                                    <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
                                 ) : (
                                     <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                                 )}
@@ -1780,7 +1806,6 @@ QUY TẮC:
         // --- Main App ---
         const App = () => {
             const navigate = useNavigate();
-            const adminPassword = "admin@1993";
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -1830,12 +1855,11 @@ QUY TẮC:
             useEffect(() => {
                 supabase.auth.getSession().then(({ data: { session } }) => {
                     setSession(session);
-                    if (session) setIsAdmin(true);
+                    setIsAdmin(Boolean(session && session.user));
                 });
                 const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
                     setSession(session);
-                    if (session) setIsAdmin(true);
-                    else setIsAdmin(false);
+                    setIsAdmin(Boolean(session && session.user));
                 });
                 return () => subscription.unsubscribe();
             }, []);
@@ -2209,25 +2233,40 @@ QUY TẮC:
 
             // 5. Admin Print / Save PDF Price List
             const handlePrintPriceListPDF = () => {
+                const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, (m) => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[m]));
+                const sanitizeImageUrl = (url) => {
+                    if (!url) return FallbackImage;
+                    const clean = String(url).trim();
+                    if (clean.startsWith('https://') || clean.startsWith('http://') || clean.startsWith('data:image/')) {
+                        return escapeHtml(clean);
+                    }
+                    return FallbackImage;
+                };
+
                 const exportList = (filteredProducts.length > 0 ? filteredProducts : products).filter(p => !p.is_hidden);
-                const todayStr = new Date().toLocaleDateString('vi-VN');
+                const todayStr = escapeHtml(new Date().toLocaleDateString('vi-VN'));
                 const printWin = window.open('', '_blank', 'width=1000,height=800');
                 if (!printWin) {
                     alert('Vui lòng cho phép mở cửa sổ bật lên (Pop-up) để in bảng giá.');
                     return;
                 }
                 const rowsHtml = exportList.map((p, idx) => {
-                    const tagsStr = Array.isArray(p.tags) ? p.tags.join(', ') : '';
-                    const priceStr = formatVND(p.price);
-                    const stockStr = p.stock_status || 'Hàng sẵn tại kho';
-                    const isOut = stockStr.toLowerCase() === 'hết hàng';
+                    const tagsStr = escapeHtml(Array.isArray(p.tags) ? p.tags.join(', ') : '');
+                    const priceStr = escapeHtml(formatVND(p.price));
+                    const rawStock = p.stock_status || 'Hàng sẵn tại kho';
+                    const isOut = rawStock.toLowerCase() === 'hết hàng';
+                    const stockStr = escapeHtml(rawStock);
+                    const safeName = escapeHtml(p.name || '');
+                    const safeImage = sanitizeImageUrl(p.image_url);
                     return `
                         <tr>
                             <td style="text-align:center;font-weight:600;">${idx + 1}</td>
                             <td style="text-align:center;">
-                                <img src="${p.image_url || FallbackImage}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #eee;" />
+                                <img src="${safeImage}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #eee;" />
                             </td>
-                            <td style="font-weight:700;color:#1c1917;">${p.name || ''}</td>
+                            <td style="font-weight:700;color:#1c1917;">${safeName}</td>
                             <td style="color:#57534e;font-size:12px;">${tagsStr}</td>
                             <td style="text-align:right;font-weight:800;color:#b91c1c;">${priceStr}</td>
                             <td style="text-align:center;color:#0068FF;font-weight:600;font-size:12px;">Liên hệ Zalo</td>
@@ -2447,13 +2486,6 @@ QUY TẮC:
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-primary"></span>
                                                     </span>
                                                     <span>Chế độ Quản Trị (Admin)</span>
-                                                    <span
-                                                        className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-600 backdrop-blur-md border border-red-400/40 text-white select-all shadow-sm"
-                                                        style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }}
-                                                        title="Mật khẩu Admin hiện tại"
-                                                    >
-                                                        Pass: {adminPassword}
-                                                    </span>
                                                 </div>
                                                 <div className="flex flex-wrap items-center justify-center gap-2.5">
                                                     <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-3.5 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
@@ -2875,15 +2907,6 @@ QUY TẮC:
                                             <button onClick={(e) => handleAdminClick(e)} className="text-red-100 hover:text-yellow-300 transition-colors cursor-pointer font-medium outline-none text-left md:text-right w-max">
                                                 Admin
                                             </button>
-                                        )}
-                                        {isAdmin && (
-                                            <span
-                                                className="px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-md border border-white/30 text-white select-all"
-                                                style={{ backgroundColor: 'rgba(255, 255, 255, 0.22)' }}
-                                                title="Mật khẩu Admin hiện tại"
-                                            >
-                                                Pass: {adminPassword}
-                                            </span>
                                         )}
                                     </div>
                                 </div>

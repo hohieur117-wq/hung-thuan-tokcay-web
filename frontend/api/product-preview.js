@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
         if (!slug || !supabaseKey) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             return res.status(200).send(baseHtml);
         }
 
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
 
         if (!product) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             return res.status(200).send(baseHtml);
         }
 
@@ -101,15 +101,15 @@ export default async function handler(req, res) {
         const ogUrl = escapeHtml(`https://tokcayfood.com/san-pham/${product.slug || product.id}`);
 
         let html = baseHtml
-            .replace(/<title>.*?<\/title>/i, `<title>${ogTitle}</title>`)
-            .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${ogTitle}" />`)
-            .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${ogDesc}" />`)
-            .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${ogUrl}" />`)
-            .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image" content="${ogImage}" />`)
-            .replace(/<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/i, `<meta property="og:image:secure_url" content="${ogImage}" />`)
-            .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${ogTitle}" />`)
-            .replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${ogDesc}" />`)
-            .replace(/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i, `<meta name="twitter:image" content="${ogImage}" />`);
+            .replace(/<title>.*?<\/title>/i, () => `<title>${ogTitle}</title>`)
+            .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i, () => `<meta property="og:title" content="${ogTitle}" />`)
+            .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i, () => `<meta property="og:description" content="${ogDesc}" />`)
+            .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i, () => `<meta property="og:url" content="${ogUrl}" />`)
+            .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i, () => `<meta property="og:image" content="${ogImage}" />`)
+            .replace(/<meta\s+property="og:image:secure_url"\s+content="[^"]*"\s*\/?>/i, () => `<meta property="og:image:secure_url" content="${ogImage}" />`)
+            .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i, () => `<meta name="twitter:title" content="${ogTitle}" />`)
+            .replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i, () => `<meta name="twitter:description" content="${ogDesc}" />`)
+            .replace(/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i, () => `<meta name="twitter:image" content="${ogImage}" />`);
 
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Fallback preview handler:', error);
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         return res.status(200).send(baseHtml);
     }
 }
