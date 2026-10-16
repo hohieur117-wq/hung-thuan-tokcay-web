@@ -832,10 +832,55 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 return height;
             };
 
-            const compressImageBeforeAI = (file, maxWidth = 1000, maxHeight = 1000) => {
+            const drawWatermark = (ctx, width, height, bottomY) => {
+                const fontSize = Math.max(16, Math.round(width * 0.052));
+                ctx.font = `bold ${fontSize}px "Inter", "Arial", sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                const text = 'www.tokcayfood.com';
+                const x = width / 2;
+                const marginInside = height * 0.035;
+                const watermarkY = Math.min(height - 12, Math.max(fontSize + 12, bottomY - marginInside));
+
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = fontSize * 0.25;
+                ctx.lineJoin = 'round';
+                ctx.strokeText(text, x, watermarkY);
+
+                ctx.fillStyle = '#b91c1c';
+                ctx.fillText(text, x, watermarkY);
+            };
+
+            const getImageSourceBlob = async () => {
+                if (processedImage) return processedImage;
+                if (rawImage) return rawImage;
+                const targetUrl = previewUrl || imageUrl;
+                if (!targetUrl) return null;
+                try {
+                    const res = await fetch(targetUrl);
+                    return await res.blob();
+                } catch (e) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth || img.width;
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+                        };
+                        img.onerror = () => reject(new Error('Không thể tải ảnh.'));
+                        img.src = targetUrl;
+                    });
+                }
+            };
+
+            const compressImageBeforeAI = (blobOrFile, maxWidth = 1000, maxHeight = 1000) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.readAsDataURL(file);
+                    reader.readAsDataURL(blobOrFile);
                     reader.onload = (event) => {
                         const img = new Image();
                         img.src = event.target.result;
@@ -844,8 +889,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             let height = img.height;
                             if (width > maxWidth || height > maxHeight) {
                                 const ratio = Math.min(maxWidth / width, maxHeight / height);
-                                width *= ratio;
-                                height *= ratio;
+                                width = Math.round(width * ratio);
+                                height = Math.round(height * ratio);
                             }
                             const canvas = document.createElement('canvas');
                             canvas.width = width;
@@ -854,7 +899,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             ctx.drawImage(img, 0, 0, width, height);
                             canvas.toBlob((blob) => {
                                 resolve(blob);
-                            }, file.type || 'image/jpeg', 0.9);
+                            }, 'image/jpeg', 0.9);
                         };
                         img.onerror = reject;
                     };
@@ -863,63 +908,71 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             };
 
             const handleProcessImage = async () => {
-                if (!rawImage) return;
+                const sourceBlob = await getImageSourceBlob();
+                if (!sourceBlob) {
+                    alert('Vui lòng chọn ảnh hoặc dán link ảnh trước khi xử lý!');
+                    return;
+                }
                 if (cancelRef) cancelRef.current = false;
                 setIsProcessing(true);
                 try {
-                    const compressedBlob = await compressImageBeforeAI(rawImage);
-                    if (cancelRef && cancelRef.current) return;
-                    
-                    const { removeBackground } = await import('@imgly/background-removal');
+                    const compressedBlob = await compressImageBeforeAI(sourceBlob);
                     if (cancelRef && cancelRef.current) return;
 
-                    const bgRemovedBlob = await removeBackground(compressedBlob, { model: 'isnet' });
+                    let bgRemovedBlob = null;
+                    try {
+                        const { removeBackground } = await import('@imgly/background-removal');
+                        if (cancelRef && cancelRef.current) return;
+
+                        const removalPromise = removeBackground(compressedBlob, {
+                            model: 'isnet_quint8',
+                            publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/',
+                            debug: false
+                        });
+                        const timeoutPromise = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Timeout')), 25000)
+                        );
+                        bgRemovedBlob = await Promise.race([removalPromise, timeoutPromise]);
+                    } catch (removalErr) {
+                        console.warn('AI tách nền không khả dụng trên thiết bị/mạng hiện tại, tự động chuyển sang chế độ căn chuẩn 1:1 và đóng mộc Tokcay:', removalErr);
+                    }
+
                     if (cancelRef && cancelRef.current) return;
-                    
+
+                    const activeBlob = bgRemovedBlob || compressedBlob;
                     const img = new Image();
-                    img.src = URL.createObjectURL(bgRemovedBlob);
+                    img.src = URL.createObjectURL(activeBlob);
                     await new Promise((resolve, reject) => {
                         img.onload = resolve;
                         img.onerror = reject;
                     });
                     if (cancelRef && cancelRef.current) return;
 
+                    const size = Math.max(img.width, img.height);
                     const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+                    canvas.width = size;
+                    canvas.height = size;
                     const ctx = canvas.getContext('2d');
-                    
-                    ctx.drawImage(img, 0, 0);
-                    const productBottomY = getProductBottomY(ctx, canvas.width, canvas.height);
-                    
-                    ctx.globalCompositeOperation = 'destination-over';
+
+                    // Pure white background
                     ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalCompositeOperation = 'source-over';
-                    
-                    const fontSize = canvas.width * 0.055;
-                    ctx.font = `bold ${fontSize}px "Arial", sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    const text = 'www.tokcayfood.com';
-                    const x = canvas.width / 2;
-                    const marginInside = canvas.height * 0.03;
-                    const watermarkY = productBottomY - marginInside;
-                    
-                    ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = fontSize * 0.2;
-                    ctx.strokeText(text, x, watermarkY);
-                    
-                    ctx.fillStyle = '#E3000F';
-                    ctx.fillText(text, x, watermarkY);
-                    
+                    ctx.fillRect(0, 0, size, size);
+
+                    // Center product
+                    const offsetX = (size - img.width) / 2;
+                    const offsetY = (size - img.height) / 2;
+                    ctx.drawImage(img, offsetX, offsetY, img.width, img.height);
+
+                    const productBottomY = bgRemovedBlob ? getProductBottomY(ctx, size, size) : size;
+                    drawWatermark(ctx, size, size, productBottomY);
+
                     canvas.toBlob((blob) => {
                         if (cancelRef && cancelRef.current) return;
                         setProcessedImage(blob);
                         onFileChange(blob); // Pass processed blob up
                         setIsProcessing(false);
-                    }, 'image/webp', 0.8);
-                    
+                    }, 'image/webp', 0.85);
+
                     URL.revokeObjectURL(img.src);
                 } catch (error) {
                     if (cancelRef && cancelRef.current) return;
@@ -928,6 +981,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                     setIsProcessing(false);
                 }
             };
+
+            const hasImage = Boolean(rawImage || processedImage || previewUrl || imageUrl);
 
             return (
                 <div>
@@ -947,7 +1002,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                 <button 
                                     type="button" 
                                     onClick={handleProcessImage} 
-                                    disabled={!rawImage || isProcessing}
+                                    disabled={!hasImage || isProcessing}
                                     className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[180px]"
                                 >
                                     {isProcessing ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý...</> : <>✨ Xử lý tự động</>}
@@ -1005,61 +1060,86 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             if (!isOpen) return null;
 
-            const imageToBase64InlineData = async (url) => {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const base64data = reader.result.split(',')[1];
-                        resolve({
-                            inlineData: {
-                                data: base64data,
-                                mimeType: blob.type
-                            }
+            const getImageInlineData = async (source) => {
+                if (source instanceof Blob || source instanceof File) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            const result = reader.result || '';
+                            const commaIndex = result.indexOf(',');
+                            const base64data = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
+                            resolve({
+                                inlineData: {
+                                    data: base64data,
+                                    mimeType: source.type || 'image/jpeg'
+                                }
+                            });
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(source);
+                    });
+                }
+                if (typeof source === 'string') {
+                    if (source.startsWith('data:')) {
+                        const commaIdx = source.indexOf(',');
+                        const meta = source.slice(0, commaIdx);
+                        const data = source.slice(commaIdx + 1);
+                        const mimeType = meta.split(':')[1]?.split(';')[0] || 'image/jpeg';
+                        return { inlineData: { data, mimeType } };
+                    }
+                    try {
+                        const response = await fetch(source);
+                        const blob = await response.blob();
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                const result = reader.result || '';
+                                const commaIndex = result.indexOf(',');
+                                const base64data = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
+                                resolve({
+                                    inlineData: {
+                                        data: base64data,
+                                        mimeType: blob.type || 'image/jpeg'
+                                    }
+                                });
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
                         });
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                });
+                    } catch (fetchErr) {
+                        return new Promise((resolve, reject) => {
+                            const img = new Image();
+                            img.crossOrigin = 'anonymous';
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth || img.width;
+                                canvas.height = img.naturalHeight || img.height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0);
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                                const base64 = dataUrl.split(',')[1];
+                                resolve({ inlineData: { data: base64, mimeType: 'image/jpeg' } });
+                            };
+                            img.onerror = () => reject(new Error('Không thể tải ảnh qua URL do chính sách bảo mật (CORS). Vui lòng chọn ảnh trực tiếp từ máy tính.'));
+                            img.src = source;
+                        });
+                    }
+                }
+                throw new Error('Định dạng ảnh không hợp lệ.');
             };
 
             const generateDescriptionFromImage = async () => {
-                if (!formData.image_url) {
-                    alert("Chưa có ảnh! Vui lòng chọn ảnh trước khi dùng AI phân tích.");
+                const imageSource = selectedFile || formData.image_url;
+                if (!imageSource) {
+                    alert("Chưa có ảnh! Vui lòng chọn ảnh từ máy hoặc dán link ảnh trước khi dùng AI phân tích.");
                     return;
                 }
                 setIsGenerating(true);
                 try {
-                    const imagePart = await imageToBase64InlineData(formData.image_url);
+                    const imagePart = await getImageInlineData(imageSource);
                     let text = '';
 
-                    // 1. First try secure serverless endpoint
-                    try {
-                        const apiRes = await fetch('/api/generate-description', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                imageBase64: imagePart.inlineData.data,
-                                mimeType: imagePart.inlineData.mimeType
-                            })
-                        });
-                        if (apiRes.ok) {
-                            const apiData = await apiRes.json();
-                            if (apiData.text) text = apiData.text;
-                        }
-                    } catch (netErr) {
-                        console.warn("Serverless AI endpoint fallback:", netErr);
-                    }
-
-                    // 2. Client fallback if serverless endpoint is offline
-                    if (!text) {
-                        const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || '';
-                        if (apiKey) {
-                            const { GoogleGenerativeAI } = await import('https://esm.sh/@google/generative-ai');
-                            const genAI = new GoogleGenerativeAI(apiKey);
-                            const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-                            const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.
+                    const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.
 QUY TẮC: 
 1. Trích xuất chính xác 100% thông tin (khối lượng, thành phần, thương hiệu...).
 2. Tuyệt đối không bịa đặt số liệu. Nếu ảnh mờ, dùng kiến thức thực tế về mặt hàng đó để suy luận hợp lý.
@@ -1075,9 +1155,77 @@ QUY TẮC:
 * Đối tượng sử dụng: [Gia đình, nhà hàng...]
 * Bảo quản: [Hướng dẫn bảo quản]
 * Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
-                            const result = await visionModel.generateContent([promptText, imagePart]);
-                            const response = await result.response;
-                            text = response.text();
+
+                    // 1. First try secure serverless endpoint
+                    try {
+                        const apiRes = await fetch('/api/generate-description', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                imageBase64: imagePart.inlineData.data,
+                                mimeType: imagePart.inlineData.mimeType
+                            })
+                        });
+                        const contentType = apiRes.headers.get('content-type') || '';
+                        if (apiRes.ok && contentType.includes('application/json')) {
+                            const apiData = await apiRes.json();
+                            if (apiData.text) text = apiData.text;
+                        }
+                    } catch (netErr) {
+                        console.warn("Serverless AI endpoint fallback:", netErr);
+                    }
+
+                    // 2. Client fallback using Gemini API REST with model fallback chain
+                    if (!text) {
+                        const apiKey = (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_GEMINI_API_KEY || import.meta.env?.GEMINI_API_KEY)) || '';
+                        if (!apiKey) {
+                            throw new Error("Chưa cấu hình Gemini API Key. Vui lòng kiểm tra file .env hoặc cấu hình Vercel.");
+                        }
+
+                        const candidateModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
+                        let lastErr = null;
+
+                        for (const model of candidateModels) {
+                            try {
+                                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                                const clientRes = await fetch(url, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        contents: [
+                                            {
+                                                parts: [
+                                                    { text: promptText },
+                                                    {
+                                                        inline_data: {
+                                                            mime_type: imagePart.inlineData.mimeType,
+                                                            data: imagePart.inlineData.data
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    })
+                                });
+
+                                if (clientRes.ok) {
+                                    const clientData = await clientRes.json();
+                                    const genText = clientData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                                    if (genText) {
+                                        text = genText;
+                                        break;
+                                    }
+                                } else {
+                                    const errJson = await clientRes.json().catch(() => null);
+                                    lastErr = errJson?.error?.message || `HTTP ${clientRes.status}`;
+                                }
+                            } catch (mErr) {
+                                lastErr = mErr.message;
+                            }
+                        }
+
+                        if (!text && lastErr) {
+                            throw new Error(`Không thể kết nối Gemini API: ${lastErr}`);
                         }
                     }
 

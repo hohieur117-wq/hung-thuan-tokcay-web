@@ -31,35 +31,48 @@ QUY TẮC:
 * Bảo quản: [Hướng dẫn bảo quản]
 * Quy cách đóng gói: [Túi zip, chai thủy tinh...]`;
 
-        const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const geminiRes = await fetch(geminiEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            { text: promptText },
+        const CANDIDATE_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
+        let lastErr = null;
+
+        for (const model of CANDIDATE_MODELS) {
+            try {
+                const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                const geminiRes = await fetch(geminiEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [
                             {
-                                inline_data: {
-                                    mime_type: mimeType,
-                                    data: imageBase64
-                                }
+                                parts: [
+                                    { text: promptText },
+                                    {
+                                        inline_data: {
+                                            mime_type: mimeType,
+                                            data: imageBase64
+                                        }
+                                    }
+                                ]
                             }
                         ]
-                    }
-                ]
-            })
-        });
+                    })
+                });
 
-        if (!geminiRes.ok) {
-            const errBody = await geminiRes.text();
-            throw new Error(`Gemini API error ${geminiRes.status}: ${errBody}`);
+                if (geminiRes.ok) {
+                    const data = await geminiRes.json();
+                    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    if (text) {
+                        return res.status(200).json({ text, model });
+                    }
+                } else {
+                    const errBody = await geminiRes.json().catch(() => null);
+                    lastErr = errBody?.error?.message || `HTTP ${geminiRes.status}`;
+                }
+            } catch (err) {
+                lastErr = err.message;
+            }
         }
 
-        const data = await geminiRes.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        return res.status(200).json({ text });
+        throw new Error(`Tất cả mô hình Gemini đều bận hoặc không phản hồi: ${lastErr}`);
     } catch (err) {
         console.error('generate-description error:', err);
         return res.status(500).json({ error: err.message });
