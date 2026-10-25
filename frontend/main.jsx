@@ -1457,7 +1457,7 @@ import './styles.css';
                         }
                     `}</style>
                     <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden flex items-center gap-2 box-border">
+                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden md:flex md:items-center md:gap-2 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
@@ -1470,19 +1470,20 @@ import './styles.css';
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="flex flex-1 min-w-0 flex-nowrap items-center justify-start gap-2 overflow-x-auto no-scrollbar scroll-smooth px-0.5 snap-x snap-mandatory"
+                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto md:no-scrollbar md:scroll-smooth md:px-0.5 md:snap-x md:snap-mandatory"
                         >
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="flex-shrink-0 snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
+                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer mb-1 md:mb-0"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
-                                className={`flex-shrink-0 snap-start whitespace-nowrap truncate flex items-center justify-center text-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                title="Tất cả sản phẩm"
+                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                 style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
@@ -1493,7 +1494,8 @@ import './styles.css';
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`flex-shrink-0 snap-start whitespace-nowrap truncate flex items-center justify-center text-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        title={tag}
+                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                         style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
@@ -1511,8 +1513,8 @@ import './styles.css';
                             &gt;
                         </button>
 
-                        {/* Gợi ý còn danh mục bên phải trên mobile */}
-                        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-full w-10 rounded-r-2xl bg-gradient-to-l from-white/95 via-white/55 to-transparent md:hidden" />
+
+
                     </div>
                 </div>
             );
