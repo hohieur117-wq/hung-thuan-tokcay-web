@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
+import { createClient } from '@supabase/supabase-js';
 import FloatingDecor from './components/FloatingDecor.jsx';
+import './styles.css';
 
 
         // Tích hợp Supabase
         const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
         const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { experimental: { passkey: true } } });
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { experimental: { passkey: true } } });
 
         const isWebAuthnSupported = typeof window !== 'undefined' && window.PublicKeyCredential !== undefined;
 
@@ -81,9 +83,11 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             }
         };
 
-        const writeProductsCache = (payload) => {
+        const writeProductsCache = (products, settings, categories) => {
             const serialized = JSON.stringify({
-                ...payload,
+                data: products,
+                settings,
+                categories,
                 timestamp: Date.now(),
             });
             try { sessionStorage.setItem(CACHE_KEY, serialized); } catch (_) {}
@@ -116,6 +120,20 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 return () => clearTimeout(handler);
             }, [value, delay]);
             return debouncedValue;
+        };
+
+        // Đóng modal bằng phím ESC (giữ callback luôn mới mà không cần gắn lại listener)
+        const useEscapeToClose = (isOpen, onClose) => {
+            const onCloseRef = useRef(onClose);
+            useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+            useEffect(() => {
+                if (!isOpen) return;
+                const handleKeyDown = (event) => {
+                    if (event.key === 'Escape') onCloseRef.current && onCloseRef.current();
+                };
+                document.addEventListener('keydown', handleKeyDown);
+                return () => document.removeEventListener('keydown', handleKeyDown);
+            }, [isOpen]);
         };
 
         const removeAccents = (str) => {
@@ -179,12 +197,14 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                         const cacheEntry = readProductsCache();
                         if (cacheEntry && cacheEntry.cached) {
-                            rawData = cacheEntry.cached.data.filter(p => {
+                            const cachedMatches = cacheEntry.cached.data.filter(p => {
                                 if (p.is_hidden) return false;
                                 const pName = removeAccents(p.name || '');
                                 const pSlug = String(p.slug || '').toLowerCase();
                                 return pName.includes(normalizedTerm) || (slugTerm && pSlug.includes(slugTerm));
                             });
+                            // Chỉ dùng cache khi có kết quả; nếu không, truy vấn server để không bỏ sót sản phẩm mới
+                            if (cachedMatches.length > 0) rawData = cachedMatches;
                         }
 
                         if (!rawData) {
@@ -508,10 +528,11 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                     <button
                                         onClick={onOpenCart}
                                         className="relative w-9 h-9 sm:w-10 sm:h-10 text-sm md:w-11 md:h-11 md:text-xl rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md text-white hover:text-yellow-300 flex items-center justify-center cursor-pointer flex-shrink-0 active:scale-95 transition-transform"
+                                        aria-label={cartCount > 0 ? `Giỏ hàng (${cartCount} sản phẩm)` : 'Giỏ hàng'}
                                     >
-                                        <i className="fa-solid fa-cart-shopping"></i>
+                                        <i className="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                                         {cartCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white pointer-events-none z-10">
+                                            <span aria-hidden="true" className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold leading-none text-red-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-full shadow-md border border-white pointer-events-none z-10">
                                                 {cartCount}
                                             </span>
                                         )}
@@ -543,8 +564,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const HeroBanner = ({ bannerMobileUrl, bannerDesktopUrl, isAdmin, onBannerMobileUpload, onBannerDesktopUpload }) => {
-            const finalMobileBanner = bannerMobileUrl || "/media__1783108509497.png";
-            const finalDesktopBanner = bannerDesktopUrl || "/media__1783108509497.png";
+            const finalMobileBanner = bannerMobileUrl || "/hero-banner.jpg";
+            const finalDesktopBanner = bannerDesktopUrl || "/hero-banner.jpg";
 
             return (
                 <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
@@ -553,13 +574,17 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         <img
                             src={finalMobileBanner}
                             className="w-full h-auto object-contain block md:hidden"
-                            alt="Banner Mobile"
+                            alt="Banner Hùng Thuận Tokcay"
+                            width="1024"
+                            height="576"
                             decoding="async"
                         />
                         <img
                             src={finalDesktopBanner}
                             className="w-full h-auto object-contain hidden md:block"
-                            alt="Banner PC"
+                            alt="Banner Hùng Thuận Tokcay"
+                            width="1024"
+                            height="576"
                             decoding="async"
                         />
 
@@ -596,6 +621,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                     href={getCleanZaloLink(zaloNumber)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Chat với shop qua Zalo"
                     className="fixed bottom-6 right-6 w-14 h-14 bg-[#0068FF] rounded-full ring-4 ring-white/60 backdrop-blur-sm shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 group border border-white/80"
                 >
                     <span className="text-white font-bold text-lg drop-shadow-sm">Zalo</span>
@@ -604,6 +630,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const ContactModal = ({ isOpen, onClose, settings }) => {
+            useEscapeToClose(isOpen, onClose);
             if (!isOpen) return null;
 
             // Các link mặc định theo yêu cầu
@@ -617,7 +644,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white/85 backdrop-blur-xl border border-white/80 rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-6 sm:p-7">
+                    <div role="dialog" aria-modal="true" aria-label="Liên hệ với chúng tôi" className="bg-white/85 backdrop-blur-xl border border-white/80 rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-6 sm:p-7">
                         <div className="flex items-center justify-between gap-4 pr-12 border-b border-stone-200/70 pb-4 mb-5">
                             <h3 className="text-lg sm:text-xl font-bold text-gray-800 uppercase tracking-wide leading-snug">LIÊN HỆ VỚI CHÚNG TÔI</h3>
                             <button onClick={onClose} className="absolute top-5 right-5 text-gray-500 hover:text-red-600 transition-colors w-9 h-9 flex items-center justify-center rounded-full bg-white/90 border border-stone-200/70 shadow-sm flex-shrink-0"><i className="fa-solid fa-xmark text-lg"></i></button>
@@ -653,6 +680,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
         };
 
         const CartSlideOver = ({ isOpen, onClose, cart, setCart, zaloNumber }) => {
+            const [checkoutCopied, setCheckoutCopied] = useState(false);
+            useEscapeToClose(isOpen, onClose);
+
+            useEffect(() => {
+                if (!isOpen) setCheckoutCopied(false);
+            }, [isOpen]);
+
             const updateQuantity = (id, newQty) => {
                 if (newQty < 1) {
                     setCart(cart.filter(item => item.id !== id));
@@ -662,24 +696,32 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             };
             const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
 
-            const handleCheckout = () => {
+            const handleCheckout = async () => {
                 if (cart.length === 0) return;
                 let message = "Xin chào shop, tôi muốn đặt hàng:\n";
                 cart.forEach((item, index) => {
-                    message += `${index + 1}. ${item.name} - Số lượng: ${item.qty}\n`;
+                    message += `${index + 1}. ${item.name} - SL: ${item.qty} x ${formatVND(item.price)} = ${formatVND(item.price * item.qty)}\n`;
                 });
                 message += `Tổng tạm tính: ${formatVND(total)}`;
 
-                const encodedMessage = encodeURIComponent(message);
                 const rawZalo = String(zaloNumber || '0902631632').replace(/^https?:\/\/(www\.)?zalo\.me\//i, '').replace(/[^\d]/g, '').trim();
                 const cleanZalo = rawZalo || '0902631632';
-                window.open(`https://zalo.me/${cleanZalo}?text=${encodedMessage}`, '_blank');
+
+                // Zalo không hỗ trợ điền sẵn nội dung qua ?text=, nên mở chat trước rồi copy đơn vào clipboard
+                window.open(`https://zalo.me/${cleanZalo}`, '_blank', 'noopener,noreferrer');
+                try {
+                    await navigator.clipboard.writeText(message);
+                    setCheckoutCopied(true);
+                    setTimeout(() => setCheckoutCopied(false), 6000);
+                } catch (err) {
+                    window.prompt('Sao chép nội dung đơn hàng bên dưới rồi dán vào Zalo:', message);
+                }
             };
 
             return (
                 <div className={`fixed inset-0 z-[60] transition-opacity ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" onClick={onClose}></div>
-                    <div className={`fixed inset-y-0 right-0 max-w-md w-full bg-white/85 backdrop-blur-2xl border-l border-white/80 shadow-2xl transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+                    <div role="dialog" aria-modal="true" aria-label="Giỏ hàng" className={`fixed inset-y-0 right-0 max-w-md w-full bg-white/85 backdrop-blur-2xl border-l border-white/80 shadow-2xl transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
                         <div className="flex items-center justify-between gap-4 pr-12 p-5 border-b border-white/60 bg-red-50/70 backdrop-blur-md relative">
                             <h2 className="text-xl font-bold text-primaryDark">Giỏ hàng ({cart.reduce((a, c) => a + c.qty, 0)})</h2>
                             <button onClick={onClose} className="absolute top-4 right-4 p-2 w-9 h-9 flex items-center justify-center text-gray-500 hover:text-red-600 rounded-full bg-white/80 border border-white/60 shadow-sm transition-colors">
@@ -713,17 +755,23 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                             )}
                         </div>
                         <div className="border-t border-white/80 p-5 bg-white/75 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
-                            <div className="flex justify-between text-lg font-bold text-gray-900 mb-5">
+                            <div className="flex justify-between text-lg font-bold text-gray-900 mb-4">
                                 <p>Tổng tiền:</p>
                                 <p className="text-red-700 text-xl">{formatVND(total)}</p>
                             </div>
                             <button
                                 onClick={handleCheckout}
-                                className="w-full bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-700/25 active:scale-[0.99]"
+                                className="w-full bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-700/25 active:scale-[0.99] flex items-center justify-center gap-2"
                                 disabled={cart.length === 0}
                             >
-                                Đặt hàng
+                                <i className="fa-solid fa-comment-dots"></i>
+                                Đặt hàng qua Zalo
                             </button>
+                            <p className={`mt-2.5 text-center text-[11px] leading-relaxed transition-colors ${checkoutCopied ? 'text-emerald-700 font-semibold' : 'text-stone-500'}`}>
+                                {checkoutCopied
+                                    ? '✅ Đã sao chép đơn hàng — chỉ cần dán (Ctrl+V) vào khung chat Zalo để gửi shop.'
+                                    : 'Nội dung đơn hàng sẽ được sao chép sẵn để bạn dán vào Zalo.'}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -737,13 +785,15 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 setShowFullDetails(false);
             }, [product?.id, isOpen]);
 
+            useEscapeToClose(isOpen, onClose);
+
             if (!isOpen || !product) return null;
             const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center modal-overlay p-4 sm:p-6">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col sm:flex-row overflow-hidden animate-fade-in relative">
+                    <div role="dialog" aria-modal="true" aria-label={product?.name || 'Chi tiết sản phẩm'} className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col sm:flex-row overflow-hidden animate-fade-in relative">
                         <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-500 hover:text-red-500 shadow-md">
                             <i className="fa-solid fa-xmark"></i>
                         </button>
@@ -1052,6 +1102,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 onClose();
             };
 
+            useEscapeToClose(isOpen, handleClose);
+
             useEffect(() => {
                 if (product) {
                     let oldStatus = product.stock_status || 'Hàng sẵn kho';
@@ -1189,6 +1241,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
+                if (uploading || isProcessing) return;
                 setUploading(true);
                 let finalImageUrl = formData.image_url;
                 const previousImageUrl = product?.image_url;
@@ -1225,12 +1278,12 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             return (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
+                    <div role="dialog" aria-modal="true" aria-label={product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'} className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
                             <h3 className="text-xl font-bold text-gray-800">{product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h3>
                             <button type="button" onClick={handleClose} className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"><i className="fa-solid fa-xmark"></i></button>
                         </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
+                        <form id="admin-product-form" onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
                                 <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => {
@@ -1314,7 +1367,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                         </form>
                         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                             <button type="button" onClick={handleClose} className="px-5 py-2.5 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Hủy</button>
-                            <button type="submit" onClick={handleSubmit} disabled={uploading || isProcessing} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
+                            <button type="submit" form="admin-product-form" disabled={uploading || isProcessing} className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark shadow-md transition-colors disabled:opacity-50">
                                 {uploading ? <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu...</> : 'Lưu sản phẩm'}
                             </button>
                         </div>
@@ -1331,6 +1384,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             useEffect(() => {
                 if (settings) setFormData(settings);
             }, [settings, isOpen]);
+
+            useEscapeToClose(isOpen, onClose);
 
             if (!isOpen) return null;
 
@@ -1371,7 +1426,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             return (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
+                    <div role="dialog" aria-modal="true" aria-label="Cài đặt chung" className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
                                 <h3 className="text-lg font-bold text-gray-800">Cài đặt chung</h3>
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
@@ -1536,6 +1591,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
             const [newTag, setNewTag] = useState('');
             const [isLoading, setIsLoading] = useState(false);
 
+            useEscapeToClose(isOpen, onClose);
+
             if (!isOpen) return null;
 
             const handleAdd = async () => {
@@ -1589,7 +1646,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             return (
                 <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in flex flex-col max-h-[90vh]">
+                    <div role="dialog" aria-modal="true" aria-label="Quản lý danh mục" className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
                             <h3 className="text-lg font-bold text-gray-800">Quản lý Danh Mục</h3>
                             <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
@@ -1739,6 +1796,48 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 resolveProductDetail();
                 return () => { isMounted = false; };
             }, [slug, products, parentLoading]);
+
+            // SEO: cập nhật title/meta description + Structured Data (JSON-LD) theo từng sản phẩm
+            useEffect(() => {
+                if (!product) return;
+                const previousTitle = document.title;
+                const metaDescription = document.querySelector('meta[name="description"]');
+                const previousDescription = metaDescription ? metaDescription.getAttribute('content') : null;
+                const cleanDescription = (product.description || '').replace(/\s+/g, ' ').trim();
+                const desc = cleanDescription.slice(0, 160);
+
+                document.title = `${product.name} - ${formatVND(product.price)} | Hùng Thuận Tokcay`;
+                if (metaDescription && desc) metaDescription.setAttribute('content', desc);
+
+                const jsonLd = document.createElement('script');
+                jsonLd.type = 'application/ld+json';
+                jsonLd.text = JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    name: product.name,
+                    image: [product.image_url].filter(Boolean),
+                    description: cleanDescription || undefined,
+                    sku: product.sku || undefined,
+                    offers: {
+                        '@type': 'Offer',
+                        price: Number(product.price) || 0,
+                        priceCurrency: 'VND',
+                        availability: (product.stock_status || '').toLowerCase() === 'hết hàng'
+                            ? 'https://schema.org/OutOfStock'
+                            : 'https://schema.org/InStock',
+                        url: window.location.href,
+                    },
+                });
+                document.head.appendChild(jsonLd);
+
+                return () => {
+                    document.title = previousTitle;
+                    if (metaDescription && previousDescription !== null) {
+                        metaDescription.setAttribute('content', previousDescription);
+                    }
+                    jsonLd.remove();
+                };
+            }, [product]);
 
             if (loading || (parentLoading && !product)) {
                 return (
@@ -1940,7 +2039,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
             const [isCartOpen, setIsCartOpen] = useState(false);
             const [searchParams, setSearchParams] = useSearchParams();
-            const currentPage = parseInt(searchParams.get('page') || '1', 10);
+            const rawPage = parseInt(searchParams.get('page') || '1', 10);
+            const currentPage = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
             const ITEMS_PER_PAGE = 15;
 
             // Filter States
@@ -2057,7 +2157,14 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 fetchData();
             }, []);
 
+            const filtersInitializedRef = useRef(false);
+
             useEffect(() => {
+                // Không reset trang ở lần render đầu để link chia sẻ ?page=2 vẫn giữ nguyên
+                if (!filtersInitializedRef.current) {
+                    filtersInitializedRef.current = true;
+                    return;
+                }
                 if (currentPage !== 1) {
                     setSearchParams({ page: '1' });
                 }
@@ -2112,6 +2219,18 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 }
             }, [settings]);
 
+            // Hợp nhất danh mục trong bảng tags với tags thực tế của sản phẩm
+            // để không bị thiếu bộ lọc khi sản phẩm có tag chưa được tạo trong bảng tags
+            const allTags = useMemo(() => {
+                const merged = new Set((categories || []).filter(Boolean));
+                (products || []).forEach(p => {
+                    if (Array.isArray(p.tags)) {
+                        p.tags.forEach(t => { if (t) merged.add(t); });
+                    }
+                });
+                return Array.from(merged).sort((a, b) => a.localeCompare(b, 'vi'));
+            }, [categories, products]);
+
             const filteredProducts = useMemo(() => {
                 let result = products.filter(p => {
                     if (!isAdmin && p.is_hidden) return false;
@@ -2142,11 +2261,13 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 return result;
             }, [products, isAdmin, selectedTag, priceMin, priceMax, sortOrder, pinnedProductIds]);
 
-            const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-            const currentProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+            const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+            const safePage = Math.min(currentPage, totalPages);
+            const currentProducts = filteredProducts.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
 
             // Handlers
             const handleAddToCart = (product) => {
+                if (product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') return;
                 setCart(prev => {
                     const existing = prev.find(i => i.id === product.id);
                     if (existing) {
@@ -2530,6 +2651,16 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                 setPriceMax(max);
             };
 
+            const handleResetFilters = () => {
+                setSelectedTag('');
+                setPriceMin('');
+                setPriceMax('');
+                setSortOrder('');
+                setShowFilters(false);
+                setSearchResetKey(prev => prev + 1);
+                setSearchParams({ page: '1' });
+            };
+
             const handleProductsNavClick = () => {
                 setSelectedProduct(null);
                 setIsDetailsModalOpen(false);
@@ -2618,7 +2749,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                         <div className="flex flex-col w-full max-w-7xl mx-auto px-3 sm:px-4 gap-3 mb-4">
                                             {/* HÀNG 1: Thanh Tag Danh mục */}
                                             <TagsSlider
-                                                uniqueTags={categories}
+                                                uniqueTags={allTags}
                                                 selectedTag={selectedTag}
                                                 onTagToggle={handleTagToggle}
                                                 isAdmin={isAdmin}
@@ -2680,7 +2811,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                                             <div className="mb-4 border-b border-gray-100 pb-4">
                                                                 <h4 className="font-bold text-gray-700 mb-2.5 text-xs uppercase tracking-wider">Dòng Sản Phẩm</h4>
                                                                 <div className="space-y-2.5 max-h-44 overflow-y-auto hide-scroll">
-                                                                    {categories.map(tag => (
+                                                                    {allTags.map(tag => (
                                                                         <label key={tag} className="flex items-center gap-2.5 cursor-pointer group">
                                                                             <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
                                                                                 checked={selectedTag === tag}
@@ -2731,19 +2862,39 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                         {/* KHU VỰC LƯỚI SẢN PHẨM */}
                                         <div className="w-full max-w-7xl mx-auto pb-10 mb-8">
                                             {loading ? (
-                                                <div className="flex justify-center py-32">
-                                                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full" aria-busy="true" aria-label="Đang tải sản phẩm">
+                                                    {Array.from({ length: 10 }).map((_, index) => (
+                                                        <div key={index} className="bg-white/60 border border-red-100/60 rounded-2xl overflow-hidden animate-pulse">
+                                                            <div className="aspect-square bg-red-50/80"></div>
+                                                            <div className="p-4 sm:p-5 space-y-2.5">
+                                                                <div className="h-3.5 bg-red-50 rounded w-full"></div>
+                                                                <div className="h-3.5 bg-red-50 rounded w-2/3"></div>
+                                                                <div className="h-5 bg-red-50 rounded w-1/2 mt-3"></div>
+                                                                <div className="h-9 bg-red-50 rounded-xl mt-2"></div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             ) : filteredProducts.length === 0 ? (
-                                                <div className="text-center py-32 text-gray-500 bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/80 flex flex-col items-center">
+                                                <div className="text-center py-20 sm:py-28 text-gray-500 bg-white/70 backdrop-blur-md rounded-2xl shadow-sm border border-white/80 flex flex-col items-center px-4">
                                                     <i className="fa-solid fa-box-open text-6xl text-gray-300 mb-4"></i>
-                                                    <p className="text-lg">Không tìm thấy sản phẩm nào phù hợp.</p>
+                                                    <p className="text-lg font-semibold text-stone-700">Không tìm thấy sản phẩm nào phù hợp.</p>
+                                                    <p className="text-sm text-stone-500 mt-1.5">Thử từ khóa khác hoặc xóa bớt bộ lọc để xem toàn bộ sản phẩm.</p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleResetFilters}
+                                                        className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold bg-red-600 hover:bg-red-700 shadow-md active:scale-95 transition-all cursor-pointer"
+                                                        style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }}
+                                                    >
+                                                        <i className="fa-solid fa-rotate-left"></i> Xóa bộ lọc & tìm kiếm
+                                                    </button>
                                                 </div>
                                             ) : (
                                                 <>
                                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full justify-center">
                                                         {currentProducts.map(product => {
                                                             const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
+                                                            const isOutOfStock = Boolean(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng');
                                                             const isPinned = pinnedProductIds.includes(Number(product.id));
                                                             const CardLink = isAdmin ? 'div' : Link;
                                                             const cardLinkProps = isAdmin ? {} : { to: `/san-pham/${product.slug || product.id}` };
@@ -2761,6 +2912,11 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                                                             decoding="async"
                                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                                         />
+                                                                        {isOutOfStock && (
+                                                                            <div className="absolute inset-x-0 bottom-0 z-10 bg-stone-900/75 backdrop-blur-sm text-white text-[11px] font-bold text-center py-1.5 tracking-wide pointer-events-none">
+                                                                                HẾT HÀNG
+                                                                            </div>
+                                                                        )}
                                                                         {isAdmin && (
                                                                             <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
                                                                                 <button
@@ -2849,15 +3005,15 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                                                                 </p>
                                                                             )}
                                                                             <button
-                                                                                onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
-                                                                                disabled={product.stock_status && product.stock_status.toLowerCase() === 'hết hàng'}
+                                                                                onClick={(e) => { e.stopPropagation(); if (!isOutOfStock) handleAddToCart(product); }}
+                                                                                disabled={isOutOfStock}
                                                                                 className="w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
-                                                                                style={!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
+                                                                                style={!isOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
                                                                             >
-                                                                                {!(product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') ? (
-                                                                                    <>Thêm vào giỏ</>
+                                                                                {!isOutOfStock ? (
+                                                                                    <><i className="fa-solid fa-cart-plus"></i> Thêm vào giỏ</>
                                                                                 ) : (
-                                                                                    <>Hết hàng</>
+                                                                                    <><i className="fa-solid fa-ban"></i> Hết hàng</>
                                                                                 )}
                                                                             </button>
                                                                         </div>
@@ -2877,7 +3033,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                         <div className="w-full py-6 flex justify-center items-center gap-2">
                                             <button
                                                 onClick={() => handlePageChange(1)}
-                                                disabled={currentPage === 1}
+                                                disabled={safePage === 1}
                                                 title="Trang đầu"
                                                 aria-label="Trang đầu"
                                                 className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -2886,8 +3042,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                             </button>
 
                                             <button
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}
+                                                onClick={() => handlePageChange(safePage - 1)}
+                                                disabled={safePage === 1}
                                                 title="Trang trước"
                                                 aria-label="Trang trước"
                                                 className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -2902,8 +3058,8 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                                         <button
                                                             key={page}
                                                             onClick={() => handlePageChange(page)}
-                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-400/40' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
-                                                            style={currentPage === page ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
+                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${safePage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-400/40' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
+                                                            style={safePage === page ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                                         >
                                                             {page}
                                                         </button>
@@ -2911,12 +3067,12 @@ import FloatingDecor from './components/FloatingDecor.jsx';
                                                 })}
                                             </div>
                                             <div className="sm:hidden px-3.5 py-2 bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-sm font-bold text-stone-700">
-                                                {currentPage} / {totalPages}
+                                                {safePage} / {totalPages}
                                             </div>
 
                                             <button
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === totalPages}
+                                                onClick={() => handlePageChange(safePage + 1)}
+                                                disabled={safePage === totalPages}
                                                 title="Trang sau"
                                                 aria-label="Trang sau"
                                                 className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -2926,7 +3082,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                                             <button
                                                 onClick={() => handlePageChange(totalPages)}
-                                                disabled={currentPage === totalPages}
+                                                disabled={safePage === totalPages}
                                                 title="Trang cuối"
                                                 aria-label="Trang cuối"
                                                 className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -3037,7 +3193,7 @@ import FloatingDecor from './components/FloatingDecor.jsx';
 
                     {isAdmin && (
                         <>
-                            <AdminProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} uniqueTags={categories} />
+                            <AdminProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} uniqueTags={allTags} />
                             <AdminSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} settings={settings} onSave={handleSaveSettings} session={session} />
                             <AdminTagsModal isOpen={isTagsModalOpen} onClose={() => setIsTagsModalOpen(false)} categories={categories} products={products} fetchData={fetchData} />
                         </>

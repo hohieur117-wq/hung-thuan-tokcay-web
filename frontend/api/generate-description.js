@@ -11,8 +11,18 @@ export default async function handler(req, res) {
 
     try {
         const { imageBase64, mimeType = 'image/jpeg' } = req.body || {};
-        if (!imageBase64) {
+        if (!imageBase64 || typeof imageBase64 !== 'string') {
             return res.status(400).json({ error: 'Missing imageBase64 in request body' });
+        }
+
+        // Chặn payload quá lớn để tránh lãng phí băng thông/quota AI
+        if (imageBase64.length > 4_500_000) {
+            return res.status(413).json({ error: 'Ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn (tối đa ~3MB).' });
+        }
+
+        const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'];
+        if (!ALLOWED_MIME_TYPES.includes(String(mimeType).toLowerCase())) {
+            return res.status(400).json({ error: 'Định dạng ảnh không được hỗ trợ.' });
         }
 
         const promptText = `Bạn là một chuyên gia kiểm định nhãn mác hàng hóa và là copywriter cho cửa hàng thực phẩm Hàn Quốc. Nhiệm vụ: soi CỰC KỲ CHI TIẾT hình ảnh bao bì sản phẩm được cung cấp.

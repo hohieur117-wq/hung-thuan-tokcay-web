@@ -4,9 +4,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hùng Thuận Tokcay</title>
+    <title>Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc tại Cần Thơ</title>
     <meta name="description" content="Hùng Thuận Tokcay - Khám phá thế giới ẩm thực Hàn Quốc phong phú với các loại bánh gạo, mì cay, rong biển và gia vị nhập khẩu chính hãng." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#b91c1c" />
+    <link rel="canonical" href="https://tokcayfood.com/" />
     <!-- Default Open Graph tags for homepage sharing -->
+    <meta property="og:site_name" content="Hùng Thuận Tokcay" />
+    <meta property="og:locale" content="vi_VN" />
     <meta property="og:title" content="Cửa hàng Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc" />
     <meta property="og:description" content="Chuyên cung cấp sỉ và lẻ nguyên liệu nấu ăn Hàn Quốc: Bánh gạo, chả cá, tương ớt, mì cay... Uy tín, chất lượng tại Cần Thơ." />
     <meta property="og:url" content="https://tokcayfood.com/" />
@@ -21,7 +26,10 @@
     <meta name="twitter:title" content="Cửa hàng Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc" />
     <meta name="twitter:description" content="Chuyên cung cấp sỉ và lẻ nguyên liệu nấu ăn Hàn Quốc: Bánh gạo, chả cá, tương ớt, mì cay... Uy tín, chất lượng tại Cần Thơ." />
     <meta name="twitter:image" content="https://tokcayfood.com/og-banner.jpg" />
-    <link rel="icon" href="/media__1783017175239.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preload" as="image" href="/hero-banner.jpg" fetchpriority="high" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,39 +39,8 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#b91c1c', // Đỏ đậm
-                        primaryDark: '#991b1b',
-                        primaryLight: '#fef2f2',
-                    },
-                    animation: {
-                        'float-slow': 'float-slow 15s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'float-slow': {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
     <!-- Preconnect Supabase -->
     <link rel="preconnect" href="https://ufffqeaurlulzfsmznmq.supabase.co" crossorigin>
-
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         html, body {
@@ -122,6 +99,13 @@
 
 <body>
     <div id="root"></div>
+
+    <noscript>
+        <div style="font-family: Inter, Arial, sans-serif; padding: 32px; text-align: center; color: #1c1917;">
+            <h1 style="color: #b91c1c;">Hùng Thuận Tokcay</h1>
+            <p>Trang web cần JavaScript để hiển thị sản phẩm. Vui lòng bật JavaScript hoặc liên hệ Zalo <strong>0902 631 632</strong> để được tư vấn.</p>
+        </div>
+    </noscript>
 
     <script type="module" src="/main.jsx"></script>
 </body>
