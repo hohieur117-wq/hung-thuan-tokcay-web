@@ -16,7 +16,7 @@ import './styles.css';
         const formatVND = (price) => {
             const num = Number(price);
             const safePrice = (!isNaN(num) && num >= 0) ? num : 0;
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safePrice).replace(' ', ' ');
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safePrice);
         };
 
         const sanitizeHttpUrl = (url, fallback = '#') => {
@@ -58,7 +58,7 @@ import './styles.css';
                 .replace(/-+$/, "");
         };
 
-        const FallbackImage = "/media__1783016111445.png";
+        const FallbackImage = "/fallback.png";
         const LogoImage = "./logo.png";
 
         // --- SWR Cache Helpers (localStorage + sessionStorage) ---
@@ -563,30 +563,31 @@ import './styles.css';
             );
         };
 
-        const HeroBanner = ({ bannerMobileUrl, bannerDesktopUrl, isAdmin, onBannerMobileUpload, onBannerDesktopUpload }) => {
-            const finalMobileBanner = bannerMobileUrl || "/hero-banner.jpg";
+        const HeroBanner = ({ bannerMobileUrl, bannerDesktopUrl, settingsReady, isAdmin, onBannerMobileUpload, onBannerDesktopUpload }) => {
+            const finalMobileBanner = bannerMobileUrl || "/hero-banner-mobile.jpg";
             const finalDesktopBanner = bannerDesktopUrl || "/hero-banner.jpg";
 
             return (
                 <div className="relative w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 mb-4 group">
                     {/* Thẻ chứa ảnh bo góc và tỏa sáng */}
                     <div className="relative w-full h-auto rounded-[2rem] shadow-[0_0_80px_-15px_rgba(220,38,38,0.4)] border border-red-200 overflow-hidden bg-white">
-                        <img
-                            src={finalMobileBanner}
-                            className="w-full h-auto object-contain block md:hidden"
-                            alt="Banner Hùng Thuận Tokcay"
-                            width="1024"
-                            height="576"
-                            decoding="async"
-                        />
-                        <img
-                            src={finalDesktopBanner}
-                            className="w-full h-auto object-contain hidden md:block"
-                            alt="Banner Hùng Thuận Tokcay"
-                            width="1024"
-                            height="576"
-                            decoding="async"
-                        />
+                        {/* Chưa nạp xong settings thì giữ chỗ đúng tỉ lệ, tránh tải ảnh mặc định thừa khi shop đã có banner riêng */}
+                        {settingsReady === false ? (
+                            <div className="w-full aspect-video bg-gradient-to-br from-white via-red-50/70 to-rose-100/60 animate-pulse" aria-hidden="true" />
+                        ) : (
+                            <picture>
+                                <source media="(max-width: 767px)" srcSet={finalMobileBanner} />
+                                <img
+                                    src={finalDesktopBanner}
+                                    className="w-full h-auto object-contain block"
+                                    alt="Banner Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc"
+                                    width="1280"
+                                    height="720"
+                                    decoding="async"
+                                    fetchpriority="high"
+                                />
+                            </picture>
+                        )}
 
                         {/* 1 Lớp Glass duy nhất */}
                         <div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.7),inset_0_-1px_2px_rgba(185,28,28,0.1)] bg-gradient-to-tr from-white/10 via-transparent to-white/15" />
@@ -772,79 +773,6 @@ import './styles.css';
                                     ? '✅ Đã sao chép đơn hàng — chỉ cần dán (Ctrl+V) vào khung chat Zalo để gửi shop.'
                                     : 'Nội dung đơn hàng sẽ được sao chép sẵn để bạn dán vào Zalo.'}
                             </p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const ProductDetailsModal = ({ isOpen, onClose, product, onAddToCart }) => {
-            const [showFullDetails, setShowFullDetails] = useState(false);
-
-            useEffect(() => {
-                setShowFullDetails(false);
-            }, [product?.id, isOpen]);
-
-            useEscapeToClose(isOpen, onClose);
-
-            if (!isOpen || !product) return null;
-            const isOutOfStock = product.stock_status && product.stock_status.toLowerCase() === 'hết hàng';
-            const colorClass = product.statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
-
-            return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center modal-overlay p-4 sm:p-6">
-                    <div role="dialog" aria-modal="true" aria-label={product?.name || 'Chi tiết sản phẩm'} className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col sm:flex-row overflow-hidden animate-fade-in relative">
-                        <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-500 hover:text-red-500 shadow-md">
-                            <i className="fa-solid fa-xmark"></i>
-                        </button>
-
-                        {/* Image Section */}
-                        <div className="w-full sm:w-1/2 bg-gray-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100">
-                            <img src={product.image_url || FallbackImage} onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }} alt={product.name} loading="lazy" decoding="async" className="w-full max-h-[40vh] sm:max-h-full object-cover drop-shadow-md" />
-                        </div>
-
-                        {/* Content Section */}
-                        <div className="w-full sm:w-1/2 p-6 sm:p-8 flex flex-col overflow-y-auto hide-scroll">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h2>
-                            <p className="text-3xl font-black text-primary mb-6">{formatVND(product.price)}</p>
-
-                            <div className="mb-6 flex-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowFullDetails(prev => !prev)}
-                                    className="w-full py-2.5 px-4 rounded-xl bg-white/75 hover:bg-red-50/80 backdrop-blur-md border border-red-200/70 text-red-700 font-semibold text-sm flex items-center justify-between shadow-sm transition-all duration-200 cursor-pointer select-none"
-                                >
-                                    <span>{showFullDetails ? 'Thu gọn thông tin chi tiết' : 'Nhấn để xem thêm thông tin chi tiết'}</span>
-                                    <i className={`fa-solid fa-chevron-down text-xs transition-transform duration-300 ${showFullDetails ? 'rotate-180' : ''}`}></i>
-                                </button>
-
-                                {showFullDetails && (
-                                    <div className="mt-2.5 p-4 rounded-xl bg-white/80 backdrop-blur-md border border-red-100/80 text-stone-700 text-sm leading-relaxed shadow-inner transition-all duration-300 animate-fadeIn">
-                                        {product.description ? (
-                                            <div className="whitespace-pre-line leading-relaxed text-gray-600">{product.description}</div>
-                                        ) : (
-                                            <p className="italic text-gray-400">Chưa có mô tả chi tiết cho sản phẩm này.</p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-auto pt-4 border-t border-gray-100">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <span className="text-sm text-gray-600 font-medium">Tình trạng:</span>
-                                    <span className={`px-2 py-1 rounded-md text-sm font-medium ${colorClass}`}>
-                                        {product.stock_status || 'Hàng sẵn tại kho'}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => { onAddToCart(product); onClose(); }}
-                                    disabled={isOutOfStock}
-                                    className="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
-                                >
-                                    <i className="fa-solid fa-cart-plus"></i>
-                                    {isOutOfStock ? 'Sản phẩm hết hàng' : 'Thêm vào giỏ hàng'}
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1529,7 +1457,7 @@ import './styles.css';
                         }
                     `}</style>
                     <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden flex items-center gap-2 box-border">
+                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden flex items-center gap-2 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
@@ -1542,19 +1470,19 @@ import './styles.css';
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto no-scrollbar scroll-smooth md:px-1"
+                            className="flex flex-1 min-w-0 flex-nowrap items-center justify-start gap-2 overflow-x-auto no-scrollbar scroll-smooth px-0.5 snap-x snap-mandatory"
                         >
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
+                                    className="flex-shrink-0 snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
-                                className={`w-full md:w-auto md:flex-shrink-0 whitespace-nowrap truncate flex items-center justify-center text-center px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                className={`flex-shrink-0 snap-start whitespace-nowrap truncate flex items-center justify-center text-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                 style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
@@ -1565,7 +1493,7 @@ import './styles.css';
                                     <button
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
-                                        className={`w-full md:w-auto md:flex-shrink-0 whitespace-nowrap truncate flex items-center justify-center text-center px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        className={`flex-shrink-0 snap-start whitespace-nowrap truncate flex items-center justify-center text-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
                                         style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
@@ -1582,6 +1510,9 @@ import './styles.css';
                         >
                             &gt;
                         </button>
+
+                        {/* Gợi ý còn danh mục bên phải trên mobile */}
+                        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-full w-10 rounded-r-2xl bg-gradient-to-l from-white/95 via-white/55 to-transparent md:hidden" />
                     </div>
                 </div>
             );
@@ -2018,7 +1949,6 @@ import './styles.css';
             const [products, setProducts] = useState([]);
             const [settings, setSettings] = useState(null);
             const [loading, setLoading] = useState(true);
-            const [totalCount, setTotalCount] = useState(0);
 
             // UI State - Persist Cart in localStorage
             const [cart, setCart] = useState(() => {
@@ -2054,8 +1984,6 @@ import './styles.css';
             const [searchResetKey, setSearchResetKey] = useState(0);
 
             // Modals
-            const [selectedProduct, setSelectedProduct] = useState(null);
-            const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
             const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
             // Admin State
@@ -2079,7 +2007,7 @@ import './styles.css';
             const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
 
             useEffect(() => {
-                const hasOpenModal = isCartOpen || isContactModalOpen || isProductModalOpen || isSettingsModalOpen || isTagsModalOpen || isDetailsModalOpen || !!selectedProduct;
+                const hasOpenModal = isCartOpen || isContactModalOpen || isProductModalOpen || isSettingsModalOpen || isTagsModalOpen;
                 if (hasOpenModal) {
                     document.body.style.overflow = 'hidden';
                 } else {
@@ -2088,7 +2016,7 @@ import './styles.css';
                 return () => {
                     document.body.style.overflow = '';
                 };
-            }, [isCartOpen, isContactModalOpen, isProductModalOpen, isSettingsModalOpen, isTagsModalOpen, isDetailsModalOpen, selectedProduct]);
+            }, [isCartOpen, isContactModalOpen, isProductModalOpen, isSettingsModalOpen, isTagsModalOpen]);
 
             const [categories, setCategories] = useState([]);
             const [localBanner, setLocalBanner] = useState(null);
@@ -2101,7 +2029,6 @@ import './styles.css';
                     const cached = readProductsCache();
                     if (cached && Array.isArray(cached.data)) {
                         setProducts(cached.data);
-                        setTotalCount(cached.data.filter(p => !p.is_hidden).length);
                         if (cached.settings) setSettings(cached.settings);
                         if (Array.isArray(cached.categories)) setCategories(cached.categories);
                         setLoading(false);
@@ -2129,7 +2056,6 @@ import './styles.css';
 
                     const productsList = productsRes.data || [];
                     setProducts(productsList);
-                    setTotalCount(productsList.filter(p => !p.is_hidden).length);
 
                     let settingsObj = {};
                     if (settingsRes.data) {
@@ -2286,11 +2212,6 @@ import './styles.css';
                         window.scrollTo({ top: y, behavior: 'smooth' });
                     }
                 }
-            };
-
-            const handleOpenDetails = (product) => {
-                setSelectedProduct(product);
-                setIsDetailsModalOpen(true);
             };
 
             const handleAdminLogin = async (e) => {
@@ -2712,6 +2633,7 @@ import './styles.css';
                                     <HeroBanner
                                         bannerMobileUrl={settings?.banner_mobile_url}
                                         bannerDesktopUrl={settings?.banner_desktop_url}
+                                        settingsReady={settings !== null || !loading}
                                         isAdmin={isAdmin}
                                         onBannerMobileUpload={(e) => handleAppBannerUpload(e, 'mobile')}
                                         onBannerDesktopUpload={(e) => handleAppBannerUpload(e, 'desktop')}
@@ -2912,11 +2834,6 @@ import './styles.css';
                                                                             decoding="async"
                                                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                                         />
-                                                                        {isOutOfStock && (
-                                                                            <div className="absolute inset-x-0 bottom-0 z-10 bg-stone-900/75 backdrop-blur-sm text-white text-[11px] font-bold text-center py-1.5 tracking-wide pointer-events-none">
-                                                                                HẾT HÀNG
-                                                                            </div>
-                                                                        )}
                                                                         {isAdmin && (
                                                                             <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
                                                                                 <button
@@ -3183,13 +3100,6 @@ import './styles.css';
                     <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ZaloWidget zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} settings={settings} />
-
-                    <ProductDetailsModal
-                        isOpen={isDetailsModalOpen}
-                        onClose={() => setIsDetailsModalOpen(false)}
-                        product={selectedProduct}
-                        onAddToCart={handleAddToCart}
-                    />
 
                     {isAdmin && (
                         <>
