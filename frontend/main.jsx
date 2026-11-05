@@ -1419,10 +1419,10 @@ import './styles.css';
         const TagsSlider = ({ uniqueTags, selectedTag, onTagToggle, isAdmin, onManageTags }) => {
             const sliderRef = useRef(null);
             const scrollLeft = () => {
-                if (sliderRef.current) sliderRef.current.scrollBy({ left: -220, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: -200, behavior: 'smooth' });
             };
             const scrollRight = () => {
-                if (sliderRef.current) sliderRef.current.scrollBy({ left: 220, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: 200, behavior: 'smooth' });
             };
 
             useEffect(() => {
@@ -1456,157 +1456,13 @@ import './styles.css';
                             scrollbar-width: none;
                         }
                     `}</style>
-
-                    {/* 1. DẢI CAM KẾT ĐỎ LƯỢN SÓNG (RED COMMITMENT RIBBON) */}
-                    <div className="relative w-full mb-5 sm:mb-6 overflow-hidden rounded-2xl md:rounded-[28px] bg-gradient-to-r from-red-800 via-red-600 to-red-800 shadow-[0_12px_28px_-6px_rgba(185,28,28,0.42)] border-y border-red-400/40">
-                        {/* Silk waves decorative background */}
-                        <svg className="absolute -top-3 left-0 w-full h-8 opacity-25 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1200 40">
-                            <path d="M0,0 C300,35 600,5 900,30 C1050,42 1150,20 1200,10 L1200,40 L0,40 Z" fill="white" />
-                        </svg>
-                        <svg className="absolute -bottom-3 left-0 w-full h-8 opacity-20 pointer-events-none rotate-180" preserveAspectRatio="none" viewBox="0 0 1200 40">
-                            <path d="M0,0 C300,35 600,5 900,30 C1050,42 1150,20 1200,10 L1200,40 L0,40 Z" fill="white" />
-                        </svg>
-
-                        <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 py-3.5 sm:py-4 px-3 sm:px-6">
-                            {/* Cam kết 1: Nguồn hàng chính hãng */}
-                            <div className="flex items-center gap-2.5 sm:gap-3">
-                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white/60 bg-red-700/80 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-red-950/30">
-                                    <i className="fa-solid fa-shield-halved text-base sm:text-lg"></i>
-                                </div>
-                                <div className="text-left min-w-0">
-                                    <div className="text-white font-black text-[11px] sm:text-xs md:text-sm tracking-wide uppercase leading-tight truncate">
-                                        Nguồn Hàng Chính Hãng
-                                    </div>
-                                    <div className="text-red-100 text-[10px] sm:text-[11px] leading-tight mt-0.5 truncate font-medium">
-                                        Nhập khẩu trực tiếp Hàn Quốc
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Cam kết 2: Chất lượng đảm bảo */}
-                            <div className="flex items-center gap-2.5 sm:gap-3">
-                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white/60 bg-red-700/80 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-red-950/30">
-                                    <i className="fa-solid fa-certificate text-base sm:text-lg"></i>
-                                </div>
-                                <div className="text-left min-w-0">
-                                    <div className="text-white font-black text-[11px] sm:text-xs md:text-sm tracking-wide uppercase leading-tight truncate">
-                                        Chất Lượng Đảm Bảo
-                                    </div>
-                                    <div className="text-red-100 text-[10px] sm:text-[11px] leading-tight mt-0.5 truncate font-medium">
-                                        An toàn, chất lượng nhất
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Cam kết 3: Giao hàng nhanh chóng */}
-                            <div className="flex items-center gap-2.5 sm:gap-3">
-                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white/60 bg-red-700/80 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-red-950/30">
-                                    <i className="fa-solid fa-truck-fast text-base sm:text-lg"></i>
-                                </div>
-                                <div className="text-left min-w-0">
-                                    <div className="text-white font-black text-[11px] sm:text-xs md:text-sm tracking-wide uppercase leading-tight truncate">
-                                        Giao Hàng Nhanh Chóng
-                                    </div>
-                                    <div className="text-red-100 text-[10px] sm:text-[11px] leading-tight mt-0.5 truncate font-medium">
-                                        Đáp ứng mọi đơn hàng
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Cam kết 4: Đồng hành phát triển */}
-                            <div className="flex items-center gap-2.5 sm:gap-3">
-                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white/60 bg-red-700/80 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-red-950/30">
-                                    <i className="fa-solid fa-headset text-base sm:text-lg"></i>
-                                </div>
-                                <div className="text-left min-w-0">
-                                    <div className="text-white font-black text-[11px] sm:text-xs md:text-sm tracking-wide uppercase leading-tight truncate">
-                                        Đồng Hành Phát Triển
-                                    </div>
-                                    <div className="text-red-100 text-[10px] sm:text-[11px] leading-tight mt-0.5 truncate font-medium">
-                                        Hợp tác bền vững
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 2. TIÊU ĐỀ HOA MAI & MÂY CÁT TƯỜNG (AUSPICIOUS HEADING) */}
-                    <div className="relative flex items-center justify-center mb-4 sm:mb-5 min-h-[48px] px-6 sm:px-16 md:px-24">
-                        {/* Mây cát tường uốn lượn 2 bên */}
-                        <div className="absolute left-0 -bottom-2 pointer-events-none select-none z-0">
-                            <svg viewBox="0 0 160 80" className="w-20 sm:w-28 md:w-36 h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g filter="drop-shadow(0 4px 10px rgba(185,28,28,0.12))">
-                                    <path d="M20,62 C8,62 2,52 4,42 C6,30 18,22 30,25 C34,14 46,6 59,8 C73,10 80,21 82,30 C88,25 98,24 107,28 C116,33 121,43 118,52 C127,50 138,54 142,63 C145,70 140,76 130,76 L20,76 C14,76 20,62 20,62 Z" fill="#fff8ee" stroke="#ecd7be" strokeWidth="1.6" />
-                                    <path d="M36,56 C28,54 24,46 27,39 C30,32 37,30 44,33 C50,36 52,43 49,49 C46,54 41,56 36,54" stroke="#e4c49f" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-                                    <path d="M87,54 C81,51 79,43 83,36 C88,29 96,29 101,34 C107,38 106,47 99,52 C94,54 89,54 87,54" stroke="#e4c49f" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-                                    <path d="M116,62 C111,60 109,54 112,50 C116,45 122,46 125,51" stroke="#e4c49f" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-                                </g>
-                            </svg>
-                        </div>
-                        <div className="absolute right-0 -bottom-2 pointer-events-none select-none z-0 -scale-x-100">
-                            <svg viewBox="0 0 160 80" className="w-20 sm:w-28 md:w-36 h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g filter="drop-shadow(0 4px 10px rgba(185,28,28,0.12))">
-                                    <path d="M20,62 C8,62 2,52 4,42 C6,30 18,22 30,25 C34,14 46,6 59,8 C73,10 80,21 82,30 C88,25 98,24 107,28 C116,33 121,43 118,52 C127,50 138,54 142,63 C145,70 140,76 130,76 L20,76 C14,76 20,62 20,62 Z" fill="#fff8ee" stroke="#ecd7be" strokeWidth="1.6" />
-                                    <path d="M36,56 C28,54 24,46 27,39 C30,32 37,30 44,33 C50,36 52,43 49,49 C46,54 41,56 36,54" stroke="#e4c49f" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-                                    <path d="M87,54 C81,51 79,43 83,36 C88,29 96,29 101,34 C107,38 106,47 99,52 C94,54 89,54 87,54" stroke="#e4c49f" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-                                    <path d="M116,62 C111,60 109,54 112,50 C116,45 122,46 125,51" stroke="#e4c49f" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-                                </g>
-                            </svg>
-                        </div>
-
-                        {/* Tiêu đề chính giữa */}
-                        <div className="relative z-10 flex items-center justify-center gap-2 sm:gap-3.5">
-                            {/* Đường chỉ đỏ bên trái với nốt tròn */}
-                            <div className="flex items-center gap-1 sm:gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-700/80"></span>
-                                <span className="h-[1.5px] w-6 sm:w-14 md:w-24 bg-gradient-to-r from-red-700/80 to-red-500/80"></span>
-                                <span className="w-1 h-1 rounded-full bg-red-600/80"></span>
-                            </div>
-
-                            {/* Biểu tượng hoa 5 cánh đỏ */}
-                            <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 drop-shadow-[0_1px_2px_rgba(185,28,28,0.3)]" aria-hidden="true">
-                                <defs>
-                                    <radialGradient id="cherryPetal" cx="50%" cy="30%" r="70%">
-                                        <stop offset="0%" stopColor="#ef4444" />
-                                        <stop offset="100%" stopColor="#b91c1c" />
-                                    </radialGradient>
-                                </defs>
-                                <g fill="url(#cherryPetal)">
-                                    <ellipse cx="12" cy="6.2" rx="3.3" ry="4.5" />
-                                    <ellipse cx="12" cy="6.2" rx="3.3" ry="4.5" transform="rotate(72 12 12)" />
-                                    <ellipse cx="12" cy="6.2" rx="3.3" ry="4.5" transform="rotate(144 12 12)" />
-                                    <ellipse cx="12" cy="6.2" rx="3.3" ry="4.5" transform="rotate(216 12 12)" />
-                                    <ellipse cx="12" cy="6.2" rx="3.3" ry="4.5" transform="rotate(288 12 12)" />
-                                </g>
-                                <circle cx="12" cy="12" r="2.8" fill="#fff" />
-                                <circle cx="12" cy="12" r="1.8" fill="#fecdd3" />
-                                <circle cx="12" cy="10.4" r="0.45" fill="#b91c1c" />
-                                <circle cx="13.5" cy="11.2" r="0.45" fill="#b91c1c" />
-                                <circle cx="12.9" cy="13.2" r="0.45" fill="#b91c1c" />
-                                <circle cx="11.1" cy="13.2" r="0.45" fill="#b91c1c" />
-                                <circle cx="10.5" cy="11.2" r="0.45" fill="#b91c1c" />
-                            </svg>
-
-                            <h3 className="text-base sm:text-xl md:text-2xl font-black text-center text-red-800 uppercase tracking-[0.08em] drop-shadow-sm whitespace-nowrap">
-                                DANH MỤC SẢN PHẨM
-                            </h3>
-
-                            {/* Đường chỉ đỏ bên phải với nốt tròn */}
-                            <div className="flex items-center gap-1 sm:gap-1.5">
-                                <span className="w-1 h-1 rounded-full bg-red-600/80"></span>
-                                <span className="h-[1.5px] w-6 sm:w-14 md:w-24 bg-gradient-to-r from-red-500/80 to-red-700/80"></span>
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-700/80"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 3. THANH DANH MỤC TAGS (THEO PHONG CÁCH ẢNH THIẾT KẾ) */}
-                    <div className="relative w-full max-w-full flex items-center gap-2 box-border">
+                    <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
+                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden md:flex md:items-center md:gap-2 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
                             aria-label="Cuộn sang trái"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white shadow-sm border border-stone-200/80 text-stone-700 hover:text-red-600 hover:border-red-300 hover:shadow transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
                         >
                             &lt;
                         </button>
@@ -1619,19 +1475,16 @@ import './styles.css';
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-full transition-all px-4 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100 shadow-sm cursor-pointer mb-1 md:mb-0"
+                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer mb-1 md:mb-0"
                                 >
-                                    <i className="fa-solid fa-gear mr-1.5"></i> Quản lý danh mục
+                                    <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
                                 onClick={() => onTagToggle('')}
                                 title="Tất cả sản phẩm"
-                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-4 py-2 sm:px-5 sm:py-2 text-xs sm:text-sm rounded-full font-bold transition-all cursor-pointer ${
-                                    selectedTag === ''
-                                        ? 'text-white bg-gradient-to-r from-red-600 to-red-700 border border-red-500 shadow-[0_4px_12px_rgba(220,38,38,0.35)]'
-                                        : 'bg-white text-stone-800 border border-stone-200/80 shadow-sm hover:border-red-300 hover:text-red-600 hover:shadow'
-                                }`}
+                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
                             </button>
@@ -1642,11 +1495,8 @@ import './styles.css';
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
                                         title={tag}
-                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-4 py-2 sm:px-5 sm:py-2 text-xs sm:text-sm rounded-full font-semibold transition-all cursor-pointer ${
-                                            isActive
-                                                ? 'text-white bg-gradient-to-r from-red-600 to-red-700 border border-red-500 shadow-[0_4px_12px_rgba(220,38,38,0.35)] font-bold'
-                                                : 'bg-white text-stone-800 border border-stone-200/80 shadow-sm hover:border-red-300 hover:text-red-600 hover:shadow'
-                                        }`}
+                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
                                     </button>
@@ -1658,7 +1508,7 @@ import './styles.css';
                             type="button"
                             onClick={scrollRight}
                             aria-label="Cuộn sang phải"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white shadow-sm border border-stone-200/80 text-stone-700 hover:text-red-600 hover:border-red-300 hover:shadow transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
                         >
                             &gt;
                         </button>
