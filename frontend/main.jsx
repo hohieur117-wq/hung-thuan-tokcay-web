@@ -1470,7 +1470,7 @@ import './styles.css';
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto md:no-scrollbar md:scroll-smooth md:px-0.5 md:snap-x md:snap-mandatory"
+                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto no-scrollbar md:scroll-smooth md:px-0.5 md:snap-x md:snap-mandatory"
                         >
                             {isAdmin && (
                                 <button
@@ -2949,15 +2949,15 @@ import './styles.css';
 
                                     {/* Pagination */}
                                     {totalPages > 1 && (
-                                        <div className="w-full py-6 flex justify-center items-center gap-2">
+                                        <div className="w-full py-6 flex flex-wrap justify-center items-center gap-2">
                                             <button
                                                 onClick={() => handlePageChange(1)}
                                                 disabled={safePage === 1}
                                                 title="Trang đầu"
                                                 aria-label="Trang đầu"
-                                                className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                                className="h-10 px-2.5 sm:px-4 flex items-center justify-center whitespace-nowrap bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                                             >
-                                                &laquo;
+                                                Trang đầu
                                             </button>
 
                                             <button
@@ -2965,9 +2965,9 @@ import './styles.css';
                                                 disabled={safePage === 1}
                                                 title="Trang trước"
                                                 aria-label="Trang trước"
-                                                className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                                className="h-10 px-2.5 sm:px-4 flex items-center justify-center whitespace-nowrap bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                                             >
-                                                &lt;
+                                                Trang trước
                                             </button>
 
                                             <div className="hidden sm:flex items-center gap-1.5">
@@ -2977,7 +2977,7 @@ import './styles.css';
                                                         <button
                                                             key={page}
                                                             onClick={() => handlePageChange(page)}
-                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${safePage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-400/40' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
+                                                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all cursor-pointer ${safePage === page ? 'bg-red-600 text-white shadow-md shadow-red-600/25 border border-red-400/40' : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
                                                             style={safePage === page ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                                         >
                                                             {page}
@@ -2985,7 +2985,7 @@ import './styles.css';
                                                     );
                                                 })}
                                             </div>
-                                            <div className="sm:hidden px-3.5 py-2 bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-sm font-bold text-stone-700">
+                                            <div className="sm:hidden px-3.5 py-2 bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-xs font-bold text-stone-700">
                                                 {safePage} / {totalPages}
                                             </div>
 
@@ -2994,9 +2994,9 @@ import './styles.css';
                                                 disabled={safePage === totalPages}
                                                 title="Trang sau"
                                                 aria-label="Trang sau"
-                                                className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                                className="h-10 px-2.5 sm:px-4 flex items-center justify-center whitespace-nowrap bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                                             >
-                                                &gt;
+                                                Trang sau
                                             </button>
 
                                             <button
@@ -3004,9 +3004,9 @@ import './styles.css';
                                                 disabled={safePage === totalPages}
                                                 title="Trang cuối"
                                                 aria-label="Trang cuối"
-                                                className="w-10 h-10 flex items-center justify-center bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-base font-bold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                                className="h-10 px-2.5 sm:px-4 flex items-center justify-center whitespace-nowrap bg-white/75 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                                             >
-                                                &raquo;
+                                                Trang cuối
                                             </button>
                                         </div>
                                     )}
