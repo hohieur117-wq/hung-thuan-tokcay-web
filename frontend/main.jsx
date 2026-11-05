@@ -2352,37 +2352,126 @@ import './styles.css';
                 }
             };
 
-            // 4. Admin Export Price List to Excel (CSV UTF-8 BOM)
-            const handleExportPriceListCSV = () => {
+            // 4. Admin Export Price List to Excel (XLSX, formatted table)
+            const handleExportPriceListExcel = async () => {
                 const exportList = filteredProducts.length > 0 ? filteredProducts : products;
+                const mod = await import('xlsx-js-style');
+                const XLSX = mod.default || mod;
+
                 const headers = ['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'Giá bán lẻ (VNĐ)', 'Tình trạng kho', 'Nổi bật', 'Link sản phẩm'];
-                const rows = exportList.map((p, idx) => {
-                    const tagsStr = Array.isArray(p.tags) ? p.tags.join('; ') : '';
-                    const isPinned = pinnedProductIds.includes(Number(p.id)) ? 'Đã ghim' : '';
-                    const link = `${window.location.origin}/san-pham/${p.slug || p.id}`;
-                    const escapeCsv = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
-                    return [
-                        idx + 1,
-                        escapeCsv(p.sku || `SP-${p.id}`),
-                        escapeCsv(p.name || ''),
-                        escapeCsv(tagsStr),
-                        p.price || 0,
-                        escapeCsv(p.stock_status || 'Hàng sẵn tại kho'),
-                        escapeCsv(isPinned),
-                        escapeCsv(link)
-                    ].join(',');
+                const today = new Date();
+                const todayStr = today.toLocaleDateString('vi-VN');
+
+                const aoa = [
+                    ['BẢNG BÁO GIÁ SẢN PHẨM - HÙNG THUẬN TOKCAY KOREA FOODS'],
+                    [`Ngày xuất: ${todayStr}  •  Tổng số mặt hàng: ${exportList.length}`],
+                    headers,
+                    ...exportList.map((p, idx) => {
+                        const tagsStr = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+                        const isPinned = pinnedProductIds.includes(Number(p.id)) ? 'Đã ghim' : '';
+                        const link = `${window.location.origin}/san-pham/${p.slug || p.id}`;
+                        return [
+                            idx + 1,
+                            p.sku || `SP-${p.id}`,
+                            p.name || '',
+                            tagsStr,
+                            Number(p.price) || 0,
+                            p.stock_status || 'Hàng sẵn tại kho',
+                            isPinned,
+                            link
+                        ];
+                    })
+                ];
+
+                const ws = XLSX.utils.aoa_to_sheet(aoa);
+                const lastRow = aoa.length; // 1-based row index of the last data row
+                const lastCol = headers.length - 1;
+
+                ws['!cols'] = [
+                    { wch: 6 },   // STT
+                    { wch: 15 },  // Mã SP
+                    { wch: 42 },  // Tên sản phẩm
+                    { wch: 26 },  // Danh mục
+                    { wch: 17 },  // Giá bán lẻ
+                    { wch: 20 },  // Tình trạng kho
+                    { wch: 11 },  // Nổi bật
+                    { wch: 52 }   // Link
+                ];
+
+                ws['!rows'] = [{ hpt: 26 }, { hpt: 18 }, { hpt: 30 }];
+                for (let r = 3; r < lastRow; r++) ws['!rows'][r] = { hpt: 22 };
+
+                ws['!merges'] = [
+                    { s: { r: 0, c: 0 }, e: { r: 0, c: lastCol } },
+                    { s: { r: 1, c: 0 }, e: { r: 1, c: lastCol } }
+                ];
+
+                const border = {
+                    top: { style: 'thin', color: { rgb: 'D6D3D1' } },
+                    bottom: { style: 'thin', color: { rgb: 'D6D3D1' } },
+                    left: { style: 'thin', color: { rgb: 'D6D3D1' } },
+                    right: { style: 'thin', color: { rgb: 'D6D3D1' } }
+                };
+
+                const setStyle = (r, c, style) => {
+                    const ref = XLSX.utils.encode_cell({ r, c });
+                    if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+                    ws[ref].s = style;
+                };
+
+                // Tiêu đề
+                setStyle(0, 0, {
+                    font: { bold: true, sz: 15, color: { rgb: 'B91C1C' } },
+                    alignment: { horizontal: 'center', vertical: 'center' }
                 });
-                const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                const today = new Date().toISOString().slice(0, 10);
-                a.href = url;
-                a.download = `Bang-Gia-Hung-Thuan-Tokcay-${today}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                setStyle(1, 0, {
+                    font: { italic: true, sz: 10, color: { rgb: '57534E' } },
+                    alignment: { horizontal: 'center', vertical: 'center' }
+                });
+
+                // Dòng tiêu đề cột
+                for (let c = 0; c <= lastCol; c++) {
+                    setStyle(2, c, {
+                        font: { bold: true, sz: 11, color: { rgb: 'FFFFFF' } },
+                        fill: { patternType: 'solid', fgColor: { rgb: 'B91C1C' } },
+                        alignment: { horizontal: c === 4 ? 'right' : 'center', vertical: 'center', wrapText: true },
+                        border
+                    });
+                }
+
+                // Dữ liệu
+                for (let r = 3; r < lastRow; r++) {
+                    const evenFill = r % 2 === 1 ? { patternType: 'solid', fgColor: { rgb: 'FAF9F7' } } : undefined;
+                    for (let c = 0; c <= lastCol; c++) {
+                        const isPrice = c === 4;
+                        const linkCell = c === 7 ? ws[XLSX.utils.encode_cell({ r, c })] : null;
+                        if (linkCell) {
+                            linkCell.l = { Target: linkCell.v, Tooltip: linkCell.v };
+                        }
+                        setStyle(r, c, {
+                            font: {
+                                sz: 11,
+                                bold: isPrice,
+                                color: { rgb: isPrice ? 'B91C1C' : c === 7 ? '0068FF' : '1C1917' },
+                                underline: c === 7
+                            },
+                            fill: evenFill,
+                            numFmt: isPrice ? '#,##0' : undefined,
+                            alignment: {
+                                horizontal: isPrice ? 'right' : [0, 1, 5, 6].includes(c) ? 'center' : 'left',
+                                vertical: 'center',
+                                wrapText: c === 2 || c === 3 || c === 7
+                            },
+                            border
+                        });
+                    }
+                }
+
+                ws['!autofilter'] = { ref: `A3:${XLSX.utils.encode_col(lastCol)}${lastRow}` };
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Bang Gia');
+                XLSX.writeFile(wb, `Bang-Gia-Hung-Thuan-Tokcay-${today.toLocaleDateString('en-CA')}.xlsx`, { compression: true });
             };
 
             // 5. Admin Print / Save PDF Price List
@@ -2399,7 +2488,9 @@ import './styles.css';
                     return FallbackImage;
                 };
 
-                const exportList = (filteredProducts.length > 0 ? filteredProducts : products).filter(p => !p.is_hidden);
+                const exportList = (filteredProducts.length > 0 ? filteredProducts : products)
+                    .filter(p => !p.is_hidden)
+                    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'vi', { sensitivity: 'base' }));
                 const todayStr = escapeHtml(new Date().toLocaleDateString('vi-VN'));
                 const printWin = window.open('', '_blank', 'width=1000,height=800');
                 if (!printWin) {
@@ -2656,7 +2747,7 @@ import './styles.css';
                                                     <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-3.5 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
                                                         <i className="fa-solid fa-plus text-primary"></i> Thêm sản phẩm
                                                     </button>
-                                                    <button onClick={handleExportPriceListCSV} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" title="Tải xuống Bảng Giá file Excel (.CSV)">
+                                                    <button onClick={handleExportPriceListExcel} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" title="Tải xuống Bảng Giá file Excel (.XLSX)">
                                                         <i className="fa-solid fa-file-excel"></i> Xuất Excel
                                                     </button>
                                                     <button onClick={handlePrintPriceListPDF} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }} title="In Bảng Báo Giá hoặc Lưu thành PDF">
