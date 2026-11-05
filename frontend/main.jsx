@@ -917,7 +917,7 @@ import './styles.css';
 
                     let bgRemovedBlob = null;
                     try {
-                        const { removeBackground } = await import('@imgly/background-removal');
+                        const { removeBackground } = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
                         if (cancelRef && cancelRef.current) return;
 
                         const removalPromise = removeBackground(compressedBlob, {
