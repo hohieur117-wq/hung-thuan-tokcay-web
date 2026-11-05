@@ -1455,14 +1455,78 @@ import './styles.css';
                             -ms-overflow-style: none;
                             scrollbar-width: none;
                         }
+                        .tag-cloud {
+                            position: absolute;
+                            width: 92px;
+                            height: 38px;
+                            border-radius: 9999px;
+                            background: #fff7ea;
+                            filter: drop-shadow(0 7px 12px rgba(185, 28, 28, 0.14));
+                        }
+                        .tag-cloud::before,
+                        .tag-cloud::after {
+                            content: '';
+                            position: absolute;
+                            border-radius: 50%;
+                            background: #fff7ea;
+                        }
+                        .tag-cloud::before {
+                            width: 42px;
+                            height: 42px;
+                            left: 9px;
+                            bottom: 9px;
+                        }
+                        .tag-cloud::after {
+                            width: 54px;
+                            height: 54px;
+                            left: 32px;
+                            bottom: 5px;
+                        }
+                        @media (max-width: 640px) {
+                            .tag-cloud {
+                                width: 64px;
+                                height: 28px;
+                            }
+                            .tag-cloud::before {
+                                width: 30px;
+                                height: 30px;
+                                left: 5px;
+                                bottom: 6px;
+                            }
+                            .tag-cloud::after {
+                                width: 40px;
+                                height: 40px;
+                                left: 21px;
+                                bottom: 3px;
+                            }
+                        }
                     `}</style>
-                    <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden md:flex md:items-center md:gap-2 box-border">
+                    <div className="relative flex items-center justify-center mb-3 min-h-[48px] px-10 sm:px-16 md:px-24">
+                        <span className="tag-cloud left-0 bottom-0 z-0 pointer-events-none" aria-hidden="true"></span>
+                        <span className="tag-cloud right-0 bottom-0 z-0 pointer-events-none -scale-x-100" aria-hidden="true"></span>
+                        <div className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
+                            <span className="hidden sm:block h-[2px] w-10 md:w-20 lg:w-28 rounded-full bg-gradient-to-r from-transparent to-red-400/70" aria-hidden="true"></span>
+                            <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 drop-shadow-sm" aria-hidden="true">
+                                <g fill="#dc2626">
+                                    <ellipse cx="12" cy="6.6" rx="3.1" ry="4.4" />
+                                    <ellipse cx="12" cy="6.6" rx="3.1" ry="4.4" transform="rotate(72 12 12)" />
+                                    <ellipse cx="12" cy="6.6" rx="3.1" ry="4.4" transform="rotate(144 12 12)" />
+                                    <ellipse cx="12" cy="6.6" rx="3.1" ry="4.4" transform="rotate(216 12 12)" />
+                                    <ellipse cx="12" cy="6.6" rx="3.1" ry="4.4" transform="rotate(288 12 12)" />
+                                </g>
+                                <circle cx="12" cy="12" r="2.7" fill="#fca5a5" />
+                                <circle cx="12" cy="12" r="1.2" fill="#fff1f2" />
+                            </svg>
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-primary uppercase tracking-[0.08em] drop-shadow-sm whitespace-nowrap">DANH MỤC SẢN PHẨM</h3>
+                            <span className="hidden sm:block h-[2px] w-10 md:w-20 lg:w-28 rounded-full bg-gradient-to-r from-red-400/70 to-transparent" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-gradient-to-r from-white/45 via-rose-50/45 to-white/45 backdrop-blur-xl border border-white/70 shadow-[0_10px_30px_-12px_rgba(185,28,28,0.25),inset_0_1px_0_rgba(255,255,255,0.85)] w-full max-w-full overflow-hidden md:flex md:items-center md:gap-2 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
                             aria-label="Cuộn sang trái"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/60 backdrop-blur-md hover:bg-white/90 text-red-700/80 hover:text-red-600 shadow-sm border border-white/80 transition-all cursor-pointer z-10"
                         >
                             &lt;
                         </button>
@@ -1475,7 +1539,7 @@ import './styles.css';
                             {isAdmin && (
                                 <button
                                     onClick={onManageTags}
-                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer mb-1 md:mb-0"
+                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/70 text-yellow-800 border-yellow-300/80 hover:bg-yellow-200/90 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_6px_rgba(120,53,15,0.06)] cursor-pointer mb-1 md:mb-0"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
@@ -1483,7 +1547,7 @@ import './styles.css';
                             <button
                                 onClick={() => onTagToggle('')}
                                 title="Tất cả sản phẩm"
-                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 border border-white/25 shadow-[0_4px_14px_rgba(185,28,28,0.35),inset_0_1px_0_rgba(255,255,255,0.35)]' : 'bg-white/55 backdrop-blur-md text-stone-700 border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(120,53,15,0.06)] hover:bg-white/85 hover:text-red-600'}`}
                                 style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
@@ -1495,7 +1559,7 @@ import './styles.css';
                                         key={tag}
                                         onClick={() => onTagToggle(tag)}
                                         title={tag}
-                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
+                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 border border-white/25 shadow-[0_4px_14px_rgba(185,28,28,0.35),inset_0_1px_0_rgba(255,255,255,0.35)]' : 'bg-white/55 backdrop-blur-md text-stone-700 border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(120,53,15,0.06)] hover:bg-white/85 hover:text-red-600'}`}
                                         style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                     >
                                         {tag}
@@ -1508,7 +1572,7 @@ import './styles.css';
                             type="button"
                             onClick={scrollRight}
                             aria-label="Cuộn sang phải"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/60 backdrop-blur-md hover:bg-white/90 text-red-700/80 hover:text-red-600 shadow-sm border border-white/80 transition-all cursor-pointer z-10"
                         >
                             &gt;
                         </button>
