@@ -2500,11 +2500,11 @@ import './styles.css';
                 <div ref={detailTopRef} className="w-full pb-12 animate-fade-in">
                     {/* Khung chi tiết sản phẩm: bọc gợn sóng vàng đỏ toàn thẻ bên ngoài, bên trong là thẻ trắng viền kem */}
                     <div
-                        className="relative rounded-[30px] p-2.5 sm:p-3.5 border-2 border-[#E6C27E] shadow-[0_14px_38px_rgba(155,15,20,0.2)] mb-8 overflow-hidden"
+                        className="relative rounded-[26px] p-1 sm:p-1.5 border border-[#E6C27E]/95 shadow-[0_12px_32px_rgba(155,15,20,0.16)] mb-8 overflow-hidden"
                         style={SEIGAIHA_CRIMSON_STYLE}
                     >
                         <div
-                            className="relative overflow-hidden rounded-[22px] border border-[#E6C27E]/85 shadow-inner flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8"
+                            className="relative overflow-hidden rounded-[21px] border border-[#E6C27E]/85 shadow-inner flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8"
                             style={SEIGAIHA_WHITE_BG_STYLE}
                         >
                             <div className="pointer-events-none absolute inset-0 bg-white/40 backdrop-blur-[1.5px]"></div>
