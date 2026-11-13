@@ -2498,13 +2498,13 @@ import './styles.css';
 
             return (
                 <div ref={detailTopRef} className="w-full pb-12 animate-fade-in">
-                    {/* Khung chi tiết sản phẩm: bọc gợn sóng vàng đỏ toàn thẻ bên ngoài, bên trong là thẻ trắng viền kem */}
+                    {/* Khung chi tiết sản phẩm: viền đỏ glass đồng bộ màu header */}
                     <div
-                        className="relative rounded-[26px] p-1 sm:p-1.5 border border-[#E6C27E]/95 shadow-[0_12px_32px_rgba(155,15,20,0.16)] mb-8 overflow-hidden"
-                        style={SEIGAIHA_CRIMSON_STYLE}
+                        className="relative rounded-[26px] p-1 sm:p-1.5 backdrop-blur-xl border border-white/25 shadow-[0_12px_32px_rgba(153,27,27,0.24)] mb-8 overflow-hidden"
+                        style={{ background: 'linear-gradient(90deg, rgba(153, 27, 27, 0.96) 0%, rgba(185, 28, 28, 0.94) 50%, rgba(153, 27, 27, 0.96) 100%)' }}
                     >
                         <div
-                            className="relative overflow-hidden rounded-[21px] border border-[#E6C27E]/85 shadow-inner flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8"
+                            className="relative overflow-hidden rounded-[21px] border border-white/30 shadow-inner flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8"
                             style={SEIGAIHA_WHITE_BG_STYLE}
                         >
                             <div className="pointer-events-none absolute inset-0 bg-white/40 backdrop-blur-[1.5px]"></div>
