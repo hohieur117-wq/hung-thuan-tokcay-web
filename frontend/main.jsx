@@ -456,9 +456,9 @@ import './styles.css';
             </svg>
         );
 
-        const SEIGAIHA_TILE_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><rect width='60' height='30' fill='%23C4161C'/><g fill='%23C4161C' stroke='%23F7C948' stroke-width='1.2' stroke-opacity='0.92'><circle cx='30' cy='-15' r='28'/><circle cx='30' cy='-15' r='20'/><circle cx='30' cy='-15' r='12'/><circle cx='0' cy='0' r='28'/><circle cx='0' cy='0' r='20'/><circle cx='0' cy='0' r='12'/><circle cx='60' cy='0' r='28'/><circle cx='60' cy='0' r='20'/><circle cx='60' cy='0' r='12'/><circle cx='30' cy='15' r='28'/><circle cx='30' cy='15' r='20'/><circle cx='30' cy='15' r='12'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='30' cy='45' r='28'/><circle cx='30' cy='45' r='20'/><circle cx='30' cy='45' r='12'/></g></svg>";
+        const SEIGAIHA_TILE_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><rect width='60' height='30' fill='%239B0F14'/><g fill='%239B0F14' stroke='%23F5C542' stroke-width='1.2' stroke-opacity='0.92'><circle cx='30' cy='-15' r='28'/><circle cx='30' cy='-15' r='20'/><circle cx='30' cy='-15' r='12'/><circle cx='0' cy='0' r='28'/><circle cx='0' cy='0' r='20'/><circle cx='0' cy='0' r='12'/><circle cx='60' cy='0' r='28'/><circle cx='60' cy='0' r='20'/><circle cx='60' cy='0' r='12'/><circle cx='30' cy='15' r='28'/><circle cx='30' cy='15' r='20'/><circle cx='30' cy='15' r='12'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='30' cy='45' r='28'/><circle cx='30' cy='45' r='20'/><circle cx='30' cy='45' r='12'/></g></svg>";
         const SEIGAIHA_CRIMSON_STYLE = {
-            backgroundColor: '#C4161C',
+            backgroundColor: '#9B0F14',
             backgroundImage: `url("data:image/svg+xml,${SEIGAIHA_TILE_SVG}")`,
             backgroundSize: '48px 24px',
             backgroundRepeat: 'repeat'
@@ -2498,19 +2498,19 @@ import './styles.css';
 
             return (
                 <div ref={detailTopRef} className="w-full pb-12 animate-fade-in">
-                    {/* Khung chi tiết sản phẩm: nền gợn sóng trắng toàn khung đi kèm lớp glass mờ, bọc gợn sóng đỏ bên khung ảnh */}
+                    {/* Khung chi tiết sản phẩm: bọc gợn sóng vàng đỏ toàn thẻ bên ngoài, bên trong là thẻ trắng viền kem */}
                     <div
-                        className="relative overflow-hidden rounded-[28px] border border-white/90 shadow-[0_12px_36px_rgba(185,28,28,0.08),inset_0_1px_1px_rgba(255,255,255,0.95)] flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8 mb-8"
-                        style={SEIGAIHA_WHITE_BG_STYLE}
+                        className="relative rounded-[30px] p-2.5 sm:p-3.5 border-2 border-[#E6C27E] shadow-[0_14px_38px_rgba(155,15,20,0.2)] mb-8 overflow-hidden"
+                        style={SEIGAIHA_CRIMSON_STYLE}
                     >
-                        <div className="pointer-events-none absolute inset-0 bg-white/40 backdrop-blur-[1.5px]"></div>
-                        {/* Cột trái: Khung gợn sóng bọc khung ảnh sản phẩm bên trong */}
-                        <div className="relative z-10 w-full md:w-1/2 flex flex-col">
-                            <div
-                                className="relative flex flex-col rounded-[22px] p-2 sm:p-2.5 border border-[#E6C27E]/95 shadow-[0_10px_28px_rgba(139,21,21,0.14)] overflow-hidden"
-                                style={SEIGAIHA_CRIMSON_STYLE}
-                            >
-                                <div className="relative z-10 w-full aspect-square flex items-center justify-center rounded-[14px] border border-[#E6C27E]/85 bg-white shadow-inner overflow-hidden">
+                        <div
+                            className="relative overflow-hidden rounded-[22px] border border-[#E6C27E]/85 shadow-inner flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8"
+                            style={SEIGAIHA_WHITE_BG_STYLE}
+                        >
+                            <div className="pointer-events-none absolute inset-0 bg-white/40 backdrop-blur-[1.5px]"></div>
+                            {/* Cột trái: Ảnh sản phẩm sạch sẽ không bọc khung gợn sóng bên trong */}
+                            <div className="relative z-10 w-full md:w-1/2 flex flex-col">
+                                <div className="relative w-full aspect-square flex items-center justify-center rounded-2xl border border-[#E6D2B5]/90 bg-white shadow-sm overflow-hidden">
                                     <img
                                         src={product.image_url || FallbackImage}
                                         onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
@@ -2520,7 +2520,6 @@ import './styles.css';
                                         className="w-full h-full object-contain rounded-xl transition-transform duration-500 hover:scale-[1.03]"
                                     />
                                 </div>
-                            </div>
 
                             {productTags.length > 0 && (
                                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
@@ -2680,6 +2679,7 @@ import './styles.css';
                                         </button>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
 
