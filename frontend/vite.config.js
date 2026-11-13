@@ -6,6 +6,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'esnext',
-    chunkSizeWarningLimit: 700
+    chunkSizeWarningLimit: 700,
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/@supabase')) return 'vendor-supabase';
+          if (id.includes('node_modules/react') || id.includes('node_modules/scheduler')) return 'vendor-react';
+        }
+      }
+    }
   }
 });

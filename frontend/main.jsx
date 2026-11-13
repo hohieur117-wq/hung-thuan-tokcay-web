@@ -416,6 +416,69 @@ import './styles.css';
         };
 
         // --- Components ---
+        const BlossomIcon = ({ className = 'w-5 h-5', petalColor = '#DC2626', centerColor = '#FFFFFF' }) => (
+            <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+                {[0, 72, 144, 216, 288].map((deg) => (
+                    <circle
+                        key={deg}
+                        cx="12"
+                        cy="6.8"
+                        r="4.7"
+                        fill={petalColor}
+                        transform={`rotate(${deg} 12 12)`}
+                    />
+                ))}
+                <circle cx="12" cy="12" r="4.2" fill={petalColor} />
+                {[0, 72, 144, 216, 288].map((deg) => (
+                    <line
+                        key={`r-${deg}`}
+                        x1="12"
+                        y1="12"
+                        x2="12"
+                        y2="8.1"
+                        stroke={centerColor}
+                        strokeWidth="1.25"
+                        strokeLinecap="round"
+                        transform={`rotate(${deg} 12 12)`}
+                    />
+                ))}
+                <circle cx="12" cy="12" r="2.1" fill={centerColor} />
+                {[0, 72, 144, 216, 288].map((deg) => (
+                    <circle
+                        key={`d-${deg}`}
+                        cx="12"
+                        cy="7.8"
+                        r="0.75"
+                        fill={centerColor}
+                        transform={`rotate(${deg} 12 12)`}
+                    />
+                ))}
+            </svg>
+        );
+
+        const SEIGAIHA_TILE_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><rect width='60' height='30' fill='%238c1414'/><g fill='%238c1414' stroke='%23f2ca7e' stroke-width='1.35' stroke-opacity='0.88'><circle cx='30' cy='-15' r='28'/><circle cx='30' cy='-15' r='22'/><circle cx='30' cy='-15' r='16'/><circle cx='30' cy='-15' r='10'/><circle cx='0' cy='0' r='28'/><circle cx='0' cy='0' r='22'/><circle cx='0' cy='0' r='16'/><circle cx='0' cy='0' r='10'/><circle cx='60' cy='0' r='28'/><circle cx='60' cy='0' r='22'/><circle cx='60' cy='0' r='16'/><circle cx='60' cy='0' r='10'/><circle cx='30' cy='15' r='28'/><circle cx='30' cy='15' r='22'/><circle cx='30' cy='15' r='16'/><circle cx='30' cy='15' r='10'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='22'/><circle cx='0' cy='30' r='16'/><circle cx='0' cy='30' r='10'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='22'/><circle cx='60' cy='30' r='16'/><circle cx='60' cy='30' r='10'/><circle cx='30' cy='45' r='28'/><circle cx='30' cy='45' r='22'/><circle cx='30' cy='45' r='16'/><circle cx='30' cy='45' r='10'/></g></svg>";
+        const SEIGAIHA_CRIMSON_STYLE = {
+            backgroundColor: '#8c1414',
+            backgroundImage: `url("data:image/svg+xml,${SEIGAIHA_TILE_SVG}")`,
+            backgroundSize: '48px 24px',
+            backgroundRepeat: 'repeat'
+        };
+        const buildSeigaihaWhiteSvg = () => {
+            const centers = [[30, -15], [0, 0], [60, 0], [30, 15], [0, 30], [60, 30], [30, 45]];
+            const radii = [30, 18];
+            const circles = centers.map(([cx, cy]) =>
+                radii.map((r) => `<circle cx='${cx}' cy='${cy}' r='${r}' fill='%23F6F0EE' stroke='%23FFFFFF' stroke-width='2.2' stroke-opacity='0.82'/>`).join('')
+            ).join('');
+            return `<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><rect width='60' height='30' fill='%23F6F0EE'/>${circles}</svg>`;
+        };
+        const SEIGAIHA_WHITE_TILE_SVG = buildSeigaihaWhiteSvg();
+        const SEIGAIHA_WHITE_BG_STYLE = {
+            backgroundColor: '#F6F0EE',
+            backgroundImage: `url("data:image/svg+xml,${SEIGAIHA_WHITE_TILE_SVG}")`,
+            backgroundSize: '60px 30px',
+            backgroundRepeat: 'repeat'
+        };
+
         const Header = ({ cartCount, onOpenCart, onContactClick, onProductsClick, onLogoClick, searchResetKey }) => {
             const location = useLocation();
             const isProductsRoute = location.pathname === '/san-pham';
@@ -495,19 +558,24 @@ import './styles.css';
                                 </div>
                             </div>
 
-                            {/* Cột 2: Desktop Search (Nằm chính giữa Header 100%, không bị đè hay co nhỏ) */}
-                            <div className="flex-1 hidden md:flex justify-center items-center relative z-40 px-2 lg:px-4 min-w-0">
-                                <div className="w-full max-w-xs lg:max-w-md">
+                            {/* Cột 2: Desktop Search (Nằm chính giữa Header cân đối với 2 cột hai bên) */}
+                            <div className="hidden md:flex md:flex-none md:w-[280px] lg:w-[410px] xl:w-[470px] justify-center items-center relative z-40 px-2 lg:px-4 min-w-0">
+                                <div className="w-full">
                                     <LiveSearchBar resetKey={searchResetKey} />
                                 </div>
                             </div>
 
-                            {/* Cột 3: Navigation & Cart (Các nút giữ kích thước cố định chống đè, không giật kích cỡ khi cuộn) */}
-                            <div className="flex-shrink-0 md:flex-1 flex justify-end items-center gap-1.5 sm:gap-2.5 lg:gap-4 min-w-0">
-                                <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-white font-semibold flex-shrink-0">
-                                    <button onClick={onProductsClick} aria-current={isProductsRoute ? 'page' : undefined} className={`px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0 ${isProductsRoute ? 'bg-white/25 text-yellow-300 ring-1 ring-white/40 shadow-inner' : 'hover:bg-white/15 hover:text-yellow-300'}`}>Sản phẩm</button>
-                                    <button onClick={() => alert('Hiện tại chưa có chương trình khuyến mãi nào. Bạn vui lòng quay lại sau nhé!')} className="px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">Khuyến mãi</button>
-                                    <button onClick={onContactClick} className="px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-xs lg:text-sm rounded-full hover:bg-white/15 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none flex items-center justify-center whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">Liên hệ</button>
+                            {/* Cột 3: Navigation & Cart */}
+                            <div className="flex-shrink-0 md:flex-1 flex justify-end items-center gap-1.5 sm:gap-2.5 lg:gap-3.5 min-w-0">
+                                <nav className="hidden md:flex items-center gap-1.5 lg:gap-2.5 text-white font-semibold flex-shrink-0">
+                                    <button type="button" onClick={onProductsClick} aria-current={isProductsRoute ? 'page' : undefined} className={`px-3 py-1.5 lg:px-4 lg:py-2 text-xs lg:text-sm rounded-full border active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none inline-flex items-center justify-center gap-1.5 whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0 ${isProductsRoute ? 'bg-white/25 text-yellow-300 border-yellow-300/60 shadow-inner' : 'bg-white/10 hover:bg-white/20 border-white/20 hover:text-yellow-300'}`}>
+                                        <i className="fa-solid fa-box-open text-[11px] lg:text-xs"></i>
+                                        <span>Sản phẩm</span>
+                                    </button>
+                                    <button type="button" onClick={onContactClick} className="px-3 py-1.5 lg:px-4 lg:py-2 text-xs lg:text-sm rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:text-yellow-300 active:scale-95 transition-all duration-200 uppercase tracking-wide outline-none inline-flex items-center justify-center gap-1.5 whitespace-nowrap drop-shadow-sm cursor-pointer flex-shrink-0">
+                                        <i className="fa-solid fa-headset text-[11px] lg:text-xs"></i>
+                                        <span>Liên hệ</span>
+                                    </button>
                                 </nav>
 
                                 <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
@@ -619,22 +687,267 @@ import './styles.css';
             );
         };
 
-        const ZaloWidget = ({ zaloNumber }) => {
+        const BackToTopButton = () => {
+            const [visible, setVisible] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setVisible(window.scrollY > 360);
+                };
+                handleScroll();
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
             return (
-                <a
-                    href={getCleanZaloLink(zaloNumber)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Chat với shop qua Zalo"
-                    className="fixed bottom-6 right-6 w-14 h-14 bg-[#0068FF] rounded-full ring-4 ring-white/60 backdrop-blur-sm shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50 group border border-white/80"
-                >
-                    <span className="text-white font-bold text-lg drop-shadow-sm">Zalo</span>
-                </a>
+                <div className={`fixed bottom-[92px] right-[30px] z-40 flex items-center gap-2 group transition-all duration-200 ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
+                    <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#EED3AC] shadow-sm text-[11px] font-bold text-red-700 opacity-0 translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap">
+                        Lên đầu trang
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        aria-label="Lên đầu trang"
+                        title="Lên đầu trang"
+                        className="w-11 h-11 rounded-full bg-white/95 hover:bg-red-600 text-red-600 hover:text-white border border-[#EED3AC] hover:border-red-600 shadow-[0_6px_18px_rgba(185,28,28,0.14)] backdrop-blur-md flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-90 cursor-pointer"
+                    >
+                        <i className="fa-solid fa-chevron-up text-[9px] leading-none"></i>
+                        <i className="fa-solid fa-house text-[13px] leading-none"></i>
+                    </button>
+                </div>
+            );
+        };
+
+        const ZaloBubbleMark = ({ className = 'w-8 h-8', textColor = '#0068FF' }) => (
+            <svg viewBox="0 0 36 32" className={className} aria-hidden="true">
+                <path
+                    fill="currentColor"
+                    d="M18 2C9.16 2 2 8.04 2 15.5c0 4.02 2.08 7.62 5.38 10.08L5.8 30.2c-.22.64.42 1.22 1.02.92l5.3-2.65c1.84.62 3.82.97 5.88.97 8.84 0 16-6.04 16-13.5S26.84 2 18 2z"
+                />
+                <text x="18" y="18.8" textAnchor="middle" fill={textColor} fontSize="9" fontWeight="900" fontFamily="Inter, sans-serif">
+                    Zalo
+                </text>
+            </svg>
+        );
+
+        const ZaloWidget = ({ zaloNumber }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [copied, setCopied] = useState(false);
+            const [qrFailed, setQrFailed] = useState(false);
+            const widgetRef = useRef(null);
+            const copyTimeoutRef = useRef(null);
+
+            const zaloLink = getCleanZaloLink(zaloNumber);
+            const cleanDigits = zaloLink.split('/').pop() || '0902631632';
+            const displayPhone = cleanDigits.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=6&data=${encodeURIComponent(zaloLink)}`;
+
+            useEscapeToClose(isOpen, () => setIsOpen(false));
+
+            useEffect(() => {
+                if (!isOpen) return;
+                const handleClickOutside = (e) => {
+                    if (widgetRef.current && !widgetRef.current.contains(e.target)) {
+                        setIsOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                document.addEventListener('touchstart', handleClickOutside);
+                return () => {
+                    document.removeEventListener('mousedown', handleClickOutside);
+                    document.removeEventListener('touchstart', handleClickOutside);
+                };
+            }, [isOpen]);
+
+            useEffect(() => {
+                return () => {
+                    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+                };
+            }, []);
+
+            const handleCopyPhone = async () => {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(cleanDigits);
+                    } else {
+                        const input = document.createElement('input');
+                        input.value = cleanDigits;
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                    }
+                    setCopied(true);
+                    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+                    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+                } catch {
+                    window.prompt('Sao chép số Zalo của shop:', cleanDigits);
+                }
+            };
+
+            return (
+                <div ref={widgetRef}>
+                    {isOpen && (
+                        <div
+                            role="dialog"
+                            aria-label="Hỗ trợ nhanh qua Zalo"
+                            className="fixed bottom-24 right-4 sm:right-6 z-[60] w-[calc(100vw-2rem)] max-w-[330px] animate-zalo-pop"
+                        >
+                            <div className="rounded-2xl overflow-hidden bg-white/95 backdrop-blur-xl border border-[#CFE2FF] shadow-[0_20px_48px_rgba(0,78,196,0.22),0_4px_16px_rgba(0,0,0,0.08)]">
+                                {/* Header xanh Zalo */}
+                                <div className="bg-gradient-to-r from-[#0068FF] via-[#007BFF] to-[#0052CC] text-white px-4 py-3 flex items-center justify-between gap-2 relative overflow-hidden">
+                                    <div className="pointer-events-none absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10"></div>
+                                    <div className="flex items-center gap-2.5 min-w-0 relative z-10">
+                                        <div className="relative w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
+                                            <ZaloBubbleMark className="w-6 h-6 text-[#0068FF]" textColor="#FFFFFF" />
+                                            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#0068FF]"></span>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="font-extrabold text-sm leading-tight truncate">Hùng Thuận Tokcay</p>
+                                            <p className="text-[11px] text-blue-100 flex items-center gap-1 mt-0.5">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 inline-block"></span>
+                                                Tư vấn sỉ & lẻ • Trả lời nhanh
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsOpen(false)}
+                                        aria-label="Đóng cửa sổ Zalo"
+                                        className="relative z-10 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors cursor-pointer flex-shrink-0"
+                                    >
+                                        <i className="fa-solid fa-xmark text-sm"></i>
+                                    </button>
+                                </div>
+
+                                {/* Nội dung & QR + Copy SĐT */}
+                                <div className="bg-[#FAF0E6]/75 px-4 py-3.5 space-y-3">
+                                    <div className="bg-white rounded-2xl rounded-tl-sm px-3.5 py-2.5 shadow-sm border border-[#EED3AC]/70 text-xs text-stone-700 leading-relaxed">
+                                        Xin chào! Bạn cần báo giá sỉ/thùng, hỏi tồn kho hay lên đơn nhanh? Nhắn Zalo hoặc gọi trực tiếp cho shop nhé!
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-2.5 border border-[#EED3AC]/70 shadow-sm flex items-center justify-between gap-3">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Hotline / Zalo</p>
+                                            <p className="text-sm font-extrabold text-stone-800 tracking-tight mt-0.5">{displayPhone}</p>
+                                            <button
+                                                type="button"
+                                                onClick={handleCopyPhone}
+                                                className={`mt-1.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${copied
+                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                    : 'bg-blue-50 text-[#0068FF] hover:bg-blue-100 border border-blue-200/70'}`}
+                                            >
+                                                <i className={`fa-solid ${copied ? 'fa-check' : 'fa-copy'} text-[10px]`}></i>
+                                                <span>{copied ? 'Đã sao chép SĐT' : 'Sao chép SĐT'}</span>
+                                            </button>
+                                        </div>
+                                        {!qrFailed && (
+                                            <div className="flex flex-col items-center flex-shrink-0">
+                                                <img
+                                                    src={qrUrl}
+                                                    alt={`Mã QR Zalo ${displayPhone}`}
+                                                    onError={() => setQrFailed(true)}
+                                                    className="w-16 h-16 rounded-lg border border-stone-200 bg-white p-0.5 object-contain"
+                                                />
+                                                <span className="text-[9px] font-semibold text-stone-400 mt-0.5">Quét QR Zalo</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Nút hành động */}
+                                <div className="px-4 pb-3.5 pt-0.5 bg-[#FAF0E6]/75 flex flex-col gap-2">
+                                    <a
+                                        href={zaloLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={() => setIsOpen(false)}
+                                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#007BFF] to-[#0052CC] hover:brightness-110 text-white font-bold text-xs sm:text-sm shadow-[0_6px_18px_rgba(0,104,255,0.32)] flex items-center justify-center gap-2 transition-all active:scale-95"
+                                    >
+                                        <i className="fa-solid fa-comment-dots text-sm"></i>
+                                        <span>Mở khung chat Zalo ngay</span>
+                                        <i className="fa-solid fa-arrow-up-right-from-square text-[11px] opacity-90"></i>
+                                    </a>
+                                    <a
+                                        href={`tel:${cleanDigits}`}
+                                        className="w-full py-2 px-4 rounded-xl bg-white hover:bg-red-50 border border-[#EED3AC] text-red-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                                    >
+                                        <i className="fa-solid fa-phone text-[11px]"></i>
+                                        <span>Gọi điện ngay ({displayPhone})</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Nút Zalo nổi trang trí & hiệu ứng sóng lan tỏa */}
+                    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 group">
+                        {!isOpen && (
+                            <button
+                                type="button"
+                                onClick={() => setIsOpen(true)}
+                                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#CFE2FF] shadow-[0_6px_20px_rgba(0,104,255,0.16)] text-xs font-extrabold text-[#0068FF] opacity-0 translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto transition-all duration-200 cursor-pointer whitespace-nowrap"
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                Chat Zalo ngay
+                            </button>
+                        )}
+
+                        <div className="relative flex items-center justify-center">
+                            {!isOpen && (
+                                <>
+                                    <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute inset-0 rounded-full bg-[#0068FF]/35 animate-zalo-ripple"
+                                    ></span>
+                                    <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute inset-0 rounded-full bg-[#0068FF]/25 animate-zalo-ripple"
+                                        style={{ animationDelay: '1.2s' }}
+                                    ></span>
+                                </>
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={() => setIsOpen(prev => !prev)}
+                                aria-label={isOpen ? 'Đóng cửa sổ Zalo' : 'Mở chat nhanh qua Zalo'}
+                                aria-expanded={isOpen}
+                                className={`relative w-14 h-14 rounded-full ring-4 ring-white/85 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer border border-white/80 ${isOpen
+                                    ? 'bg-gradient-to-br from-stone-700 to-stone-900 shadow-[0_10px_24px_rgba(0,0,0,0.28)]'
+                                    : 'bg-gradient-to-br from-[#0088FF] via-[#0068FF] to-[#004EC4] shadow-[0_10px_28px_rgba(0,104,255,0.45),inset_0_1px_1px_rgba(255,255,255,0.45)]'}`}
+                            >
+                                {isOpen ? (
+                                    <i className="fa-solid fa-xmark text-white text-xl transition-transform duration-200"></i>
+                                ) : (
+                                    <ZaloBubbleMark className="w-8 h-8 text-white animate-zalo-wiggle drop-shadow-sm" textColor="#0068FF" />
+                                )}
+
+                                {!isOpen && (
+                                    <span
+                                        aria-hidden="true"
+                                        className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-white shadow-sm"
+                                    ></span>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             );
         };
 
         const ContactModal = ({ isOpen, onClose, settings }) => {
+            const [copiedPhone, setCopiedPhone] = useState(false);
+            const copyPhoneTimerRef = useRef(null);
+
             useEscapeToClose(isOpen, onClose);
+
+            useEffect(() => {
+                return () => {
+                    if (copyPhoneTimerRef.current) clearTimeout(copyPhoneTimerRef.current);
+                };
+            }, []);
+
             if (!isOpen) return null;
 
             // Các link mặc định theo yêu cầu
@@ -645,38 +958,169 @@ import './styles.css';
             const fbLink = sanitizeHttpUrl(settings?.facebook_url, defaultFb);
             const mapsLink = sanitizeHttpUrl(settings?.maps_url, defaultMaps);
             const zaloLink = getCleanZaloLink(settings?.link_zalo || settings?.zalo_number || defaultZalo);
+            const cleanDigits = zaloLink.split('/').pop() || defaultZalo;
+            const displayPhone = cleanDigits.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
+
+            const handleCopyHotline = async () => {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(cleanDigits);
+                    } else {
+                        const input = document.createElement('input');
+                        input.value = cleanDigits;
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                    }
+                    setCopiedPhone(true);
+                    if (copyPhoneTimerRef.current) clearTimeout(copyPhoneTimerRef.current);
+                    copyPhoneTimerRef.current = setTimeout(() => setCopiedPhone(false), 2000);
+                } catch {
+                    window.prompt('Sao chép số hotline / Zalo:', cleanDigits);
+                }
+            };
 
             return (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4">
-                    <div role="dialog" aria-modal="true" aria-label="Liên hệ với chúng tôi" className="bg-white/85 backdrop-blur-xl border border-white/80 rounded-2xl shadow-2xl max-w-md w-full animate-fade-in relative p-6 sm:p-7">
-                        <div className="flex items-center justify-between gap-4 pr-12 border-b border-stone-200/70 pb-4 mb-5">
-                            <h3 className="text-lg sm:text-xl font-bold text-gray-800 uppercase tracking-wide leading-snug">LIÊN HỆ VỚI CHÚNG TÔI</h3>
-                            <button onClick={onClose} className="absolute top-5 right-5 text-gray-500 hover:text-red-600 transition-colors w-9 h-9 flex items-center justify-center rounded-full bg-white/90 border border-stone-200/70 shadow-sm flex-shrink-0"><i className="fa-solid fa-xmark text-lg"></i></button>
+                <div
+                    className="fixed inset-0 z-[80] flex items-center justify-center modal-overlay p-4"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) onClose();
+                    }}
+                >
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Liên hệ với chúng tôi"
+                        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl bg-[#FAF0E6] border-2 border-[#E6C27E] shadow-[0_24px_60px_rgba(127,29,29,0.34),0_6px_18px_rgba(0,0,0,0.14)] animate-fade-in relative"
+                    >
+                        {/* Header họa tiết Seigaiha đỏ & viền vàng đồng bộ thương hiệu */}
+                        <div className="relative px-5 py-5 sm:px-6 text-white overflow-hidden border-b-2 border-[#E6C27E]/85" style={SEIGAIHA_CRIMSON_STYLE}>
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#7f1d1d]/85 via-[#991b1b]/60 to-[#7f1d1d]/85"></div>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                aria-label="Đóng cửa sổ liên hệ"
+                                className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/15 hover:bg-white/30 border border-[#E6C27E]/60 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 cursor-pointer backdrop-blur-sm"
+                            >
+                                <i className="fa-solid fa-xmark text-base"></i>
+                            </button>
+                            <div className="relative z-10 pr-10">
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/20 border border-[#E6C27E]/65 text-[10px] font-bold tracking-wider uppercase text-[#FDE68A] mb-2">
+                                    <BlossomIcon className="w-3 h-3" petalColor="#FFFFFF" centerColor="#FDE047" />
+                                    <span>Hùng Thuận Tokcay Korea Foods</span>
+                                </div>
+                                <h3 className="text-lg sm:text-xl font-extrabold uppercase tracking-wide drop-shadow-sm">
+                                    Liên Hệ Với Chúng Tôi
+                                </h3>
+                                <p className="text-xs text-red-100/95 mt-0.5">
+                                    Báo giá sỉ/lẻ nguyên liệu Hàn Quốc & giao nhanh Cần Thơ – ĐBSCL
+                                </p>
+                            </div>
                         </div>
-                        <div className="mb-5 p-3.5 rounded-xl bg-white/75 border border-white/80 space-y-2.5 text-xs sm:text-sm text-stone-700">
-                            <div className="flex items-center gap-3">
-                                <span className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0 shadow-sm"><i className="fa-solid fa-phone text-xs"></i></span>
-                                <span className="font-semibold">0902 631 632</span>
+
+                        <div className="p-4 sm:p-6 space-y-4">
+                            {/* Thẻ thông tin cửa hàng */}
+                            <div className="rounded-2xl bg-white/95 border border-[#EED3AC] shadow-sm divide-y divide-[#FAF0E6] text-xs sm:text-sm text-stone-700">
+                                <div className="flex items-center justify-between gap-2.5 p-3">
+                                    <a href={`tel:${cleanDigits}`} className="flex items-center gap-3 min-w-0 group">
+                                        <span className="w-9 h-9 rounded-xl bg-red-50 border border-red-100 text-red-600 flex items-center justify-center flex-shrink-0 shadow-xs group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                            <i className="fa-solid fa-phone text-xs"></i>
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Hotline / Sỉ & Lẻ</p>
+                                            <p className="font-extrabold text-stone-800 group-hover:text-red-700 transition-colors">{displayPhone}</p>
+                                        </div>
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={handleCopyHotline}
+                                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 flex-shrink-0 transition-all cursor-pointer ${copiedPhone
+                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                            : 'bg-[#FAF0E6] text-red-700 hover:bg-red-50 border border-[#EED3AC]'}`}
+                                    >
+                                        <i className={`fa-solid ${copiedPhone ? 'fa-check' : 'fa-copy'} text-[10px]`}></i>
+                                        <span>{copiedPhone ? 'Đã chép' : 'Sao chép'}</span>
+                                    </button>
+                                </div>
+
+                                <div className="flex items-start gap-3 p-3">
+                                    <span className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 shadow-xs">
+                                        <i className="fa-solid fa-location-dot text-xs"></i>
+                                    </span>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Địa chỉ kho hàng</p>
+                                        <p className="text-stone-700 font-medium leading-snug">92B5, KDC Hưng Phú 1, KV9, P. Hưng Phú, TP. Cần Thơ</p>
+                                    </div>
+                                </div>
+
+                                <a href="mailto:hungthuanfood@gmail.com" className="flex items-center gap-3 p-3 hover:bg-red-50/40 rounded-b-2xl transition-colors group">
+                                    <span className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0 shadow-xs group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                                        <i className="fa-solid fa-envelope text-xs"></i>
+                                    </span>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Email</p>
+                                        <p className="text-stone-700 font-medium truncate group-hover:text-sky-700">hungthuanfood@gmail.com</p>
+                                    </div>
+                                </a>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <span className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0 shadow-sm"><i className="fa-solid fa-location-dot text-xs"></i></span>
-                                <span className="line-clamp-2">92B5, KDC Hưng Phú 1, KV9, P. Hưng Phú, TP. Cần Thơ</span>
+
+                            {/* Kênh kết nối nhanh */}
+                            <div className="space-y-2.5">
+                                <a
+                                    href={zaloLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-2xl text-white bg-gradient-to-r from-[#007BFF] to-[#0052CC] hover:brightness-110 shadow-[0_8px_20px_rgba(0,104,255,0.28)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] group"
+                                >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                                            <ZaloBubbleMark className="w-6 h-6 text-[#0068FF]" textColor="#FFFFFF" />
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="font-extrabold text-sm sm:text-base leading-tight">Chat Zalo ngay</p>
+                                            <p className="text-[11px] text-blue-100 truncate">Nhắn đặt hàng & nhận báo giá sỉ/thùng</p>
+                                        </div>
+                                    </div>
+                                    <i className="fa-solid fa-arrow-up-right-from-square text-xs opacity-85 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform flex-shrink-0"></i>
+                                </a>
+
+                                <a
+                                    href={fbLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-2xl text-white bg-gradient-to-r from-[#1877F2] to-[#0F5CC0] hover:brightness-110 shadow-[0_8px_20px_rgba(24,119,242,0.24)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] group"
+                                >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center flex-shrink-0">
+                                            <i className="fa-brands fa-facebook-f text-lg text-white"></i>
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="font-extrabold text-sm sm:text-base leading-tight">Trang Facebook</p>
+                                            <p className="text-[11px] text-blue-100 truncate">Theo dõi hàng mới & tin ưu đãi</p>
+                                        </div>
+                                    </div>
+                                    <i className="fa-solid fa-arrow-up-right-from-square text-xs opacity-85 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform flex-shrink-0"></i>
+                                </a>
+
+                                <a
+                                    href={mapsLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-2xl text-stone-800 bg-white/95 hover:bg-emerald-50/70 border border-[#EED3AC] hover:border-emerald-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] group"
+                                >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/70 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                                            <i className="fa-solid fa-map-location-dot text-lg"></i>
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="font-extrabold text-sm sm:text-base leading-tight text-stone-800">Bản đồ Google Maps</p>
+                                            <p className="text-[11px] text-stone-500 truncate">Chỉ đường đến kho Cần Thơ</p>
+                                        </div>
+                                    </div>
+                                    <i className="fa-solid fa-arrow-up-right-from-square text-xs text-stone-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all flex-shrink-0"></i>
+                                </a>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <span className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0 shadow-sm"><i className="fa-solid fa-envelope text-xs"></i></span>
-                                <span>hungthuanfood@gmail.com</span>
-                            </div>
-                        </div>
-                        <div className="space-y-3.5">
-                            <a href={zaloLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg bg-[#0068FF] hover:bg-blue-700 transition-transform hover:scale-[1.02] shadow-md">
-                                <i className="fa-solid fa-comment-dots text-2xl"></i> Chat Zalo
-                            </a>
-                            <a href={fbLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg bg-[#1877F2] hover:bg-[#166FE5] transition-transform hover:scale-[1.02] shadow-md">
-                                <i className="fa-brands fa-facebook text-2xl"></i> Trang Facebook
-                            </a>
-                            <a href={mapsLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-gray-700 font-bold text-lg bg-white/85 backdrop-blur-sm border border-white/80 hover:bg-white transition-transform hover:scale-[1.02] shadow-md">
-                                <i className="fa-solid fa-map-location-dot text-green-600 text-2xl"></i> Bản đồ Google Maps
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -1015,7 +1459,7 @@ import './styles.css';
         };
 
 
-        const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags }) => {
+        const AdminProductModal = ({ isOpen, onClose, product, onSave, uniqueTags, products = [], onSwitchToEdit }) => {
             const [formData, setFormData] = useState({
                 name: '', slug: '', price: '', stock_status: 'Hàng sẵn kho', statusColor: 'green', image_url: '', description: '', tags: []
             });
@@ -1058,6 +1502,65 @@ import './styles.css';
                 }
                 setSelectedFile(null);
             }, [product, isOpen]);
+
+            // Bộ lọc thông minh phát hiện sản phẩm trùng / gần giống khi thêm hoặc sửa
+            const duplicateAnalysis = useMemo(() => {
+                if (!isOpen || !Array.isArray(products) || products.length === 0) {
+                    return { exactMatches: [], similarMatches: [] };
+                }
+
+                const currentNameSlug = generateSlug(formData.name || '');
+                const currentSlug = (formData.slug || '').trim().toLowerCase();
+                if (!currentNameSlug && !currentSlug) {
+                    return { exactMatches: [], similarMatches: [] };
+                }
+
+                const nameTokens = currentNameSlug.split('-').filter(t => t.length >= 2);
+                const exactMatches = [];
+                const similarCandidates = [];
+
+                for (const item of products) {
+                    if (product && item.id === product.id) continue;
+
+                    const itemNameSlug = generateSlug(item.name || '');
+                    const itemSlug = (item.slug || '').trim().toLowerCase();
+
+                    const isExactName = Boolean(currentNameSlug && itemNameSlug && currentNameSlug === itemNameSlug);
+                    const isExactSlug = Boolean(currentSlug && itemSlug && currentSlug === itemSlug);
+
+                    if (isExactName || isExactSlug) {
+                        exactMatches.push({
+                            ...item,
+                            matchReason: isExactName ? 'Trùng tên sản phẩm' : 'Trùng đường dẫn URL (slug)'
+                        });
+                        continue;
+                    }
+
+                    if (currentNameSlug.length < 4 || !itemNameSlug) continue;
+
+                    const itemTokens = itemNameSlug.split('-').filter(t => t.length >= 2);
+                    const overlapCount = nameTokens.filter(t => itemTokens.includes(t)).length;
+                    const minTokenLen = Math.min(nameTokens.length, itemTokens.length);
+                    const maxTokenLen = Math.max(nameTokens.length, itemTokens.length);
+
+                    let score = 0;
+                    if (itemNameSlug.includes(currentNameSlug) || (itemNameSlug.length >= 4 && currentNameSlug.includes(itemNameSlug))) {
+                        score = 0.9;
+                    } else if (nameTokens.length >= 2 && overlapCount >= Math.max(2, Math.ceil(minTokenLen * 0.65))) {
+                        score = maxTokenLen > 0 ? overlapCount / maxTokenLen : 0;
+                    }
+
+                    if (score > 0) {
+                        similarCandidates.push({ item, score });
+                    }
+                }
+
+                similarCandidates.sort((a, b) => b.score - a.score);
+                return {
+                    exactMatches,
+                    similarMatches: similarCandidates.slice(0, 5).map(entry => entry.item)
+                };
+            }, [isOpen, products, product, formData.name, formData.slug]);
 
             if (!isOpen) return null;
 
@@ -1173,6 +1676,23 @@ import './styles.css';
             const handleSubmit = async (e) => {
                 e.preventDefault();
                 if (uploading || isProcessing) return;
+
+                if (duplicateAnalysis.exactMatches.length > 0) {
+                    const matched = duplicateAnalysis.exactMatches[0];
+                    const cleanCurrentSlug = (formData.slug || '').trim().toLowerCase();
+                    const matchedSlug = (matched.slug || '').trim().toLowerCase();
+
+                    if (cleanCurrentSlug && matchedSlug && cleanCurrentSlug === matchedSlug) {
+                        alert(`Đường dẫn URL (slug) "${cleanCurrentSlug}" đã thuộc về sản phẩm "${matched.name}". Vui lòng chuyển sang sửa sản phẩm đó hoặc đổi tên/slug khác để tránh trùng lặp!`);
+                        return;
+                    }
+
+                    const proceed = window.confirm(
+                        `Phát hiện sản phẩm đã có trong kho:\n- "${matched.name}" (Giá: ${formatVND(matched.price)}${matched.is_hidden ? ', Đang ẩn' : ''})\n\nBạn có chắc vẫn muốn lưu thêm một sản phẩm trùng tên nữa không?`
+                    );
+                    if (!proceed) return;
+                }
+
                 setUploading(true);
                 let finalImageUrl = formData.image_url;
                 const previousImageUrl = product?.image_url;
@@ -1217,15 +1737,81 @@ import './styles.css';
                         <form id="admin-product-form" onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Tên sản phẩm *</label>
-                                <input required type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" value={formData.name} onChange={e => {
-                                    const newName = e.target.value;
-                                    setFormData(prev => {
-                                        if (!product || prev.slug === '') {
-                                            return { ...prev, name: newName, slug: generateSlug(newName) };
-                                        }
-                                        return { ...prev, name: newName };
-                                    });
-                                }} />
+                                <input
+                                    required
+                                    type="text"
+                                    className={`w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:border-transparent outline-none transition-all ${duplicateAnalysis.exactMatches.length > 0 ? 'border-red-400 bg-red-50/30 focus:ring-red-400' : 'border-gray-300 focus:ring-primary'}`}
+                                    value={formData.name}
+                                    onChange={e => {
+                                        const newName = e.target.value;
+                                        setFormData(prev => {
+                                            if (!product || prev.slug === '') {
+                                                return { ...prev, name: newName, slug: generateSlug(newName) };
+                                            }
+                                            return { ...prev, name: newName };
+                                        });
+                                    }}
+                                />
+                                {(duplicateAnalysis.exactMatches.length > 0 || duplicateAnalysis.similarMatches.length > 0) && (() => {
+                                    const isExact = duplicateAnalysis.exactMatches.length > 0;
+                                    const matchedList = isExact ? duplicateAnalysis.exactMatches : duplicateAnalysis.similarMatches;
+                                    return (
+                                        <div
+                                            role="status"
+                                            className={`mt-2.5 rounded-xl border p-3 space-y-2 ${isExact ? 'bg-red-50/90 border-red-300 text-red-900' : 'bg-amber-50/85 border-amber-200 text-amber-900'}`}
+                                        >
+                                            <div className="flex items-center justify-between gap-2 text-xs font-bold">
+                                                <span className="flex items-center gap-1.5">
+                                                    <i className={`fa-solid ${isExact ? 'fa-triangle-exclamation text-red-600' : 'fa-magnifying-glass text-amber-600'}`}></i>
+                                                    {isExact
+                                                        ? 'Sản phẩm này đã có trong kho! Tránh thêm trùng:'
+                                                        : `Có ${matchedList.length} sản phẩm tên gần giống đã tồn tại:`}
+                                                </span>
+                                            </div>
+                                            <div className="max-h-36 overflow-y-auto space-y-1.5 pr-0.5">
+                                                {matchedList.map(item => (
+                                                    <div key={item.id} className="flex items-center justify-between gap-2.5 bg-white/95 rounded-lg p-2 border border-stone-200/80 shadow-xs">
+                                                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                            <img
+                                                                src={item.image_url || FallbackImage}
+                                                                onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
+                                                                alt={item.name}
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                                className="w-9 h-9 rounded-md object-cover border border-stone-200 flex-shrink-0"
+                                                            />
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="text-xs font-bold text-stone-800 truncate" title={item.name}>{item.name}</p>
+                                                                <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-stone-500 mt-0.5">
+                                                                    <span className="font-bold text-red-600">{formatVND(item.price)}</span>
+                                                                    {item.matchReason && (
+                                                                        <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-semibold text-[10px]">
+                                                                            {item.matchReason}
+                                                                        </span>
+                                                                    )}
+                                                                    {item.is_hidden && (
+                                                                        <span className="px-1.5 py-0.5 rounded bg-stone-200 text-stone-700 font-semibold text-[10px]">
+                                                                            Đang ẩn
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {onSwitchToEdit && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => onSwitchToEdit(item)}
+                                                                className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold whitespace-nowrap flex-shrink-0 shadow-xs transition-colors cursor-pointer"
+                                                            >
+                                                                Chuyển sang sửa
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Slug (URL) *</label>
@@ -1419,16 +2005,32 @@ import './styles.css';
             );
         };
 
-        const TagsSlider = ({ uniqueTags, selectedTag, onTagToggle, isAdmin, onManageTags }) => {
+        const TagsSlider = ({ uniqueTags, selectedTags = [], onTagToggle, isAdmin, onManageTags }) => {
             const sliderRef = useRef(null);
+            const [canScrollLeft, setCanScrollLeft] = useState(false);
+            const [canScrollRight, setCanScrollRight] = useState(false);
+
+            const updateScrollEdges = () => {
+                const el = sliderRef.current;
+                if (!el || window.innerWidth < 768) {
+                    setCanScrollLeft(false);
+                    setCanScrollRight(false);
+                    return;
+                }
+                const maxScroll = el.scrollWidth - el.clientWidth;
+                setCanScrollLeft(el.scrollLeft > 4);
+                setCanScrollRight(maxScroll - el.scrollLeft > 4);
+            };
+
             const scrollLeft = () => {
-                if (sliderRef.current) sliderRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: -240, behavior: 'smooth' });
             };
             const scrollRight = () => {
-                if (sliderRef.current) sliderRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+                if (sliderRef.current) sliderRef.current.scrollBy({ left: 240, behavior: 'smooth' });
             };
 
             useEffect(() => {
+                updateScrollEdges();
                 const el = sliderRef.current;
                 if (!el) return;
                 const handleNativeWheel = (e) => {
@@ -1438,14 +2040,28 @@ import './styles.css';
                     }
                 };
                 el.addEventListener('wheel', handleNativeWheel, { passive: false });
-                return () => el.removeEventListener('wheel', handleNativeWheel);
-            }, []);
+                el.addEventListener('scroll', updateScrollEdges, { passive: true });
+                window.addEventListener('resize', updateScrollEdges, { passive: true });
+                return () => {
+                    el.removeEventListener('wheel', handleNativeWheel);
+                    el.removeEventListener('scroll', updateScrollEdges);
+                    window.removeEventListener('resize', updateScrollEdges);
+                };
+            }, [uniqueTags]);
 
             const handleWheel = (e) => {
                 if (window.innerWidth >= 768 && e.deltaY !== 0 && sliderRef.current && !e.defaultPrevented) {
                     sliderRef.current.scrollLeft += e.deltaY;
                 }
             };
+
+            const maskGradient = canScrollLeft && canScrollRight
+                ? 'linear-gradient(to right, transparent 0%, black 22px, black calc(100% - 22px), transparent 100%)'
+                : canScrollLeft
+                    ? 'linear-gradient(to right, transparent 0%, black 22px, black 100%)'
+                    : canScrollRight
+                        ? 'linear-gradient(to right, black 0%, black calc(100% - 22px), transparent 100%)'
+                        : undefined;
 
             return (
                 <div className="w-full max-w-full">
@@ -1459,47 +2075,85 @@ import './styles.css';
                             scrollbar-width: none;
                         }
                     `}</style>
-                    <h3 className="text-xl md:text-2xl font-bold text-center text-primary mb-3 uppercase tracking-wide drop-shadow-sm">DANH MỤC SẢN PHẨM</h3>
-                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-white/75 backdrop-blur-md border border-red-100/80 shadow-sm w-full max-w-full overflow-hidden md:flex md:items-center md:gap-2 box-border">
+                    <div className="flex items-center justify-center gap-2.5 sm:gap-4 mb-3.5 px-2">
+                        <div className="flex items-center flex-1 max-w-[52px] sm:max-w-[190px]">
+                            <span className="h-[1.5px] flex-1 bg-gradient-to-r from-transparent via-red-600/75 to-red-600"></span>
+                            <svg
+                                aria-hidden="true"
+                                viewBox="0 0 18 12"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinejoin="round"
+                                className="w-[16px] h-[11px] -ml-px flex-shrink-0 text-red-600"
+                            >
+                                <path d="M0.8 6 L9 1.6 L16.6 6 L9 10.4 Z" />
+                            </svg>
+                        </div>
+                        <h3 className="inline-flex items-center justify-center gap-2 text-base sm:text-xl md:text-2xl font-extrabold text-center text-red-700 uppercase tracking-wide drop-shadow-xs whitespace-nowrap">
+                            <BlossomIcon className="w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 drop-shadow-sm" petalColor="#DC2626" centerColor="#FFFFFF" />
+                            <span>DANH MỤC SẢN PHẨM</span>
+                        </h3>
+                        <div className="flex items-center flex-1 max-w-[52px] sm:max-w-[190px]">
+                            <svg
+                                aria-hidden="true"
+                                viewBox="0 0 18 12"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinejoin="round"
+                                className="w-[16px] h-[11px] -mr-px flex-shrink-0 text-red-600 -scale-x-100"
+                            >
+                                <path d="M0.8 6 L9 1.6 L16.6 6 L9 10.4 Z" />
+                            </svg>
+                            <span className="h-[1.5px] flex-1 bg-gradient-to-l from-transparent via-red-600/75 to-red-600"></span>
+                        </div>
+                    </div>
+                    <div className="relative rounded-2xl md:rounded-full p-2.5 md:p-1.5 bg-gradient-to-b from-white/95 to-[#FFF7EC]/90 backdrop-blur-md border border-[#EED3AC] shadow-[0_6px_22px_rgba(185,28,28,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] w-full max-w-full overflow-hidden md:flex md:items-center md:gap-1.5 box-border">
                         <button
                             type="button"
                             onClick={scrollLeft}
+                            disabled={!canScrollLeft}
                             aria-label="Cuộn sang trái"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className={`hidden md:flex flex-shrink-0 w-9 h-9 rounded-full items-center justify-center border transition-all duration-200 z-10 ${canScrollLeft ? 'bg-white text-stone-700 border-[#EED3AC]/90 shadow-[0_3px_10px_rgba(185,28,28,0.1)] hover:bg-red-600 hover:text-white hover:border-red-600 hover:shadow-[0_6px_14px_rgba(220,38,38,0.28)] active:scale-90 cursor-pointer' : 'bg-white/50 text-stone-300 border-stone-200/60 cursor-default'}`}
                         >
-                            &lt;
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m15 18-6-6 6-6"/></svg>
                         </button>
 
                         <div
                             ref={sliderRef}
                             onWheel={handleWheel}
-                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto no-scrollbar md:scroll-smooth md:px-0.5 md:snap-x md:snap-mandatory"
+                            style={maskGradient ? { maskImage: maskGradient, WebkitMaskImage: maskGradient } : undefined}
+                            className="grid grid-cols-2 gap-2 w-full md:flex md:flex-1 md:min-w-0 md:flex-nowrap md:items-center md:justify-start md:overflow-x-auto no-scrollbar md:scroll-smooth md:py-0.5 md:px-1 md:snap-x md:snap-mandatory"
                         >
                             {isAdmin && (
                                 <button
+                                    type="button"
                                     onClick={onManageTags}
-                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer mb-1 md:mb-0"
+                                    className="col-span-2 md:col-span-1 w-full md:w-auto md:flex-shrink-0 md:snap-start whitespace-nowrap flex items-center justify-center text-center font-semibold border rounded-xl md:rounded-full transition-all duration-200 px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-100/90 text-yellow-800 border-yellow-300 hover:bg-yellow-200 backdrop-blur-sm cursor-pointer mb-1 md:mb-0"
                                 >
                                     <i className="fa-solid fa-gear mr-1"></i> Quản lý
                                 </button>
                             )}
                             <button
+                                type="button"
                                 onClick={() => onTagToggle('')}
                                 title="Tất cả sản phẩm"
-                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${selectedTag === '' ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
-                                style={selectedTag === '' ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
+                                className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all duration-300 ease-out active:scale-95 cursor-pointer ${selectedTags.length === 0 ? 'text-white bg-red-600 shadow-[0_4px_14px_rgba(220,38,38,0.32)] border border-red-400/40' : 'bg-white/95 hover:bg-red-50/90 text-stone-700 hover:text-red-700 border border-stone-200/80 hover:border-red-200 shadow-xs hover:-translate-y-0.5'}`}
+                                style={selectedTags.length === 0 ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%)' } : undefined}
                             >
                                 Tất cả sản phẩm
                             </button>
                             {uniqueTags.map(tag => {
-                                const isActive = selectedTag === tag;
+                                const isActive = selectedTags.includes(tag);
                                 return (
                                     <button
                                         key={tag}
+                                        type="button"
                                         onClick={() => onTagToggle(tag)}
                                         title={tag}
-                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-md border border-red-400/40' : 'bg-white/85 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200/80'}`}
-                                        style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
+                                        className={`w-full md:w-auto md:flex-shrink-0 md:snap-start truncate flex items-center justify-center text-center px-3 py-2.5 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-xl md:rounded-full font-semibold transition-all duration-300 ease-out active:scale-95 cursor-pointer ${isActive ? 'text-white bg-red-600 shadow-[0_4px_14px_rgba(220,38,38,0.32)] border border-red-400/40' : 'bg-white/95 hover:bg-red-50/90 text-stone-700 hover:text-red-700 border border-stone-200/80 hover:border-red-200 shadow-xs hover:-translate-y-0.5'}`}
+                                        style={isActive ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%)' } : undefined}
                                     >
                                         {tag}
                                     </button>
@@ -1510,10 +2164,11 @@ import './styles.css';
                         <button
                             type="button"
                             onClick={scrollRight}
+                            disabled={!canScrollRight}
                             aria-label="Cuộn sang phải"
-                            className="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full items-center justify-center bg-white/90 hover:bg-red-50 text-stone-600 hover:text-red-600 shadow-sm border border-stone-200/60 transition-all cursor-pointer z-10"
+                            className={`hidden md:flex flex-shrink-0 w-9 h-9 rounded-full items-center justify-center border transition-all duration-200 z-10 ${canScrollRight ? 'bg-white text-stone-700 border-[#EED3AC]/90 shadow-[0_3px_10px_rgba(185,28,28,0.1)] hover:bg-red-600 hover:text-white hover:border-red-600 hover:shadow-[0_6px_14px_rgba(220,38,38,0.28)] active:scale-90 cursor-pointer' : 'bg-white/50 text-stone-300 border-stone-200/60 cursor-default'}`}
                         >
-                            &gt;
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
                     </div>
                 </div>
@@ -1604,36 +2259,6 @@ import './styles.css';
             );
         };
 
-        const KoreanWaveDivider = ({ label = '추천 상품', title }) => (
-            <div className="w-full my-6 sm:my-8">
-                <div className="relative flex items-center justify-center mb-4">
-                    <svg className="w-full h-6 text-red-200/80" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true">
-                        <path
-                            d="M0,20 C150,4 300,36 450,20 C600,4 750,36 900,20 C1050,4 1140,28 1200,20"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                        />
-                        <path
-                            d="M0,25 C180,38 340,8 520,24 C700,38 880,8 1060,24 C1130,30 1170,26 1200,22"
-                            fill="none"
-                            stroke="rgba(251, 146, 60, 0.35)"
-                            strokeWidth="1.25"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                    <div className="absolute inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#FAF0E6]/95 border border-red-200/80 shadow-sm">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-600 text-white text-[10px]">
-                            <i className="fa-solid fa-fan"></i>
-                        </span>
-                        {title && <span className="text-xs sm:text-sm font-extrabold text-red-700 uppercase tracking-wider">{title}</span>}
-                        {label && <span className="hidden sm:inline text-[11px] font-semibold text-rose-500 tracking-wide">{label}</span>}
-                    </div>
-                </div>
-            </div>
-        );
-
         const ProductDetail = ({ onAddToCart, onContactClick, products = [], parentLoading = false, settings = null }) => {
             const { slug } = useParams();
             const [product, setProduct] = useState(null);
@@ -1643,11 +2268,61 @@ import './styles.css';
             const [quantity, setQuantity] = useState(1);
             const navigate = useNavigate();
             const detailTopRef = useRef(null);
+            const relatedRowRef = useRef(null);
+            const [relatedScrollState, setRelatedScrollState] = useState({ left: false, right: false });
+
+            const updateRelatedScroll = () => {
+                const el = relatedRowRef.current;
+                if (!el) return;
+                setRelatedScrollState({
+                    left: el.scrollLeft > 4,
+                    right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+                });
+            };
+
+            const scrollRelatedBy = (dir) => {
+                const el = relatedRowRef.current;
+                if (!el) return;
+                const amount = Math.max(el.clientWidth * 0.65, 220);
+                el.scrollBy({ left: dir * amount, behavior: 'smooth' });
+            };
 
             useEffect(() => {
                 setShowFullDetails(false);
                 setQuantity(1);
+                if (relatedRowRef.current) relatedRowRef.current.scrollLeft = 0;
             }, [product?.id, slug]);
+
+            useEffect(() => {
+                const timer = setTimeout(updateRelatedScroll, 60);
+                window.addEventListener('resize', updateRelatedScroll);
+
+                const el = relatedRowRef.current;
+                const handleWheel = (e) => {
+                    if (!el || el.scrollWidth <= el.clientWidth + 1) return;
+                    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || e.deltaY === 0) return;
+
+                    const canScrollLeft = el.scrollLeft > 1;
+                    const canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+                    if ((e.deltaY < 0 && canScrollLeft) || (e.deltaY > 0 && canScrollRight)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        el.scrollLeft += e.deltaY;
+                    }
+                };
+
+                if (el) {
+                    el.addEventListener('wheel', handleWheel, { passive: false });
+                }
+
+                return () => {
+                    clearTimeout(timer);
+                    window.removeEventListener('resize', updateRelatedScroll);
+                    if (el) {
+                        el.removeEventListener('wheel', handleWheel);
+                    }
+                };
+            }, [relatedProducts]);
 
             const handleBack = () => {
                 if (window.history.length > 2) {
@@ -1688,7 +2363,7 @@ import './styles.css';
                         }
                         return false;
                     });
-                    return (sameCategory.length > 0 ? sameCategory : visibleList).slice(0, 5);
+                    return (sameCategory.length > 0 ? sameCategory : visibleList).slice(0, 16);
                 };
 
                 const findInList = (list) => {
@@ -1823,94 +2498,72 @@ import './styles.css';
 
             return (
                 <div ref={detailTopRef} className="w-full pb-12 animate-fade-in">
-                    {/* Thẻ chi tiết sản phẩm phong cách gợn sóng lụa Hàn Quốc */}
-                    <div className="relative bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_16px_45px_rgba(185,28,28,0.08)] border border-red-100 overflow-hidden mb-6">
-                        {/* Top Korean Silk Wave Accent */}
-                        <div className="pointer-events-none absolute top-0 left-0 right-0 h-14 sm:h-16 overflow-hidden select-none z-0">
-                            <svg className="w-full h-full" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
-                                <path d="M0,0 L1200,0 L1200,42 C980,82 720,12 480,54 C260,92 120,28 0,48 Z" fill="rgba(220, 38, 38, 0.08)" />
-                                <path d="M0,0 L1200,0 L1200,26 C920,66 660,4 380,44 C200,68 90,22 0,32 Z" fill="rgba(251, 146, 60, 0.09)" />
-                            </svg>
-                        </div>
-
-                        {/* Bottom Korean Silk Wave Accent */}
-                        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 sm:h-12 overflow-hidden select-none z-0">
-                            <svg className="w-full h-full" viewBox="0 0 1200 70" preserveAspectRatio="none" aria-hidden="true">
-                                <path d="M0,70 L1200,70 L1200,24 C950,62 700,6 450,42 C240,70 110,20 0,36 Z" fill="rgba(254, 226, 226, 0.45)" />
-                                <path d="M0,70 L1200,70 L1200,42 C960,18 680,68 400,32 C220,10 100,48 0,40 Z" fill="rgba(255, 237, 213, 0.4)" />
-                            </svg>
-                        </div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row p-5 sm:p-7 md:p-10 gap-6 lg:gap-10">
-                            {/* Cột trái: Khung ảnh K-Food sứ ấm + gợn sóng */}
-                            <div className="w-full md:w-1/2 flex flex-col">
-                                <div className="relative flex-1 flex items-center justify-center p-5 sm:p-8 rounded-2xl border border-red-100/80 bg-gradient-to-br from-[#FFF9F2] via-[#FFF2EA] to-rose-50/75 shadow-inner overflow-hidden">
-                                    {/* Subtle inner corner wave watermark */}
-                                    <svg className="pointer-events-none absolute -bottom-1 right-0 w-48 h-24 text-red-200/45 select-none" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
-                                        <path d="M0,120 L300,120 L300,20 C230,78 150,24 85,78 C45,112 20,98 0,120 Z" fill="currentColor" />
-                                    </svg>
-                                    <span className="absolute top-3.5 left-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-red-200/80 text-[11px] font-extrabold text-red-700 shadow-sm tracking-wide">
-                                        <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                                        한식 • K-FOOD
-                                    </span>
+                    {/* Khung chi tiết sản phẩm: nền gợn sóng trắng toàn khung đi kèm lớp glass mờ, bọc gợn sóng đỏ bên khung ảnh */}
+                    <div
+                        className="relative overflow-hidden rounded-[28px] border border-white/90 shadow-[0_12px_36px_rgba(185,28,28,0.08),inset_0_1px_1px_rgba(255,255,255,0.95)] flex flex-col md:flex-row p-3.5 sm:p-5 md:p-7 gap-6 lg:gap-8 mb-8"
+                        style={SEIGAIHA_WHITE_BG_STYLE}
+                    >
+                        <div className="pointer-events-none absolute inset-0 bg-white/40 backdrop-blur-[1.5px]"></div>
+                        {/* Cột trái: Khung gợn sóng bọc khung ảnh sản phẩm bên trong */}
+                        <div className="relative z-10 w-full md:w-1/2 flex flex-col">
+                            <div
+                                className="relative flex flex-col rounded-[22px] p-2 sm:p-2.5 border border-[#E6C27E]/95 shadow-[0_10px_28px_rgba(139,21,21,0.14)] overflow-hidden"
+                                style={SEIGAIHA_CRIMSON_STYLE}
+                            >
+                                <div className="relative z-10 w-full aspect-square flex items-center justify-center rounded-[14px] border border-[#E6C27E]/85 bg-white shadow-inner overflow-hidden">
                                     <img
                                         src={product.image_url || FallbackImage}
                                         onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
                                         alt={product.name}
                                         loading="lazy"
                                         decoding="async"
-                                        className="relative z-10 w-full max-h-[440px] object-contain drop-shadow-[0_12px_24px_rgba(127,29,29,0.12)] rounded-xl transition-transform duration-500 hover:scale-[1.03]"
+                                        className="w-full h-full object-contain rounded-xl transition-transform duration-500 hover:scale-[1.03]"
                                     />
                                 </div>
-
-                                {productTags.length > 0 && (
-                                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                                        <span className="text-xs font-semibold text-stone-500 mr-1">Danh mục:</span>
-                                        {productTags.map(tag => (
-                                            <button
-                                                key={tag}
-                                                type="button"
-                                                onClick={() => navigate(`/san-pham?tag=${encodeURIComponent(tag)}`)}
-                                                className="px-2.5 py-1 rounded-full bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/70 text-xs font-semibold transition-colors cursor-pointer"
-                                            >
-                                                #{tag}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
-                            {/* Cột phải: Thông tin + Card giá gợn sóng + Cam kết Tokcay + Giỏ hàng */}
-                            <div className="w-full md:w-1/2 flex flex-col">
+                            {productTags.length > 0 && (
+                                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                                    <span className="text-xs font-semibold text-stone-600 mr-1">Danh mục:</span>
+                                    {productTags.map(tag => (
+                                        <button
+                                            key={tag}
+                                            type="button"
+                                            onClick={() => navigate(`/san-pham?tag=${encodeURIComponent(tag)}`)}
+                                            className="px-2.5 py-1 rounded-full bg-white/75 hover:bg-red-50 text-red-700 border border-red-200/70 text-xs font-semibold backdrop-blur-xs transition-colors cursor-pointer"
+                                        >
+                                            #{tag}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Cột phải: Thông tin & mô tả sản phẩm đặt trực tiếp trên nền gợn sóng trắng + glass */}
+                        <div className="relative z-10 w-full md:w-1/2 flex flex-col">
                                 <div className="flex flex-wrap items-center gap-2.5 mb-4">
-                                    <button onClick={handleBack} className="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-gray-700 border border-red-100 rounded-full shadow-sm hover:bg-red-50 hover:text-red-700 text-xs sm:text-sm font-semibold transition-all active:scale-95 w-max cursor-pointer">
+                                    <button onClick={handleBack} className="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-gray-700 border border-stone-200 rounded-full shadow-sm hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-xs sm:text-sm font-semibold transition-all active:scale-95 w-max cursor-pointer">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Quay lại
                                     </button>
-                                    <button onClick={handleShare} className="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-gray-700 border border-red-100 rounded-full shadow-sm hover:bg-red-50 hover:text-red-700 text-xs sm:text-sm font-semibold transition-all active:scale-95 w-max cursor-pointer">
+                                    <button onClick={handleShare} className="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-gray-700 border border-stone-200 rounded-full shadow-sm hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-xs sm:text-sm font-semibold transition-all active:scale-95 w-max cursor-pointer">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" /></svg> Chia sẻ
                                     </button>
-                                    <Link to="/san-pham" className="ml-auto inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-50/80 hover:bg-red-100 text-red-700 border border-red-200/70 rounded-full text-xs sm:text-sm font-semibold transition-all">
-                                        <i className="fa-solid fa-table-cells-large text-xs"></i> Tất cả sản phẩm
-                                    </Link>
                                 </div>
 
                                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-stone-900 mb-4 leading-tight tracking-tight">{product.name}</h1>
 
-                                {/* Giá bán lẻ & Giá sỉ phong cách gợn sóng Hàn */}
-                                <div className="relative rounded-2xl border border-red-200/70 bg-gradient-to-r from-red-50/90 via-rose-50/75 to-amber-50/60 px-4 py-3.5 mb-5 overflow-hidden shadow-sm">
-                                    <svg className="pointer-events-none absolute right-0 bottom-0 w-36 h-12 text-red-200/40" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
-                                        <path d="M0,60 L200,60 L200,15 C140,48 80,10 0,48 Z" fill="currentColor" />
-                                    </svg>
-                                    <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
+                                {/* Giá bán lẻ & Giá sỉ sạch sẽ */}
+                                <div className="rounded-2xl border border-[#E6D2B5]/90 bg-white/75 backdrop-blur-sm px-4 py-3.5 mb-5 shadow-xs">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
                                         <div>
-                                            <span className="block text-[11px] font-bold uppercase tracking-wider text-rose-600 mb-0.5">Giá bán lẻ</span>
+                                            <span className="block text-[11px] font-bold uppercase tracking-wider text-red-600/90 mb-0.5">Giá bán lẻ</span>
                                             <p className="text-3xl sm:text-4xl font-black text-red-600 leading-none">{formatVND(product.price)}</p>
                                         </div>
                                         <a
                                             href={zaloWholesaleLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/90 hover:bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold shadow-sm transition-all"
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold shadow-xs transition-all"
                                         >
                                             <i className="fa-solid fa-comments"></i>
                                             Giá sỉ / thùng: Liên hệ Zalo
@@ -1923,7 +2576,7 @@ import './styles.css';
                                     <button
                                         type="button"
                                         onClick={() => setShowFullDetails(prev => !prev)}
-                                        className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-red-50/80 border border-red-200/80 text-red-700 font-semibold text-sm flex items-center justify-between shadow-sm transition-all duration-200 cursor-pointer select-none"
+                                        className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-red-50/70 border border-red-200/80 text-red-700 font-semibold text-sm flex items-center justify-between shadow-xs transition-all duration-200 cursor-pointer select-none"
                                     >
                                         <span className="flex items-center gap-2">
                                             <i className="fa-solid fa-circle-info text-red-500"></i>
@@ -1933,7 +2586,7 @@ import './styles.css';
                                     </button>
 
                                     {showFullDetails && (
-                                        <div className="mt-2.5 p-4 rounded-xl bg-[#FFFBF7] border border-red-100 text-stone-700 text-sm leading-relaxed shadow-inner transition-all duration-300 animate-fadeIn">
+                                        <div className="mt-2.5 p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-[#E6D2B5]/90 text-stone-700 text-sm leading-relaxed shadow-inner transition-all duration-300 animate-fadeIn">
                                             {product.description ? (
                                                 <div className="whitespace-pre-line leading-relaxed text-gray-700">{product.description}</div>
                                             ) : (
@@ -1943,9 +2596,9 @@ import './styles.css';
                                     )}
                                 </div>
 
-                                {/* Khối cam kết K-Food giúp cân đối khoảng trống & tăng uy tín */}
+                                {/* Khối cam kết Tokcay */}
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-6">
-                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-[#FFFDFB] border border-red-100/80 shadow-xs">
+                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-white/70 backdrop-blur-sm border border-[#E6D2B5]/85 shadow-xs">
                                         <span className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-sm flex-shrink-0">
                                             <i className="fa-solid fa-award"></i>
                                         </span>
@@ -1954,7 +2607,7 @@ import './styles.css';
                                             <p className="text-[11px] text-stone-500">Nguồn hàng chính hãng</p>
                                         </div>
                                     </div>
-                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-[#FFFDFB] border border-red-100/80 shadow-xs">
+                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-white/70 backdrop-blur-sm border border-[#E6D2B5]/85 shadow-xs">
                                         <span className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-sm flex-shrink-0">
                                             <i className="fa-solid fa-snowflake"></i>
                                         </span>
@@ -1963,7 +2616,7 @@ import './styles.css';
                                             <p className="text-[11px] text-stone-500">Giao hàng nhanh chóng</p>
                                         </div>
                                     </div>
-                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-[#FFFDFB] border border-red-100/80 shadow-xs">
+                                    <div className="flex sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1 p-3 rounded-2xl bg-white/70 backdrop-blur-sm border border-[#E6D2B5]/85 shadow-xs">
                                         <span className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm flex-shrink-0">
                                             <i className="fa-solid fa-boxes-stacked"></i>
                                         </span>
@@ -1975,7 +2628,7 @@ import './styles.css';
                                 </div>
 
                                 {/* Tình trạng + Số lượng + Nút thêm vào giỏ */}
-                                <div className="mt-auto pt-5 border-t border-red-100/80">
+                                <div className="mt-auto pt-5 border-t border-stone-100">
                                     <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                                         <div className="flex items-center gap-2.5">
                                             <span className="text-sm sm:text-base text-gray-600 font-medium">Tình trạng:</span>
@@ -1996,7 +2649,7 @@ import './styles.css';
 
                                     <div className="flex items-stretch gap-2.5 sm:gap-3">
                                         {!isOutOfStock && (
-                                            <div className="inline-flex items-center rounded-xl border border-red-200 bg-white shadow-sm overflow-hidden flex-shrink-0">
+                                            <div className="inline-flex items-center rounded-xl border border-stone-200 bg-white shadow-xs overflow-hidden flex-shrink-0">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
@@ -2027,68 +2680,117 @@ import './styles.css';
                                         </button>
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
 
-                    {/* SẢN PHẨM CÙNG DANH MỤC VỚI ĐƯỜNG GỢN SÓNG HÀN QUỐC */}
+                    {/* SẢN PHẨM CÙNG DANH MỤC - dải ngang toàn chiều rộng, thẻ nhỏ gọn & cuộn mượt */}
                     {relatedProducts.length > 0 && (
-                        <div className="mt-4">
-                            <KoreanWaveDivider title="Sản phẩm cùng danh mục" label="추천 상품" />
-                            <div className="flex items-center justify-between mb-3 px-1">
-                                <span className="text-xs text-stone-500 font-medium">Gợi ý thêm các món cùng nhóm hàng</span>
-                                <Link to="/san-pham" className="text-xs sm:text-sm font-bold text-red-600 hover:text-red-700 inline-flex items-center gap-1">
-                                    Xem tất cả <i className="fa-solid fa-arrow-right text-[11px]"></i>
-                                </Link>
-                            </div>
+                        <div className="relative mt-6 w-full rounded-2xl bg-[#FAF0E6]/70 backdrop-blur-xl border border-[#E5D3BE]/90 shadow-[0_6px_22px_rgba(185,28,28,0.05),inset_0_1px_1px_rgba(255,255,255,0.75)] pt-5 sm:pt-6 pb-2.5 sm:pb-3 px-2.5 sm:px-4">
                             <div
-                                onWheel={(e) => { if (e.deltaY !== 0) { e.currentTarget.scrollLeft += e.deltaY; } }}
-                                className="flex flex-nowrap items-stretch gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-2 scroll-smooth"
+                                className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-0.5 rounded-full text-white font-extrabold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md border border-[#F3D5A5]/70 whitespace-nowrap z-10"
+                                style={{ background: 'linear-gradient(90deg, #b91c1c 0%, #dc2626 50%, #b91c1c 100%)' }}
                             >
-                                {relatedProducts.map(relProduct => {
-                                    const relOutOfStock = relProduct.stock_status && relProduct.stock_status.toLowerCase() === 'hết hàng';
-                                    const handleSelectRelated = () => {
-                                        navigate(`/san-pham/${relProduct.slug || relProduct.id}`);
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    };
-                                    return (
-                                        <div
-                                            key={relProduct.id}
-                                            onClick={handleSelectRelated}
-                                            className="flex-shrink-0 w-32 sm:w-36 md:w-40 p-2 rounded-2xl bg-gradient-to-br from-white/90 via-red-50/40 to-rose-100/35 backdrop-blur-md border border-red-200/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
-                                        >
-                                            <div>
-                                                <img
-                                                    src={relProduct.image_url || FallbackImage}
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
-                                                    alt={relProduct.name}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    className="w-full h-20 sm:h-24 object-contain rounded-xl bg-white p-1 mb-1.5 border border-red-100/50"
-                                                />
-                                                <h5 className="text-[11px] sm:text-xs font-semibold text-stone-800 line-clamp-2 leading-tight mb-1" title={relProduct.name}>
-                                                    {relProduct.name}
-                                                </h5>
+                                <BlossomIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" petalColor="#FFFFFF" centerColor="#FDE047" />
+                                <span>SẢN PHẨM CÙNG DANH MỤC</span>
+                            </div>
+
+                            <div className="relative group/slider">
+                                {relatedScrollState.left && (
+                                    <button
+                                        type="button"
+                                        onClick={() => scrollRelatedBy(-1)}
+                                        aria-label="Cuộn sang trái"
+                                        className="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white/90 hover:bg-white text-red-600 border border-red-200/80 shadow-md absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 transition-all hover:scale-105 cursor-pointer"
+                                    >
+                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+                                    </button>
+                                )}
+
+                                <div
+                                    ref={relatedRowRef}
+                                    onScroll={updateRelatedScroll}
+                                    className="flex flex-nowrap items-stretch gap-2 sm:gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x no-scrollbar py-1.5 px-0.5"
+                                    style={{
+                                        WebkitMaskImage: relatedScrollState.left && relatedScrollState.right
+                                            ? 'linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%)'
+                                            : relatedScrollState.right
+                                            ? 'linear-gradient(to right, black 0%, black calc(100% - 20px), transparent 100%)'
+                                            : relatedScrollState.left
+                                            ? 'linear-gradient(to right, transparent 0%, black 20px, black 100%)'
+                                            : 'none',
+                                        maskImage: relatedScrollState.left && relatedScrollState.right
+                                            ? 'linear-gradient(to right, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%)'
+                                            : relatedScrollState.right
+                                            ? 'linear-gradient(to right, black 0%, black calc(100% - 20px), transparent 100%)'
+                                            : relatedScrollState.left
+                                            ? 'linear-gradient(to right, transparent 0%, black 20px, black 100%)'
+                                            : 'none',
+                                    }}
+                                >
+                                    {relatedProducts.map(relProduct => {
+                                        const relOutOfStock = relProduct.stock_status && relProduct.stock_status.toLowerCase() === 'hết hàng';
+                                        const handleSelectRelated = () => {
+                                            navigate(`/san-pham/${relProduct.slug || relProduct.id}`);
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        };
+                                        return (
+                                            <div
+                                                key={relProduct.id}
+                                                onClick={handleSelectRelated}
+                                                className="group flex-shrink-0 w-[116px] sm:w-[126px] md:w-[132px] p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-white/80 via-red-50/40 to-rose-100/35 hover:from-white/90 hover:via-red-50/55 hover:to-rose-100/50 backdrop-blur-sm border border-red-200/55 shadow-[0_4px_14px_rgba(185,28,28,0.05)] hover:shadow-[0_10px_22px_rgba(185,28,28,0.12)] hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                                            >
+                                                <div>
+                                                    <div className="aspect-square overflow-hidden rounded-lg bg-white/90 p-1.5 mb-1 border border-red-100/60 flex items-center justify-center">
+                                                        <img
+                                                            src={relProduct.image_url || FallbackImage}
+                                                            onError={(e) => { e.target.onerror = null; e.target.src = FallbackImage; }}
+                                                            alt={relProduct.name}
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                                                        />
+                                                    </div>
+                                                    <h5 className="text-[11px] font-semibold text-stone-800 line-clamp-2 leading-tight mb-0.5 min-h-[1.75rem] group-hover:text-primary transition-colors" title={relProduct.name}>
+                                                        {relProduct.name}
+                                                    </h5>
+                                                </div>
+                                                <div className="mt-auto pt-0.5">
+                                                    <p className="text-xs font-extrabold text-red-600 mb-1">
+                                                        {formatVND(relProduct.price)}
+                                                    </p>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onAddToCart(relProduct);
+                                                        }}
+                                                        disabled={relOutOfStock}
+                                                        className="w-full py-0.5 sm:py-1 px-2 rounded-full text-[10px] sm:text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_3px_10px_rgba(185,28,28,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_5px_14px_rgba(185,28,28,0.38)] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                                        style={!relOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
+                                                    >
+                                                        {!relOutOfStock ? 'Thêm vào giỏ' : 'Hết hàng'}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="mt-auto">
-                                                <p className="text-xs font-bold text-red-600 mb-1.5">
-                                                    {formatVND(relProduct.price)}
-                                                </p>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onAddToCart(relProduct);
-                                                    }}
-                                                    disabled={relOutOfStock}
-                                                    className="w-full py-1 px-2 rounded-lg text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                                                    style={!relOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
-                                                >
-                                                    {!relOutOfStock ? 'Thêm vào giỏ' : 'Hết hàng'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
+
+                                {relatedScrollState.right && (
+                                    <button
+                                        type="button"
+                                        onClick={() => scrollRelatedBy(1)}
+                                        aria-label="Cuộn sang phải"
+                                        className="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white/90 hover:bg-white text-red-600 border border-red-200/80 shadow-md absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 transition-all hover:scale-105 cursor-pointer"
+                                    >
+                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="flex justify-center mt-1.5">
+                                <Link to="/san-pham" className="text-[10px] sm:text-[11px] font-bold text-red-600 hover:text-red-700 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/60 hover:bg-white/90 border border-red-200/60 transition-all">
+                                    Xem tất cả sản phẩm <i className="fa-solid fa-arrow-right text-[9px]"></i>
+                                </Link>
                             </div>
                         </div>
                     )}
@@ -2127,6 +2829,144 @@ import './styles.css';
             return null;
         };
 
+        const AdminLoginForm = ({ onSubmit }) => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [showPassword, setShowPassword] = useState(false);
+            const passwordInputRef = useRef(null);
+
+            const trimmedEmail = email.trim();
+            const suggestedGmail = (() => {
+                if (!trimmedEmail || /\s/.test(trimmedEmail)) return '';
+                if (!trimmedEmail.includes('@')) return `${trimmedEmail}@gmail.com`;
+                const atIdx = trimmedEmail.indexOf('@');
+                const localPart = trimmedEmail.slice(0, atIdx);
+                const domainPart = trimmedEmail.slice(atIdx + 1).toLowerCase();
+                if (localPart && domainPart !== 'gmail.com' && 'gmail.com'.startsWith(domainPart)) {
+                    return `${localPart}@gmail.com`;
+                }
+                return '';
+            })();
+
+            const applyGmailSuggestion = (moveFocusToPassword = false) => {
+                if (suggestedGmail) {
+                    setEmail(suggestedGmail);
+                }
+                if (moveFocusToPassword && passwordInputRef.current) {
+                    passwordInputRef.current.focus();
+                }
+            };
+
+            const handleEmailBlur = () => {
+                if (trimmedEmail && !/\s/.test(trimmedEmail) && !trimmedEmail.includes('@')) {
+                    setEmail(`${trimmedEmail}@gmail.com`);
+                }
+            };
+
+            const handleEmailKeyDown = (e) => {
+                if (!suggestedGmail) return;
+                if (e.key === 'Tab' && !e.shiftKey) {
+                    setEmail(suggestedGmail);
+                } else if (e.key === 'ArrowRight' && e.target.selectionStart === email.length) {
+                    e.preventDefault();
+                    setEmail(suggestedGmail);
+                }
+            };
+
+            return (
+                <form
+                    onSubmit={(e) => {
+                        const normalized = (trimmedEmail && !/\s/.test(trimmedEmail) && !trimmedEmail.includes('@'))
+                            ? `${trimmedEmail}@gmail.com`
+                            : trimmedEmail;
+                        if (normalized !== email) {
+                            setEmail(normalized);
+                            if (e.target?.email) e.target.email.value = normalized;
+                        }
+                        onSubmit(e);
+                    }}
+                    className="w-full max-w-sm mt-4 flex flex-col gap-3.5 text-left"
+                >
+                    <div>
+                        <label htmlFor="admin-email-input" className="block text-xs font-bold text-stone-600 mb-1.5 ml-1">
+                            Email Admin
+                        </label>
+                        <div className="relative">
+                            <input
+                                id="admin-email-input"
+                                name="email"
+                                type="text"
+                                inputMode="email"
+                                placeholder="Nhập tên email (tự điền @gmail.com)"
+                                required
+                                autoComplete="username webauthn"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onBlur={handleEmailBlur}
+                                onKeyDown={handleEmailKeyDown}
+                                className={`w-full pl-4 ${suggestedGmail ? 'pr-28' : 'pr-4'} py-3 rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent text-sm transition-all`}
+                            />
+                            {suggestedGmail && (
+                                <button
+                                    type="button"
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        applyGmailSuggestion(true);
+                                    }}
+                                    title={`Điền nhanh ${suggestedGmail}`}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/80 text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap"
+                                >
+                                    +@gmail.com
+                                </button>
+                            )}
+                        </div>
+                        {suggestedGmail && (
+                            <p className="mt-1 ml-1 text-[11px] text-stone-500">
+                                Gợi ý: <button type="button" onMouseDown={(e) => { e.preventDefault(); applyGmailSuggestion(true); }} className="font-bold text-red-600 hover:underline cursor-pointer">{suggestedGmail}</button> (tự điền khi chuyển ô hoặc nhấn Tab)
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label htmlFor="admin-password-input" className="block text-xs font-bold text-stone-600 mb-1.5 ml-1">
+                            Mật khẩu
+                        </label>
+                        <div className="relative">
+                            <input
+                                ref={passwordInputRef}
+                                id="admin-password-input"
+                                name="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Nhập mật khẩu"
+                                required
+                                autoComplete="current-password webauthn"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full pl-4 pr-12 py-3 rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent text-sm transition-all"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(prev => !prev)}
+                                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                            >
+                                <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="mt-1 w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-xl shadow-[0_6px_18px_rgba(220,38,38,0.28)] transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                        style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%)' }}
+                    >
+                        Đăng nhập Admin
+                    </button>
+                </form>
+            );
+        };
+
         const ProductCard = ({
             product,
             layout = 'grid',
@@ -2153,22 +2993,23 @@ import './styles.css';
 
             const renderAdminActions = () => (
                 isAdmin && (
-                    <div className={`${isList ? 'flex items-center gap-1.5' : 'absolute top-3 right-3 flex flex-col gap-1.5 z-10'}`}>
+                    <div className={`${isList ? 'flex items-center gap-1.5 flex-wrap' : 'absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-1 sm:gap-1.5 z-10'}`}>
                         <button
+                            type="button"
                             onClick={(e) => onTogglePin(e, product)}
-                            className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${isPinned ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white/90 text-gray-700 hover:bg-amber-500 hover:text-white'}`}
+                            className={`${isList ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'} flex items-center justify-center backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${isPinned ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white/90 text-gray-700 hover:bg-amber-500 hover:text-white'}`}
                             title={isPinned ? 'Bỏ ghim khỏi đầu trang' : 'Ghim sản phẩm lên đầu trang'}
                         >
-                            <i className="fa-solid fa-thumbtack text-xs"></i>
+                            <i className="fa-solid fa-thumbtack text-[11px] sm:text-xs"></i>
                         </button>
-                        <button onClick={(e) => onEdit(e, product)} className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors cursor-pointer" title="Chỉnh sửa chi tiết">
-                            <i className="fa-solid fa-pen text-xs"></i>
+                        <button type="button" onClick={(e) => onEdit(e, product)} className={`${isList ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'} flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-primary hover:text-white text-gray-700 transition-colors cursor-pointer`} title="Chỉnh sửa chi tiết">
+                            <i className="fa-solid fa-pen text-[11px] sm:text-xs"></i>
                         </button>
-                        <button onClick={(e) => onToggleVisibility(e, product)} className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
-                            <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-xs`}></i>
+                        <button type="button" onClick={(e) => onToggleVisibility(e, product)} className={`${isList ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'} flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md transition-colors cursor-pointer ${product.is_hidden ? 'hover:bg-green-500 hover:text-white text-green-600' : 'hover:bg-gray-800 hover:text-white text-gray-600'}`} title={product.is_hidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}>
+                            <i className={`fa-solid ${product.is_hidden ? 'fa-eye' : 'fa-eye-slash'} text-[11px] sm:text-xs`}></i>
                         </button>
-                        <button onClick={(e) => onDelete(e, product)} className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors cursor-pointer" title="Xóa sản phẩm">
-                            <i className="fa-solid fa-trash-can text-xs"></i>
+                        <button type="button" onClick={(e) => onDelete(e, product)} className={`${isList ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'} flex items-center justify-center bg-white/90 backdrop-blur rounded-full shadow-md hover:bg-red-600 hover:text-white text-red-500 transition-colors cursor-pointer`} title="Xóa sản phẩm">
+                            <i className="fa-solid fa-trash-can text-[11px] sm:text-xs"></i>
                         </button>
                     </div>
                 )
@@ -2176,11 +3017,12 @@ import './styles.css';
 
             const renderPriceBlock = () => (
                 isAdmin && editingPriceId === product.id ? (
-                    <div className="mb-2.5 flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                    <div className="mb-2.5 flex items-center gap-1 min-w-0" onClick={e => e.stopPropagation()}>
                         <input
                             type="number"
+                            inputMode="numeric"
                             autoFocus
-                            className="w-full border border-red-400 rounded-md px-2 py-1 text-xs sm:text-sm font-bold text-red-600 outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                            className="w-full min-w-[76px] border border-red-400 rounded-md px-2 py-1 text-xs sm:text-sm font-bold text-red-600 outline-none focus:ring-2 focus:ring-red-400 bg-white"
                             value={editingPriceValue}
                             onChange={e => setEditingPriceValue(e.target.value)}
                             onKeyDown={e => {
@@ -2277,18 +3119,18 @@ import './styles.css';
                             </div>
                         </div>
 
-                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 sm:w-52 flex-shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 sm:border-l border-red-100/70 sm:pl-4">
-                            <div className="sm:w-full">{renderPriceBlock()}</div>
-                            <div className="flex items-center gap-2 sm:w-full">
+                        <div className="flex flex-wrap sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 sm:w-64 flex-shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 sm:border-l border-red-100/70 sm:pl-4">
+                            <div className="min-w-0 max-w-full sm:w-full">{renderPriceBlock()}</div>
+                            <div className="flex items-center gap-2 flex-shrink-0 sm:w-full">
                                 {!isAdmin && (
-                                    <Link to={`/san-pham/${product.slug || product.id}`} className="hidden sm:inline-flex items-center justify-center px-3 py-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-700 text-xs font-semibold whitespace-nowrap transition-colors">
+                                    <Link to={`/san-pham/${product.slug || product.id}`} className="hidden sm:inline-flex flex-shrink-0 items-center justify-center px-3 py-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-700 text-xs font-semibold whitespace-nowrap transition-colors">
                                         Chi tiết
                                     </Link>
                                 )}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); if (!isOutOfStock) onAddToCart(product); }}
                                     disabled={isOutOfStock}
-                                    className="sm:flex-1 py-2 px-3.5 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 border border-red-400/40 shadow-sm active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
+                                    className="sm:flex-1 flex-shrink-0 py-2 px-3 sm:px-3.5 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 backdrop-blur-md border border-red-400/40 shadow-[0_6px_16px_rgba(185,28,28,0.28),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_22px_rgba(185,28,28,0.4)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm whitespace-nowrap"
                                     style={!isOutOfStock ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : { background: '#9ca3af' }}
                                 >
                                     {!isOutOfStock ? (
@@ -2374,7 +3216,7 @@ import './styles.css';
             isAdmin,
             productsSectionRef,
             allTags,
-            selectedTag,
+            selectedTags = [],
             onTagToggle,
             onManageTags,
             filteredProducts,
@@ -2417,7 +3259,7 @@ import './styles.css';
             handlePrintPriceListPDF,
             setIsSettingsModalOpen
         }) => {
-            const hasActiveFilters = Boolean(selectedTag || priceMin || priceMax || stockFilter || sortOrder);
+            const hasActiveFilters = Boolean(selectedTags.length > 0 || priceMin || priceMax || stockFilter || sortOrder);
             const sortLabels = {
                 '': 'Sắp xếp',
                 'asc': 'Giá tăng dần',
@@ -2430,26 +3272,138 @@ import './styles.css';
                 setSortOrder(next);
             };
 
+            const handlePageSizeSelect = (mode) => {
+                setPageSizeMode(mode);
+                if (productsSectionRef?.current) {
+                    const y = productsSectionRef.current.getBoundingClientRect().top + window.scrollY - 100;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            };
+
+            const renderPaginationControls = () => {
+                let startPage = Math.max(1, safePage - 2);
+                let endPage = Math.min(totalPages, safePage + 2);
+
+                if (safePage <= 3) {
+                    endPage = Math.min(totalPages, 5);
+                }
+                if (safePage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                const pageNumbers = [];
+                for (let i = startPage; i <= endPage; i++) {
+                    pageNumbers.push(i);
+                }
+
+                return (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => handlePageChange(1)}
+                            disabled={safePage === 1}
+                            title="Trang đầu"
+                            aria-label="Trang đầu"
+                            className="h-7 sm:h-9 px-1.5 sm:px-3 rounded-full flex items-center justify-center whitespace-nowrap flex-shrink-0 text-[10.5px] sm:text-xs font-semibold text-stone-700 hover:bg-red-50 hover:text-red-600 active:scale-95 disabled:opacity-35 disabled:pointer-events-none transition-all cursor-pointer"
+                        >
+                            <span className="sm:hidden">« Đầu</span>
+                            <span className="hidden sm:inline">Trang đầu</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handlePageChange(safePage - 1)}
+                            disabled={safePage === 1}
+                            title="Trang trước"
+                            aria-label="Trang trước"
+                            className="h-7 sm:h-9 px-1.5 sm:px-3 rounded-full flex items-center justify-center whitespace-nowrap flex-shrink-0 text-[10.5px] sm:text-xs font-semibold text-stone-700 hover:bg-red-50 hover:text-red-600 active:scale-95 disabled:opacity-35 disabled:pointer-events-none transition-all cursor-pointer"
+                        >
+                            <span className="sm:hidden">‹ Trước</span>
+                            <span className="hidden sm:inline">Trang trước</span>
+                        </button>
+
+                        <span className="h-3.5 sm:h-4 w-px bg-stone-200/80 mx-0.5 flex-shrink-0" aria-hidden="true"></span>
+
+                        <div className="hidden sm:flex items-center gap-1">
+                            {startPage > 1 && (
+                                <span className="px-1.5 h-9 inline-flex items-center justify-center text-sm font-bold text-stone-400 select-none" aria-hidden="true">
+                                    ...
+                                </span>
+                            )}
+                            {pageNumbers.map(pageNum => (
+                                <button
+                                    type="button"
+                                    key={pageNum}
+                                    onClick={() => handlePageChange(pageNum)}
+                                    aria-current={safePage === pageNum ? 'page' : undefined}
+                                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all cursor-pointer ${safePage === pageNum
+                                        ? 'text-white shadow-[0_4px_12px_rgba(220,38,38,0.35),inset_0_1px_1px_rgba(255,255,255,0.35)] scale-[1.03]'
+                                        : 'text-stone-600 hover:bg-red-50 hover:text-red-600'}`}
+                                    style={safePage === pageNum ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%)' } : undefined}
+                                >
+                                    {pageNum}
+                                </button>
+                            ))}
+                            {endPage < totalPages && (
+                                <span className="px-1.5 h-9 inline-flex items-center justify-center text-sm font-bold text-stone-400 select-none" aria-hidden="true">
+                                    ...
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="sm:hidden px-2 h-7 inline-flex items-center justify-center rounded-full bg-red-50/90 border border-red-200/70 text-[10.5px] font-extrabold text-red-700 whitespace-nowrap flex-shrink-0">
+                            {safePage}/{totalPages}
+                        </div>
+
+                        <span className="h-3.5 sm:h-4 w-px bg-stone-200/80 mx-0.5 flex-shrink-0" aria-hidden="true"></span>
+
+                        <button
+                            type="button"
+                            onClick={() => handlePageChange(safePage + 1)}
+                            disabled={safePage === totalPages}
+                            title="Trang sau"
+                            aria-label="Trang sau"
+                            className="h-7 sm:h-9 px-1.5 sm:px-3 rounded-full flex items-center justify-center whitespace-nowrap flex-shrink-0 text-[10.5px] sm:text-xs font-semibold text-stone-700 hover:bg-red-50 hover:text-red-600 active:scale-95 disabled:opacity-35 disabled:pointer-events-none transition-all cursor-pointer"
+                        >
+                            <span className="sm:hidden">Sau ›</span>
+                            <span className="hidden sm:inline">Trang sau</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={safePage === totalPages}
+                            title="Trang cuối"
+                            aria-label="Trang cuối"
+                            className="h-7 sm:h-9 px-1.5 sm:px-3 rounded-full flex items-center justify-center whitespace-nowrap flex-shrink-0 text-[10.5px] sm:text-xs font-semibold text-stone-700 hover:bg-red-50 hover:text-red-600 active:scale-95 disabled:opacity-35 disabled:pointer-events-none transition-all cursor-pointer"
+                        >
+                            <span className="sm:hidden">Cuối »</span>
+                            <span className="hidden sm:inline">Trang cuối</span>
+                        </button>
+                    </>
+                );
+            };
+
             return (
-                <main id="products-section" className="flex-1 py-4 sm:py-6 w-full" ref={productsSectionRef}>
+                <main id="products-section" className="flex-1 py-4 sm:py-6 w-full min-h-[460px]" ref={productsSectionRef}>
                     {isFullPage && (
-                        <div className="relative mb-6 rounded-3xl overflow-hidden border border-red-200/80 shadow-[0_12px_32px_rgba(185,28,28,0.1)] bg-gradient-to-r from-red-800 via-red-700 to-rose-700 text-white px-5 py-5 sm:px-8 sm:py-7">
-                            <svg className="pointer-events-none absolute bottom-0 left-0 right-0 w-full h-10 sm:h-12 select-none" viewBox="0 0 1200 70" preserveAspectRatio="none" aria-hidden="true">
-                                <path d="M0,45 C260,8 540,75 840,34 C1020,10 1120,38 1200,22 L1200,70 L0,70 Z" fill="rgba(255, 255, 255, 0.12)" />
-                                <path d="M0,58 C320,25 640,78 960,44 C1090,30 1160,48 1200,40 L1200,70 L0,70 Z" fill="rgba(250, 240, 230, 0.2)" />
-                            </svg>
+                        <div
+                            className="relative mb-6 rounded-3xl overflow-hidden border-2 border-[#E6C27E] shadow-[0_12px_32px_rgba(139,21,21,0.16)] text-white px-5 py-5 sm:px-8 sm:py-7"
+                            style={SEIGAIHA_CRIMSON_STYLE}
+                        >
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#7f1d1d]/80 via-[#8f1616]/55 to-[#7f1d1d]/75"></div>
                             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-[11px] font-bold tracking-wider uppercase mb-2">
-                                        <i className="fa-solid fa-bowl-food text-yellow-300"></i>
-                                        <span>전체 상품 • K-FOOD CATALOG</span>
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-[#E6C27E]/60 text-[11px] font-bold tracking-wider uppercase mb-2 text-[#FDE68A]">
+                                        <BlossomIcon className="w-3.5 h-3.5" petalColor="#FFFFFF" centerColor="#FDE047" />
+                                        <span>KHO HÀNG ĐẦY ĐỦ • TOKCAY KOREA FOODS</span>
                                     </div>
-                                    <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">Tất Cả Sản Phẩm Tokcay</h1>
-                                    <p className="text-xs sm:text-sm text-red-100 mt-1">Xem đầy đủ kho hàng, lọc nhanh theo danh mục, tầm giá, tình trạng & chọn kiểu hiển thị.</p>
+                                    <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight drop-shadow-sm">Tất Cả Sản Phẩm Tokcay</h1>
+                                    <p className="text-xs sm:text-sm text-red-100 mt-1">Xem đầy đủ mặt hàng, lọc nhanh theo danh mục, tầm giá, tình trạng & chọn kiểu hiển thị.</p>
                                 </div>
                                 <Link
                                     to="/"
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-xs sm:text-sm font-semibold whitespace-nowrap w-max transition-all"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 border border-[#E6C27E]/60 text-xs sm:text-sm font-semibold whitespace-nowrap w-max transition-all backdrop-blur-sm"
                                 >
                                     <i className="fa-solid fa-house text-xs"></i> Về trang chủ
                                 </Link>
@@ -2466,17 +3420,22 @@ import './styles.css';
                                 </span>
                                 <span>Chế độ Quản Trị (Admin)</span>
                             </div>
-                            <div className="flex flex-wrap items-center justify-center gap-2.5">
-                                <button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-3.5 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
+                            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                                <button type="button" onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="flex items-center gap-2 bg-white border border-gray-300 px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
                                     <i className="fa-solid fa-plus text-primary"></i> Thêm sản phẩm
                                 </button>
-                                <button onClick={handleExportPriceListExcel} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" title="Tải xuống Bảng Giá file Excel (.XLSX)">
+                                {onManageTags && (
+                                    <button type="button" onClick={onManageTags} className="flex items-center gap-2 bg-amber-50 border border-amber-300 px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-amber-800 hover:bg-amber-100 shadow-sm transition-colors cursor-pointer">
+                                        <i className="fa-solid fa-tags text-amber-600"></i> Quản lý danh mục
+                                    </button>
+                                )}
+                                <button type="button" onClick={handleExportPriceListExcel} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer" title="Tải xuống Bảng Giá file Excel (.XLSX)">
                                     <i className="fa-solid fa-file-excel"></i> Xuất Excel
                                 </button>
-                                <button onClick={handlePrintPriceListPDF} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer" style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }} title="In Bảng Báo Giá hoặc Lưu thành PDF">
+                                <button type="button" onClick={handlePrintPriceListPDF} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer" style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' }} title="In Bảng Báo Giá hoặc Lưu thành PDF">
                                     <i className="fa-solid fa-print"></i> In Bảng Giá / PDF
                                 </button>
-                                <button onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-900 shadow-sm transition-colors cursor-pointer">
+                                <button type="button" onClick={() => setIsSettingsModalOpen(true)} className="flex items-center gap-2 bg-gray-800 text-white px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-gray-900 shadow-sm transition-colors cursor-pointer">
                                     <i className="fa-solid fa-gear"></i> Cài đặt chung
                                 </button>
                             </div>
@@ -2485,14 +3444,16 @@ import './styles.css';
 
                     {/* TÁCH BIỆT 2 HÀNG ĐỘC LẬP: HÀNG 1 (Danh mục) & HÀNG 2 (Số lượng + View Switch + Bộ lọc/Sắp xếp) */}
                     <div className="flex flex-col w-full max-w-7xl mx-auto px-1 sm:px-2 gap-3 mb-4">
-                        {/* HÀNG 1: Thanh Tag Danh mục */}
-                        <TagsSlider
-                            uniqueTags={allTags}
-                            selectedTag={selectedTag}
-                            onTagToggle={onTagToggle}
-                            isAdmin={isAdmin}
-                            onManageTags={onManageTags}
-                        />
+                        {/* HÀNG 1: Thanh Tag Danh mục (ẩn ở trang /san-pham đầy đủ vì đã có trong Bộ lọc) */}
+                        {!isFullPage && (
+                            <TagsSlider
+                                uniqueTags={allTags}
+                                selectedTags={selectedTags}
+                                onTagToggle={onTagToggle}
+                                isAdmin={isAdmin}
+                                onManageTags={onManageTags}
+                            />
+                        )}
 
                         {/* HÀNG 2: Thanh đếm số SP & Bộ lọc / Sắp xếp / Chọn hiển thị Lưới vs Dọc */}
                         <div className="w-full flex flex-wrap items-center justify-between gap-2 px-1 relative z-20 text-xs sm:text-sm text-stone-600">
@@ -2500,20 +3461,6 @@ import './styles.css';
                                 <span className="font-medium text-stone-500">
                                     Hiển thị <strong className="text-red-600 font-semibold">{filteredProducts.length}</strong> sản phẩm
                                 </span>
-                                {isFullPage && (
-                                    <div className="inline-flex items-center gap-0.5 bg-white/80 border border-red-100 rounded-full p-0.5 text-[11px] sm:text-xs">
-                                        {[{ v: 'all', label: 'Tất cả' }, { v: '15', label: '15/tr' }, { v: '30', label: '30/tr' }].map(opt => (
-                                            <button
-                                                key={opt.v}
-                                                type="button"
-                                                onClick={() => setPageSizeMode(opt.v)}
-                                                className={`px-2 sm:px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${pageSizeMode === opt.v ? 'bg-red-600 text-white shadow-xs' : 'text-stone-600 hover:text-red-600'}`}
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
                             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 relative ml-auto">
@@ -2546,8 +3493,8 @@ import './styles.css';
                                 <button
                                     type="button"
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm border font-medium shadow-sm transition-all cursor-pointer select-none ${showFilters || priceMin || priceMax || stockFilter ? 'bg-red-600 text-white border-red-400/40' : 'bg-white/80 hover:bg-red-50 border-red-100 text-stone-700 hover:text-red-600'}`}
-                                    style={showFilters || priceMin || priceMax || stockFilter ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm border font-medium shadow-sm transition-all cursor-pointer select-none ${showFilters || selectedTags.length > 0 || priceMin || priceMax || stockFilter ? 'bg-red-600 text-white border-red-400/40' : 'bg-white/80 hover:bg-red-50 border-red-100 text-stone-700 hover:text-red-600'}`}
+                                    style={showFilters || selectedTags.length > 0 || priceMin || priceMax || stockFilter ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
                                 >
                                     <i className="fa-solid fa-sliders text-xs"></i>
                                     <span>Bộ lọc</span>
@@ -2577,10 +3524,10 @@ import './styles.css';
 
                                 {/* Khung Bộ Lọc nổi độc lập */}
                                 {showFilters && (
-                                    <div className="absolute right-0 top-full mt-2 z-30 w-72 sm:w-80 bg-white/[0.97] backdrop-blur-2xl border border-red-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-5 animate-fade-in">
+                                    <div className="absolute right-0 top-full mt-2 z-40 w-[min(20rem,calc(100vw-2rem))] max-h-[75vh] overflow-y-auto overscroll-contain touch-pan-y bg-white/[0.98] backdrop-blur-2xl border border-red-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.22)] p-4 sm:p-5 animate-fade-in">
                                         <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2.5">
                                             <h3 className="text-base font-extrabold text-gray-800 uppercase tracking-wide">Bộ Lọc</h3>
-                                            <button onClick={() => setShowFilters(false)} className="text-gray-400 hover:text-red-600 bg-gray-100 hover:bg-red-50 w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer"><i className="fa-solid fa-xmark"></i></button>
+                                            <button type="button" onClick={() => setShowFilters(false)} className="text-gray-400 hover:text-red-600 bg-gray-100 hover:bg-red-50 w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer"><i className="fa-solid fa-xmark"></i></button>
                                         </div>
 
                                         {/* Tình trạng kho */}
@@ -2604,14 +3551,25 @@ import './styles.css';
                                             </div>
                                         </div>
 
-                                        {/* Tag Filter */}
+                                        {/* Tag Filter - hỗ trợ chọn nhiều dòng sản phẩm */}
                                         <div className="mb-4 border-b border-gray-100 pb-4">
-                                            <h4 className="font-bold text-gray-700 mb-2.5 text-xs uppercase tracking-wider">Dòng Sản Phẩm</h4>
-                                            <div className="space-y-2.5 max-h-40 overflow-y-auto hide-scroll">
+                                            <div className="flex items-center justify-between mb-2.5">
+                                                <h4 className="font-bold text-gray-700 text-xs uppercase tracking-wider">Dòng Sản Phẩm</h4>
+                                                {selectedTags.length > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onTagToggle('')}
+                                                        className="text-[11px] font-semibold text-red-600 hover:text-red-700 cursor-pointer"
+                                                    >
+                                                        Bỏ chọn ({selectedTags.length})
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="space-y-2.5 max-h-40 overflow-y-auto overscroll-contain touch-pan-y hide-scroll">
                                                 {allTags.map(tag => (
                                                     <label key={tag} className="flex items-center gap-2.5 cursor-pointer group">
                                                         <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
-                                                            checked={selectedTag === tag}
+                                                            checked={selectedTags.includes(tag)}
                                                             onChange={() => onTagToggle(tag)}
                                                         />
                                                         <span className="text-gray-600 text-xs sm:text-sm font-medium group-hover:text-primary transition-colors">{tag}</span>
@@ -2624,9 +3582,9 @@ import './styles.css';
                                         <div className="mb-4">
                                             <h4 className="font-bold text-gray-700 mb-2.5 text-xs uppercase tracking-wider">Khoảng Giá</h4>
                                             <div className="flex items-center gap-2 mb-3">
-                                                <input type="number" placeholder="Từ" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
+                                                <input type="number" inputMode="numeric" placeholder="Từ" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMin} onChange={e => setPriceMin(e.target.value)} />
                                                 <span className="text-gray-400">-</span>
-                                                <input type="number" placeholder="Đến" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
+                                                <input type="number" inputMode="numeric" placeholder="Đến" className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" value={priceMax} onChange={e => setPriceMax(e.target.value)} />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="flex items-center gap-2.5 cursor-pointer group">
@@ -2753,88 +3711,73 @@ import './styles.css';
                                     ))}
                                 </div>
 
-                                {/* Pagination - giữ gọn 1 hàng trên điện thoại */}
-                                {totalPages > 1 && (
-                                    <div className="w-full py-6 flex flex-nowrap sm:flex-wrap justify-center items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
-                                        <button
-                                            onClick={() => handlePageChange(1)}
-                                            disabled={safePage === 1}
-                                            title="Trang đầu"
-                                            aria-label="Trang đầu"
-                                            className="h-9 sm:h-10 px-2 sm:px-4 flex items-center justify-center whitespace-nowrap flex-shrink-0 bg-white/80 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                {/* Sticky bottom dock cho trang /san-pham đầy đủ: chọn số lượng hiển thị + phân trang dính theo phía dưới */}
+                                {isFullPage && filteredProducts.length > 0 && (
+                                    <div className="sticky bottom-3 sm:bottom-4 z-30 w-full mt-6 pb-2 flex justify-start lg:justify-center pr-[68px] lg:pr-0 pointer-events-none">
+                                        <nav
+                                            aria-label="Điều khiển số lượng và phân trang sản phẩm"
+                                            className="pointer-events-auto inline-flex flex-col lg:flex-row items-center gap-1.5 lg:gap-2.5 px-2 sm:px-3.5 py-1.5 rounded-2xl lg:rounded-full bg-white/95 backdrop-blur-xl border border-[#EED3AC] shadow-[0_12px_32px_rgba(185,28,28,0.14),0_2px_10px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.95)] max-w-full overflow-x-auto no-scrollbar"
                                         >
-                                            <span className="sm:hidden">« Đầu</span>
-                                            <span className="hidden sm:inline">Trang đầu</span>
-                                        </button>
+                                            <div className="inline-flex items-center gap-1.5 flex-shrink-0">
+                                                <span className="hidden sm:inline text-xs font-semibold text-stone-500 whitespace-nowrap pl-0.5">
+                                                    Hiển thị:
+                                                </span>
+                                                <div className="inline-flex items-center gap-0.5 bg-[#FAF0E6]/90 border border-[#EED3AC]/80 rounded-full p-0.5 text-[10.5px] sm:text-xs" role="group" aria-label="Số lượng sản phẩm mỗi trang">
+                                                    {[{ v: 'all', label: 'Tất cả' }, { v: '15', label: '15/tr' }, { v: '30', label: '30/tr' }].map(opt => (
+                                                        <button
+                                                            key={opt.v}
+                                                            type="button"
+                                                            onClick={() => handlePageSizeSelect(opt.v)}
+                                                            aria-pressed={pageSizeMode === opt.v}
+                                                            className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold transition-all cursor-pointer whitespace-nowrap ${pageSizeMode === opt.v
+                                                                ? 'text-white shadow-[0_2px_8px_rgba(220,38,38,0.3)]'
+                                                                : 'text-stone-600 hover:text-red-600 hover:bg-white/70'}`}
+                                                            style={pageSizeMode === opt.v ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%)' } : undefined}
+                                                        >
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                {totalPages === 1 && (
+                                                    <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-red-50/85 border border-red-200/70 text-[10.5px] sm:text-xs font-bold text-red-700 whitespace-nowrap">
+                                                        <span className="sm:hidden">1/1</span>
+                                                        <span className="hidden sm:inline">Trang 1 / 1</span>
+                                                    </span>
+                                                )}
+                                            </div>
 
-                                        <button
-                                            onClick={() => handlePageChange(safePage - 1)}
-                                            disabled={safePage === 1}
-                                            title="Trang trước"
-                                            aria-label="Trang trước"
-                                            className="h-9 sm:h-10 px-2 sm:px-4 flex items-center justify-center whitespace-nowrap flex-shrink-0 bg-white/80 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                        >
-                                            <span className="sm:hidden">‹ Trước</span>
-                                            <span className="hidden sm:inline">Trang trước</span>
-                                        </button>
+                                            {totalPages > 1 && (
+                                                <>
+                                                    <span className="lg:hidden w-full h-px bg-[#EED3AC]/50 flex-shrink-0" aria-hidden="true"></span>
+                                                    <span className="hidden lg:block h-5 w-px bg-[#EED3AC]/80 flex-shrink-0" aria-hidden="true"></span>
+                                                    <div className="inline-flex items-center gap-0.5 sm:gap-1 max-w-full overflow-x-auto no-scrollbar">
+                                                        {renderPaginationControls()}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </nav>
+                                    </div>
+                                )}
 
-                                        <div className="hidden sm:flex items-center gap-1.5">
-                                            {(() => {
-                                                let startPage = Math.max(1, safePage - 2);
-                                                let endPage = Math.min(totalPages, safePage + 2);
-
-                                                if (safePage <= 3) {
-                                                    endPage = Math.min(totalPages, 5);
-                                                }
-                                                if (safePage >= totalPages - 2) {
-                                                    startPage = Math.max(1, totalPages - 4);
-                                                }
-
-                                                const pageNumbers = [];
-                                                for (let i = startPage; i <= endPage; i++) {
-                                                    pageNumbers.push(i);
-                                                }
-
-                                                return pageNumbers.map(pageNum => (
-                                                    <button
-                                                        key={pageNum}
-                                                        onClick={() => handlePageChange(pageNum)}
-                                                        className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all cursor-pointer ${safePage === pageNum
-                                                            ? 'text-white shadow-md scale-105 bg-red-600'
-                                                            : 'bg-white/75 backdrop-blur-md border border-white/80 text-stone-700 hover:bg-white hover:text-red-600 shadow-sm'}`}
-                                                        style={safePage === pageNum ? { background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)' } : undefined}
-                                                    >
-                                                        {pageNum}
-                                                    </button>
-                                                ));
-                                            })()}
+                                {/* Pagination cho trang chủ */}
+                                {!isFullPage && totalPages > 1 && (
+                                    <nav aria-label="Phân trang sản phẩm" className="w-full pt-6 pb-3 flex justify-center px-2">
+                                        <div className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-[#EED3AC]/90 shadow-[0_8px_24px_rgba(185,28,28,0.08),inset_0_1px_0_rgba(255,255,255,0.95)] max-w-full overflow-x-auto no-scrollbar">
+                                            {renderPaginationControls()}
                                         </div>
+                                    </nav>
+                                )}
 
-                                        <div className="sm:hidden h-9 px-2.5 flex items-center justify-center bg-white/85 backdrop-blur-md border border-red-100 rounded-xl shadow-sm text-[11px] font-bold text-red-700 whitespace-nowrap flex-shrink-0">
-                                            {safePage} / {totalPages}
-                                        </div>
-
-                                        <button
-                                            onClick={() => handlePageChange(safePage + 1)}
-                                            disabled={safePage === totalPages}
-                                            title="Trang sau"
-                                            aria-label="Trang sau"
-                                            className="h-9 sm:h-10 px-2 sm:px-4 flex items-center justify-center whitespace-nowrap flex-shrink-0 bg-white/80 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                {/* Nút Xem tất cả sản phẩm ngay dưới danh sách ở trang chủ */}
+                                {!isFullPage && filteredProducts.length > 0 && (
+                                    <div className={`w-full flex justify-center px-2 ${totalPages > 1 ? 'pb-6 pt-1' : 'py-6'}`}>
+                                        <Link
+                                            to="/san-pham"
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/90 hover:bg-red-600 text-red-700 hover:text-white border border-[#EED3AC] hover:border-red-600 shadow-[0_6px_18px_rgba(185,28,28,0.08)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)] font-bold text-xs sm:text-sm transition-all duration-200 group"
                                         >
-                                            <span className="sm:hidden">Sau ›</span>
-                                            <span className="hidden sm:inline">Trang sau</span>
-                                        </button>
-
-                                        <button
-                                            onClick={() => handlePageChange(totalPages)}
-                                            disabled={safePage === totalPages}
-                                            title="Trang cuối"
-                                            aria-label="Trang cuối"
-                                            className="h-9 sm:h-10 px-2 sm:px-4 flex items-center justify-center whitespace-nowrap flex-shrink-0 bg-white/80 backdrop-blur-md border border-white/80 rounded-xl shadow-sm text-[11px] sm:text-sm font-semibold text-stone-700 hover:bg-white hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                        >
-                                            <span className="sm:hidden">Cuối »</span>
-                                            <span className="hidden sm:inline">Trang cuối</span>
-                                        </button>
+                                            <span>Xem tất cả {filteredProducts.length} sản phẩm</span>
+                                            <i className="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-0.5"></i>
+                                        </Link>
                                     </div>
                                 )}
                             </>
@@ -2876,7 +3819,10 @@ import './styles.css';
 
             // Filter & View Mode States
             const [showFilters, setShowFilters] = useState(false);
-            const [selectedTag, setSelectedTag] = useState(() => searchParams.get('tag') || '');
+            const [selectedTags, setSelectedTags] = useState(() => {
+                const rawTag = searchParams.get('tag');
+                return rawTag ? rawTag.split(',').map(s => s.trim()).filter(Boolean) : [];
+            });
             const [priceMin, setPriceMin] = useState('');
             const [priceMax, setPriceMax] = useState('');
             const [stockFilter, setStockFilter] = useState('');
@@ -2886,11 +3832,27 @@ import './styles.css';
             const [searchResetKey, setSearchResetKey] = useState(0);
             const location = useLocation();
             const isFullProductsRoute = location.pathname === '/san-pham';
+            const [cartToast, setCartToast] = useState(null);
+            const cartToastTimerRef = useRef(null);
+
+            useEffect(() => {
+                if (location.pathname === '/san-pham') {
+                    document.title = 'Tất Cả Sản Phẩm | Hùng Thuận Tokcay';
+                } else if (location.pathname === '/') {
+                    document.title = 'Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc tại Cần Thơ';
+                }
+            }, [location.pathname]);
+
+            useEffect(() => {
+                return () => {
+                    if (cartToastTimerRef.current) clearTimeout(cartToastTimerRef.current);
+                };
+            }, []);
 
             useEffect(() => {
                 const tagFromUrl = searchParams.get('tag');
                 if (tagFromUrl !== null) {
-                    setSelectedTag(tagFromUrl);
+                    setSelectedTags(tagFromUrl ? tagFromUrl.split(',').map(s => s.trim()).filter(Boolean) : []);
                 }
             }, [searchParams]);
 
@@ -3005,7 +3967,7 @@ import './styles.css';
                 if (currentPage !== 1) {
                     setSearchParams({ page: '1' });
                 }
-            }, [selectedTag, priceMin, priceMax, stockFilter, sortOrder, pageSizeMode]);
+            }, [selectedTags, priceMin, priceMax, stockFilter, sortOrder, pageSizeMode]);
 
             const handleAppBannerUpload = async (e, type) => {
                 const file = e.target.files[0];
@@ -3071,7 +4033,7 @@ import './styles.css';
             const filteredProducts = useMemo(() => {
                 let result = products.filter(p => {
                     if (!isAdmin && p.is_hidden) return false;
-                    if (selectedTag !== '' && (!p.tags || !p.tags.includes(selectedTag))) return false;
+                    if (selectedTags.length > 0 && (!p.tags || !selectedTags.some(t => p.tags.includes(t)))) return false;
                     const price = p.price || 0;
                     if (priceMin && price < Number(priceMin)) return false;
                     if (priceMax && price > Number(priceMax)) return false;
@@ -3103,7 +4065,7 @@ import './styles.css';
                 }
 
                 return result;
-            }, [products, isAdmin, selectedTag, priceMin, priceMax, stockFilter, sortOrder, pinnedProductIds]);
+            }, [products, isAdmin, selectedTags, priceMin, priceMax, stockFilter, sortOrder, pinnedProductIds]);
 
             const effectiveItemsPerPage = isFullProductsRoute
                 ? (pageSizeMode === 'all' ? Math.max(1, filteredProducts.length) : Number(pageSizeMode) || ITEMS_PER_PAGE)
@@ -3116,6 +4078,7 @@ import './styles.css';
             const handleAddToCart = (product, quantity = 1) => {
                 if (product.stock_status && product.stock_status.toLowerCase() === 'hết hàng') return;
                 const qtyToAdd = Math.max(1, Number(quantity) || 1);
+                const nextCartCount = cart.reduce((sum, item) => sum + item.qty, 0) + qtyToAdd;
                 setCart(prev => {
                     const existing = prev.find(i => i.id === product.id);
                     if (existing) {
@@ -3123,7 +4086,9 @@ import './styles.css';
                     }
                     return [...prev, { ...product, qty: qtyToAdd }];
                 });
-                setIsCartOpen(true);
+                setCartToast({ name: product.name, qty: qtyToAdd, count: nextCartCount });
+                if (cartToastTimerRef.current) clearTimeout(cartToastTimerRef.current);
+                cartToastTimerRef.current = setTimeout(() => setCartToast(null), 3200);
             };
 
             const handlePageChange = (newPage) => {
@@ -3140,7 +4105,10 @@ import './styles.css';
                 if (e && e.preventDefault) e.preventDefault();
                 
                 if (e && e.target && e.target.email) {
-                    const emailInput = e.target.email.value;
+                    const rawEmail = String(e.target.email.value || '').trim();
+                    const emailInput = (rawEmail && !/\s/.test(rawEmail) && !rawEmail.includes('@'))
+                        ? `${rawEmail}@gmail.com`
+                        : rawEmail;
                     const passwordInput = e.target.password.value;
                     const { data, error } = await supabase.auth.signInWithPassword({
                         email: emailInput,
@@ -3569,11 +4537,15 @@ import './styles.css';
             };
 
             const handleTagToggle = (tag) => {
-                const nextTag = (tag === '' || tag === 'ALL' || selectedTag === tag) ? '' : tag;
-                setSelectedTag(nextTag);
+                const nextTags = (tag === '' || tag === 'ALL')
+                    ? []
+                    : selectedTags.includes(tag)
+                        ? selectedTags.filter(t => t !== tag)
+                        : [...selectedTags, tag];
+                setSelectedTags(nextTags);
                 if (searchParams.has('tag')) {
                     const nextParams = new URLSearchParams(searchParams);
-                    if (nextTag) nextParams.set('tag', nextTag);
+                    if (nextTags.length > 0) nextParams.set('tag', nextTags.join(','));
                     else nextParams.delete('tag');
                     nextParams.delete('page');
                     setSearchParams(nextParams);
@@ -3586,7 +4558,7 @@ import './styles.css';
             };
 
             const handleResetFilters = () => {
-                setSelectedTag('');
+                setSelectedTags([]);
                 setPriceMin('');
                 setPriceMax('');
                 setStockFilter('');
@@ -3597,7 +4569,7 @@ import './styles.css';
             };
 
             const handleProductsNavClick = () => {
-                setSelectedTag('');
+                setSelectedTags([]);
                 setPriceMin('');
                 setPriceMax('');
                 setStockFilter('');
@@ -3630,7 +4602,7 @@ import './styles.css';
                         searchResetKey={searchResetKey}
                     />
 
-                    <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                         <Routes>
                             <Route path="/" element={
                                 <>
@@ -3648,7 +4620,7 @@ import './styles.css';
                                         isAdmin={isAdmin}
                                         productsSectionRef={productsSectionRef}
                                         allTags={allTags}
-                                        selectedTag={selectedTag}
+                                        selectedTags={selectedTags}
                                         onTagToggle={handleTagToggle}
                                         onManageTags={() => setIsTagsModalOpen(true)}
                                         filteredProducts={filteredProducts}
@@ -3699,7 +4671,7 @@ import './styles.css';
                                     isAdmin={isAdmin}
                                     productsSectionRef={productsSectionRef}
                                     allTags={allTags}
-                                    selectedTag={selectedTag}
+                                    selectedTags={selectedTags}
                                     onTagToggle={handleTagToggle}
                                     onManageTags={() => setIsTagsModalOpen(true)}
                                     filteredProducts={filteredProducts}
@@ -3745,26 +4717,29 @@ import './styles.css';
                             } />
                             <Route path="/san-pham/:slug" element={<ProductDetail onAddToCart={handleAddToCart} onContactClick={() => setIsContactModalOpen(true)} products={products} parentLoading={loading} settings={settings} />} />
                             <Route path="/admin/*" element={
-                                <div className="p-20 text-center flex flex-col items-center justify-center min-h-[50vh]">
+                                <div className="px-4 py-10 sm:p-16 text-center flex flex-col items-center justify-center min-h-[55vh]">
                                     <ScrollToTopAdmin />
-                                    <i className="fa-solid fa-shield-halved text-6xl text-primary mb-6"></i>
-                                    <h2 className="text-3xl font-black text-gray-800 mb-4">Khu Vực Quản Trị</h2>
-                                    <p className="text-gray-500 mb-8 max-w-md">Khu vực này dành riêng cho Admin. Vui lòng đăng nhập để thao tác thêm, sửa, xóa sản phẩm và cài đặt hệ thống.</p>
-                                    {!isAdmin && (
-                                        <form onSubmit={handleAdminLogin} className="w-full max-w-sm mt-4 flex flex-col gap-3">
-                                            <input name="email" type="email" placeholder="Email Admin" required autoComplete="username webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
-                                            <input name="password" type="password" placeholder="Mật khẩu" required autoComplete="current-password webauthn" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
-                                            <button type="submit" className="bg-primary hover:bg-primaryDark text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
-                                                Đăng nhập Admin
-                                            </button>
-                                        </form>
-                                    )}
+                                    <div className="w-full max-w-md rounded-3xl bg-white/90 backdrop-blur-xl border border-[#EED3AC] shadow-[0_14px_40px_rgba(185,28,28,0.1)] p-6 sm:p-8 flex flex-col items-center">
+                                        <span className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200/70 text-red-600 flex items-center justify-center mb-4 shadow-xs">
+                                            <i className="fa-solid fa-shield-halved text-3xl"></i>
+                                        </span>
+                                        <h2 className="text-2xl sm:text-3xl font-black text-stone-800 mb-2">Khu Vực Quản Trị</h2>
+                                        <p className="text-xs sm:text-sm text-stone-500 mb-2 max-w-sm">
+                                            Dành riêng cho Admin để thêm, sửa, xóa sản phẩm và cài đặt hệ thống.
+                                        </p>
+                                        {!isAdmin && <AdminLoginForm onSubmit={handleAdminLogin} />}
 
-                                    {isAdmin && (
-                                        <button onClick={() => navigate('/')} className="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center justify-center gap-3">
-                                            👉 Vào trang Quản trị
-                                        </button>
-                                    )}
+                                        {isAdmin && (
+                                            <button
+                                                type="button"
+                                                onClick={() => navigate('/')}
+                                                className="mt-5 w-full bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer"
+                                            >
+                                                <i className="fa-solid fa-arrow-right-to-bracket"></i>
+                                                <span>Vào trang Quản trị</span>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             } />
                         </Routes>
@@ -3830,13 +4805,60 @@ import './styles.css';
                         </div>
                     </footer>
 
+                    {cartToast && (
+                        <div
+                            role="status"
+                            aria-live="polite"
+                            className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-[65] w-[calc(100vw-2rem)] max-w-md animate-fade-in"
+                        >
+                            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-xl border border-emerald-200 shadow-[0_12px_32px_rgba(16,185,129,0.18),0_4px_12px_rgba(0,0,0,0.08)]">
+                                <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                                    <i className="fa-solid fa-check text-xs"></i>
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs sm:text-sm font-bold text-stone-800 truncate">
+                                        Đã thêm {cartToast.qty > 1 ? `x${cartToast.qty} ` : ''}{cartToast.name}
+                                    </p>
+                                    <p className="text-[11px] text-stone-500">Giỏ hàng hiện có {cartToast.count} sản phẩm</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setCartToast(null);
+                                        setIsCartOpen(true);
+                                    }}
+                                    className="px-3 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold whitespace-nowrap flex-shrink-0 shadow-xs transition-colors cursor-pointer"
+                                >
+                                    Xem giỏ ({cartToast.count})
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setCartToast(null)}
+                                    aria-label="Đóng thông báo"
+                                    className="w-6 h-6 rounded-full text-stone-400 hover:text-stone-600 hover:bg-stone-100 flex items-center justify-center flex-shrink-0 cursor-pointer"
+                                >
+                                    <i className="fa-solid fa-xmark text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <CartSlideOver isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} zaloNumber={settings?.link_zalo || settings?.zalo_number} />
+                    <BackToTopButton />
                     <ZaloWidget zaloNumber={settings?.link_zalo || settings?.zalo_number} />
                     <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} settings={settings} />
 
                     {isAdmin && (
                         <>
-                            <AdminProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} product={editingProduct} onSave={handleSaveProduct} uniqueTags={allTags} />
+                            <AdminProductModal
+                                isOpen={isProductModalOpen}
+                                onClose={() => setIsProductModalOpen(false)}
+                                product={editingProduct}
+                                onSave={handleSaveProduct}
+                                uniqueTags={allTags}
+                                products={products}
+                                onSwitchToEdit={(existingProd) => setEditingProduct(existingProd)}
+                            />
                             <AdminSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} settings={settings} onSave={handleSaveSettings} session={session} />
                             <AdminTagsModal isOpen={isTagsModalOpen} onClose={() => setIsTagsModalOpen(false)} categories={categories} products={products} fetchData={fetchData} />
                         </>

@@ -29,6 +29,29 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+    <!-- Structured Data (LocalBusiness / WholesaleStore) -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WholesaleStore",
+            "name": "Hùng Thuận Tokcay - Nguyên liệu thực phẩm Hàn Quốc",
+            "legalName": "CÔNG TY TNHH HÙNG THUẬN TOKCAY KOREA FOODS",
+            "url": "https://tokcayfood.com/",
+            "image": "https://tokcayfood.com/og-banner.jpg",
+            "telephone": "+84902631632",
+            "email": "hungthuanfood@gmail.com",
+            "priceRange": "$$",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "92B5, KDC Hưng Phú 1, KV9, Phường Hưng Phú",
+                "addressLocality": "Cần Thơ",
+                "addressRegion": "Cần Thơ",
+                "addressCountry": "VN"
+            }
+        }
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -92,6 +115,59 @@
         .animate-fade-in,
         .animate-fadeIn {
             animation: fadeIn 0.25s ease-out forwards;
+        }
+
+        @keyframes zaloRipple {
+            0% {
+                transform: scale(1);
+                opacity: 0.55;
+            }
+            75%, 100% {
+                transform: scale(1.62);
+                opacity: 0;
+            }
+        }
+
+        @keyframes zaloWiggle {
+            0%, 78%, 100% {
+                transform: rotate(0deg) scale(1);
+            }
+            82% {
+                transform: rotate(-8deg) scale(1.06);
+            }
+            86% {
+                transform: rotate(8deg) scale(1.06);
+            }
+            90% {
+                transform: rotate(-5deg) scale(1.04);
+            }
+            94% {
+                transform: rotate(4deg) scale(1.02);
+            }
+        }
+
+        @keyframes zaloPopIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-zalo-ripple {
+            animation: zaloRipple 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+        }
+
+        .animate-zalo-wiggle {
+            animation: zaloWiggle 5s ease-in-out infinite;
+        }
+
+        .animate-zalo-pop {
+            transform-origin: bottom right;
+            animation: zaloPopIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
     </style>
 </head>
