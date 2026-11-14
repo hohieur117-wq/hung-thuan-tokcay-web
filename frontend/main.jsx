@@ -3828,6 +3828,7 @@ import './styles.css';
             const [stockFilter, setStockFilter] = useState('');
             const [sortOrder, setSortOrder] = useState('');
             const [viewMode, setViewMode] = useState('grid');
+            const [fullProductsViewMode, setFullProductsViewMode] = useState('list');
             const [pageSizeMode, setPageSizeMode] = useState('all');
             const [searchResetKey, setSearchResetKey] = useState(0);
             const location = useLocation();
@@ -4688,8 +4689,8 @@ import './styles.css';
                                     setStockFilter={setStockFilter}
                                     sortOrder={sortOrder}
                                     setSortOrder={setSortOrder}
-                                    viewMode={viewMode}
-                                    setViewMode={setViewMode}
+                                    viewMode={fullProductsViewMode}
+                                    setViewMode={setFullProductsViewMode}
                                     pageSizeMode={pageSizeMode}
                                     setPageSizeMode={setPageSizeMode}
                                     handleResetFilters={handleResetFilters}
